@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts 中国地图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+	<script th:src="@{/static/js/china.js}"></script>
+    <style>
+        #map-container {
+            width: 100%;
+            height: 700px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map-container" style="width: 600px; height: 400px;"></div>
+    <script>
+        var chart = echarts.init(document.getElementById('map-container'));
+        
+        // 店铺数据
+        var shopData = [
+            {name: "北京旗舰店", value: [116.404, 39.915, 100], address: "北京市朝阳区建国路87号"},
+            {name: "上海分店", value: [121.474, 31.230, 80], address: "上海市黄浦区南京东路829号"},
+            {name: "广州店", value: [113.264, 23.129, 70], address: "广州市天河区天河路208号"},
+            {name: "深圳店", value: [114.058, 22.544, 90], address: "深圳市福田区福华三路118号"},
+            {name: "成都店", value: [104.066, 30.657, 60], address: "成都市锦江区红星路三段1号"}
+        ];
+        
+        var option = {
+            title: {
+                text: '全国店铺分布',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function(params) {
+                    if (params.seriesType === 'scatter') {
+                        return params.name + '<br/>地址: ' + params.data.address;
+                    }
+                    return params.name;
+                }
+            },
+            visualMap: {
+                min: 0,
+                max: 100,
+                text: ['高', '低'],
+                realtime: false,
+                calculable: true,
+                inRange: {
+                    color: ['#50a3ba', '#eac736', '#d94e5d']
+                }
+            },
+            regions: {
+                map: 'china',
+                roam: true,
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                }
+            },
+            series: [{
+                name: '店铺',
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                data: shopData,
+                symbolSize: function(val) {
+                    return val[2] / 10;
+                },
+                encode: {
+                    value: 2
+                },
+                label: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                }
+            }]
+        };
+        
+        chart.setOption(option);
+        
+        // 点击事件
+        chart.on('click', function(params) {
+            if (params.seriesType === 'scatter') {
+                alert('店铺名称: ' + params.name + '\n地址: ' + params.data.address);
+            }
+        });
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--公共模块-->
+  <div th:replace="~{layout}"></div>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info">
+  <input name="lotId" hidden/>
+    <div class="layui-form-item">
+      <label class="layui-form-label">组织机构id</label>
+      <div class="layui-input-block">
+        <input type="deptId" name="deptId" placeholder="请输入组织机构id" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">用户名</label>
+      <div class="layui-input-block">
+        <input type="username" name="username" placeholder="请输入用户名" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">地址</label>
+      <div class="layui-input-block">
+        <input type="address" name="address" placeholder="请输入地址" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">电话</label>
+      <div class="layui-input-block">
+        <input type="telephone" name="telephone" placeholder="请输入电话" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备名称</label>
+      <div class="layui-input-block">
+        <input type="deviceName" name="deviceName" placeholder="请输入设备名称" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">备注名称</label>
+      <div class="layui-input-block">
+        <input type="nickname" name="nickname" placeholder="请输入备注名称" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">产品 ProductKey</label>
+      <div class="layui-input-block">
+        <input type="productKey" name="productKey" placeholder="请输入产品 ProductKey" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备信息最后一次更新时的时间</label>
+      <div class="layui-input-block">
+        <input type="deviceModified" name="deviceModified" placeholder="请输入设备信息最后一次更新时的时间" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用</label>
+      <div class="layui-input-block">
+        <input type="deviceStatus" name="deviceStatus" placeholder="请输入设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备密钥</label>
+      <div class="layui-input-block">
+        <input type="deviceSecret" name="deviceSecret" placeholder="请输入设备密钥" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备类型（1机械；2电驱）</label>
+	  <div class="layui-input-block">
+	         <input type="radio" name="device_type" value="0" title="未知" checked="" lay-filter="radio-type">
+	         <input type="radio" name="device_type" value="1" title="机械" lay-filter="radio-type">
+	         <input type="radio" name="device_type" value="2" title="电驱" lay-filter="radio-type">
+	     </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-block">
+        <input type="remark" name="remark" placeholder="请输入备注" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  sa:hasPermission="dataBzjDevice:list">
+    <form class="layui-form ">
+      <div class="layui-form-item">
+        <div class="layui-input-inline">
+          <input type="text" name="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+        </div>
+		<div class="layui-input-inline">
+		          <input type="hidden" name="deviceType" class="layui-input"  autocomplete="off" value="2">
+		        </div>
+		<div class="layui-input-inline layui-form">
+		                  <select name="status">
+		                      <option value="">在线状态</option>
+		                      <option value="ONLINE">在线</option>
+		                      <option value="OFFLINE">离线</option>
+		                      <option value="UNACTIVE">未激活</option>
+		                      <option value="">全部</option>
+		                  </select>
+		              </div>
+        <div class="layui-input-inline ">
+          <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container oper">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataBzjDevice:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataBzjDevice:delete">删除</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="data">数据</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataBzjDevice:update">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="dataBzjDevice:delete">删除</a>
+</script>
+
+</body>
+</html>
+<script>
+  layui.use(function () {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+    var element = layui.element;
+    //加载table
+    var tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , page: true //开启分页
+      , url: ctx + 'dataBzjDevice/listByPage' //数据接口
+      , method: 'POST'
+	  , where:{deviceType:'2'}
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'deptId', title: '组织机构id', sort: true},
+          {field: 'username', title: '用户名', sort: true},
+          {field: 'address', title: '地址', sort: true},
+          {field: 'telephone', title: '电话', sort: true},
+          {field: 'deviceName', title: '设备名称', sort: true},
+          {field: 'nickname', title: '备注名称', sort: true},
+          {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
+          {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', sort: true},
+		  {
+		      field: 'deviceType', width: 70, title: '类型', templet: function (item) {
+		          if (item.deviceType == 0) {
+		              return '  <a class="layui-btn layui-btn-xs" >未知</a>';
+		          }
+		          if (item.deviceType == 1) {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-normal" >机械</a>';
+		          }
+		          if (item.deviceType == 2) {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-warm " >电驱</a>';
+		          }
+		      }
+		  },
+          {field: 'remark', title: '备注', sort: true},
+          {width: 220, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+	// 监听搜索操作
+	form.on('submit(data-search-btn)', function (data) {
+	  //执行搜索重载
+	  tableIns1.reload({
+	    page: {
+	      curr: 1
+	    }
+	    , where: data.field
+	  });
+	  return false;
+	});
+	
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          toUnDisabled();
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          setTimeout(function () {
+            form.val('info', {
+              "test": "test"
+              , "deptId": ""
+              , "username": ""
+              , "address": ""
+              , "telephone": ""
+              , "deviceName": ""
+              , "nickname": ""
+              , "deviceModified": ""
+              , "deviceStatus": ""
+              , "deviceType": ""
+              , "remark": ""
+            });
+          }, 200);
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'look':
+          backshow(data);
+          toDisabled();
+          break;
+        case 'data':
+          lookData(data);
+          break;
+        case 'edit':
+          backshow(data);
+          $(".title").html("编辑");
+          toUnDisabled();
+          break;
+      }
+    });
+
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete(ctx + "dataBzjDevice/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              tableIns1.reload();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.lotId===undefined || data.field.lotId===null || data.field.lotId===""){
+        CoreUtil.sendPost(ctx + "dataBzjDevice/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }else {
+        CoreUtil.sendPut(ctx + "dataBzjDevice/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }
+
+      return false;
+    });
+
+
+    //回显
+    var backshow = function (data) {
+      $(".table_div").hide();
+      $(".operation").show();
+      $(".title").html("查看");
+      setTimeout(function () {
+        form.val('info', {
+          "test": "test"
+                      , "lotId": data.lotId
+                      , "deptId": data.deptId
+                      , "username": data.username
+                      , "address": data.address
+                      , "telephone": data.telephone
+                      , "deviceName": data.deviceName
+                      , "nickname": data.nickname
+                      , "deviceModified": data.deviceModified
+                      , "deviceStatus": data.deviceStatus
+                      , "deviceType": data.deviceType
+                      , "remark": data.remark
+                  });
+      }, 200);
+    }
+	
+	var lookData = function(param)	{
+		if(param.deviceType == 2){
+	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?param=`+param.lotId;
+		    window.location.href = targetUrl;
+		}
+		if(param.deviceType == 1){
+	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?param=`+param.lotId;
+		}
+		if(param.deviceType == 0){
+			alert("不确定播种机类型，无法查看数据")
+		}
+	}
+	
+	//触发事件
+	    var active = {
+	        tabAdd: function (url, id, title) {
+	            if (url != "" && url != null && url != undefined) {
+	                window.parent.layui.element.tabAdd('tab', {
+	                    title: title
+	                    ,
+	                    content: '<iframe data-frameid="' + id + '" frameborder="0" name="content" width="100%" src="' + url + '"></iframe>'
+	                    ,
+	                    id: id
+	                })
+	            }
+
+				FrameWH();//计算框架高度
+	        },
+	        tabChange: function (id) {
+	            //切换到指定Tab项
+	            window.parent.layui.element.tabChange('tab', id); //切换到：用户管理
+	            $("iframe[data-frameid='" + id + "']").attr("src", $("iframe[data-frameid='" + id + "']").attr("src"))//切换后刷新框架
+	        },
+	        tabDelete: function (id) {
+	            window.parent.layui.element.tabDelete("tab", id);//删除
+	        }
+	    };
+	
+
+	function FrameWH() {
+	        var h = $(window).height() - 41 - 10 - 35 - 10 - 44 - 10;
+	        $("iframe").css("height", h + "px");
+	    };
+    //禁用输入
+    var toDisabled = function () {
+      $(".oper").hide();
+      $(".disabled").each(function (index, elem) {
+        $(elem).attr("disabled", "")
+      })
+    }
+
+    //放开输入
+    var toUnDisabled = function () {
+      $(".oper").show();
+      $(".disabled").each(function (index, elem) {
+        $(elem).removeAttr("disabled", "")
+      })
+    }
+  });
+</script>

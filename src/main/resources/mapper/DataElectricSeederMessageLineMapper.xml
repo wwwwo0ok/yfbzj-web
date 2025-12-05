@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.project.mapper.DataElectricSeederMessageLineMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.company.project.entity.DataElectricSeederMessageLineEntity" id="dataElectricSeederMessageLineMap">
+        <result property="lotId" column="lot_id"/>
+        <result property="dataTime" column="data_time"/>
+        <result property="lineNo" column="line_no"/>
+        <result property="seedNum" column="seed_num_"/>
+        <result property="excessSeeds" column="excess_seeds"/>
+        <result property="lackSeeds" column="lack_seeds"/>
+        <result property="fertilizerSpeedRatio" column="fertilizer_speed_ratio"/>
+        <result property="seedAlarmRatio" column="seed_alarm_ratio"/>
+        <result property="seedAbType" column="seed_ab_type"/>
+        <result property="mainFertilizerDirect" column="main_fertilizer_direct"/>
+        <result property="deputyFertilizerDirect" column="deputy_fertilizer_direct"/>
+        <result property="seedSwtich" column="seed_swtich"/>
+        <result property="mainFertilizerSwtich" column="main_fertilizer_swtich"/>
+        <result property="deputyFertilizerSwtich" column="deputy_fertilizer_swtich"/>
+        <result property="mainFertilizerMonitorSwtich" column="main_fertilizer_monitor_swtich"/>
+        <result property="fertilizerAlarmRatio" column="fertilizer_alarm_ratio"/>
+    </resultMap>
+
+
+</mapper>
