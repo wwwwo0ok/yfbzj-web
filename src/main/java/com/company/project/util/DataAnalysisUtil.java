@@ -159,7 +159,7 @@ public class DataAnalysisUtil {
 
         // 生成24行数据列表
         List<DataElectricSeederMessageLineEntity> seedData = new ArrayList<>();
-        for (int line = 1; line <= 24; line++) {
+        for (int line = 1; line <= entity.getSowLine(); line++) {
 //            String mainFertRatio = BzjUtil.parseMainFertRatio(hexData, line, mainFertMonitor, mainFertMotor);
 //            String calcBreakLine = BzjUtil.parseCalcBreakLine(hexData, line, mainFertRatio);
 //            String calcBlockLine = BzjUtil.parseCalcBlockLine(mainFertRatio);
@@ -481,7 +481,8 @@ public class DataAnalysisUtil {
 		
 		
 		if(
-				 sowLine == 0
+				 sowLine == 0 
+				 ||sowLine > 24
 				 ||sowingWidth == 0
 				 ||(aSendPulse==0&&bSendPulse==0)
 				 ||(aRecievePulse==0&&bRecievePulse==0)
@@ -493,7 +494,7 @@ public class DataAnalysisUtil {
 		
 //		System.out.println(sowLine+","+sowLine2);
 		
-		return null;
+		return entity;
 	}
 
 }

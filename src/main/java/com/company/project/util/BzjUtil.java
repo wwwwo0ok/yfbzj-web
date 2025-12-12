@@ -140,9 +140,9 @@ public class BzjUtil {
         int startAddr = 144 + (line - 1) * 2;
         String valueHex = hexData.substring(startAddr, startAddr + 2);
         int rawValue = Integer.parseInt(valueHex, 16);
-        int value = 1000 - rawValue;
+//        int value = 1000 - rawValue;
         // log.info("播种百分比: line={}, rawValue={}, value={}, formatValue={}", line, rawValue, value, formatValue);
-        return value;
+        return rawValue;
 //        return String.format("%.1f%%", value * 0.1);
     }
 

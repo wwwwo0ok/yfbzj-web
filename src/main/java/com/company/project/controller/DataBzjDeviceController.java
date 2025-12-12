@@ -64,7 +64,7 @@ public class DataBzjDeviceController {
     @ResponseBody
     public DataResult findListByPage(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
-    	DataAnalysisUtil.test();
+//    	DataAnalysisUtil.test();
     	
     	
         LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();

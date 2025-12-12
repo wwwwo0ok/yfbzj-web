@@ -11,7 +11,7 @@
   <div class="panel-heading title"></div>
 <div class="layui-card-body">
 <form class="layui-form " action="" lay-filter="info">
-  <input name="lotId" hidden/>
+  <input name="lotId" hidden />
    <div class="layui-input-inline">
         <label class="layui-form-label">设备名称</label>
         <div class="layui-input-block">
@@ -410,7 +410,7 @@
     <form class="layui-form ">
       <div class="layui-form-item">
 		<div class="layui-input-inline">
-            <input type="hidden" name="lotId" id="lotId" class="layui-input"  placeholder="设备id" th:value="${param.param}">
+            <input type="hidden" name="lotId" id="lotId" class="layui-input"  placeholder="设备id" th:value="${param.lotId}">
         </div>
         <div class="layui-input-inline">
             <input type="text" readonly class="layui-input" name="createTimeBegin" id="createTimeBegin" placeholder="开始时间">
@@ -450,7 +450,6 @@
     var layer = layui.layer;
 	var laydate = layui.laydate;
 	var router = layui.router();
-	debugger;
 	var bbb = router.search;
 	console.log('当前路由:', layui.router());//这里不显示参数
 	var aaa = $("#lotId").val();//这个有显示参数
