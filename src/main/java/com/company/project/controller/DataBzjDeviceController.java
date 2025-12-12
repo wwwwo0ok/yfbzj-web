@@ -18,6 +18,7 @@ import com.company.project.common.utils.DataResult;
 
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.service.DataBzjDeviceService;
+import com.company.project.util.DataAnalysisUtil;
 
 
 
@@ -63,10 +64,14 @@ public class DataBzjDeviceController {
     @ResponseBody
     public DataResult findListByPage(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
+    	DataAnalysisUtil.test();
+    	
     	
         LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
         //查询条件示例
-        queryWrapper.eq(StringUtils.isNotBlank(dataBzjDevice.getLotId()), DataBzjDeviceEntity::getLotId, dataBzjDevice.getLotId())
+        queryWrapper
+        .eq(StringUtils.isNotBlank(dataBzjDevice.getLotId()), DataBzjDeviceEntity::getLotId, dataBzjDevice.getLotId())
+        .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceName()),DataBzjDeviceEntity::getDeviceName,dataBzjDevice.getDeviceName())
         .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceType()),DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceType())
         .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceStatus()),DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatus())
         .orderByDesc(DataBzjDeviceEntity::getLotId);

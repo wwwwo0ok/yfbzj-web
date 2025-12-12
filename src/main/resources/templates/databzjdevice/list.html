@@ -71,7 +71,7 @@
     <form class="layui-form ">
       <div class="layui-form-item">
         <div class="layui-input-inline">
-          <input type="hidden" name="lotId" id="lotId" class="layui-input"  autocomplete="off" placeholder="请输入">
+          <input type="hidden" name="lotId" id="lotId" class="layui-input"  autocomplete="off" placeholder="请输入" th:value="${param.lotId}">
         </div>
         <div class="layui-input-inline">
           <input type="text" name="device_name" id="device_name" class="layui-input"  autocomplete="off" placeholder="设备名称">
@@ -121,6 +121,8 @@
     var form = layui.form;
     var layer = layui.layer;
     var element = layui.element;
+	
+	var initLotId = $('#lotId').val();
     //加载table
     var tableIns1 = table.render({
       elem: '#showTable'
@@ -128,7 +130,7 @@
       , page: true //开启分页
       , url: ctx + 'dataBzjDevice/listByPage' //数据接口
       , method: 'POST'
-	  , where: {deviceStatus:'ONLINE'}
+	  , where: {deviceStatus:'ONLINE',lotId:initLotId}
       , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
         return {
           "code": res.code, //解析接口状态
@@ -145,7 +147,7 @@
           {field: 'telephone', title: '电话', sort: true},
           {field: 'nickname', title: '备注名称', sort: true},
           {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
-          {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', templet:function(item){
+          {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', templet : function(item){
 			if (item.deviceStatus == 'ONLINE') {
 					              return '  <a class="layui-btn layui-btn-xs" >在线</a>';
 					          }

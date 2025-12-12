@@ -75,7 +75,7 @@ public class DataElectricSeederMessageController {
 
     @ApiOperation(value = "查询分页数据")
     @PostMapping("dataElectricSeederMessage/listByPage")
-    @SaCheckPermission("dataElectricSeederMessage:list")
+//    @SaCheckPermission("dataElectricSeederMessage:list")
     @ResponseBody
     public DataResult findListByPage(@RequestBody DataElectricSeederMessageEntity dataElectricSeederMessage){
         LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
@@ -87,11 +87,11 @@ public class DataElectricSeederMessageController {
         //单数据同步
         dataElectricSeederMessageService.insertNewData(dataElectricSeederMessage.getLotId());
         //查询条件示例
-        queryWrapper.eq(dataElectricSeederMessage.getLotId() != null, DataElectricSeederMessageEntity::getLotId, dataElectricSeederMessage.getLotId());
-        queryWrapper.orderByDesc(DataElectricSeederMessageEntity::getLotId);
+//        queryWrapper.eq(dataElectricSeederMessage.getLotId() != null, DataElectricSeederMessageEntity::getLotId, dataElectricSeederMessage.getLotId());
+//        queryWrapper.orderByDesc(DataElectricSeederMessageEntity::getDataTime);
+//        IPage<DataElectricSeederMessageEntity> iPage = dataElectricSeederMessageService.page(dataElectricSeederMessage.getQueryPage(), queryWrapper);
         
-        
-        IPage<DataElectricSeederMessageEntity> iPage = dataElectricSeederMessageService.page(dataElectricSeederMessage.getQueryPage(), queryWrapper);
+        IPage<DataElectricSeederMessageEntity> iPage = dataElectricSeederMessageService.getMessageList(dataElectricSeederMessage);
         return DataResult.success(iPage);
     }
 

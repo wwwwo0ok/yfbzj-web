@@ -1,0 +1,2 @@
+# 忽略 target 目录下所有子目录中的 .class 文件
+target/

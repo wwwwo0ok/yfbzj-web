@@ -22,9 +22,9 @@
         <result property="newHeadRepeatFlag" column="new_head_repeat_flag"/>
         <result property="shutDownDistanceFlag" column="shut_down_distance_flag"/>
         <result property="seedMotorAlarmFlag" column="seed_motor_alarm_flag"/>
-        <result property="eNCODERMODEFlag" column="ENCODER_MODE_flag"/>
-        <result property="dRIVINGDIRECTIONFlag" column="DRIVING_DIRECTION_flag"/>
-        <result property="hASENCODERFlag" column="HAS_ENCODER_flag"/>
+        <result property="encoderModeFlag" column="ENCODER_MODE_flag"/>
+        <result property="drivingDirectionFlag" column="DRIVING_DIRECTION_flag"/>
+        <result property="hasEncoderFlag" column="HAS_ENCODER_flag"/>
         <result property="realMainFertilizerValue" column="real_main_fertilizer_value"/>
         <result property="setMainFertilizerValue" column="set_main_fertilizer_value"/>
         <result property="mainFertilizerRate" column="main_fertilizer_rate"/>
@@ -67,6 +67,10 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="status" column="status"/>
+         <collection property="lines"
+                    ofType="com.company.project.entity.DataElectricSeederMessageLineEntity"
+                    select="com.company.project.mapper.DataElectricSeederMessageLineMapper.selectLinesByPrimary"
+                    column="{lotId=lot_id, dataTime=data_time}"/>
     </resultMap>
 
 	<select id="selectMaxDataTimeByDevice" resultType="java.util.Date" parameterType="com.company.project.entity.DataBzjDeviceEntity">
@@ -78,6 +82,32 @@
 	            AND device_name = #{device.deviceName}
 	        </if>
 	    </where>
+	</select>
+	
+	<select id="selectAll" resultMap="dataElectricSeederMessageMap">
+	    select * from data_electric_seeder_message
+	    <where>
+	        <if test="query.lotId != null and query.lotId != ''">
+	            AND lot_id = #{query.lotId}
+	        </if>
+	        <if test="query.deviceName != null and query.deviceName != ''">
+	            AND device_name LIKE CONCAT('%', #{query.deviceName}, '%')
+	        </if>
+	        <if test="query.dataTime != null">
+	            AND data_time = #{query.dataTime}
+	        </if>
+	        <if test="query.createTimeBegin != null">
+	            AND create_time >= #{query.createTimeBegin}
+	        </if>
+	        <if test="query.createTimeEnd != null">
+	            AND create_time &lt;= #{query.createTimeEnd}
+	        </if>
+	        <if test="query.status != null and status != ''">
+	            AND status = #{query.status}
+	        </if>
+	        <!-- 可以添加更多字段的查询条件 -->
+	    </where>
+	    ORDER BY data_time DESC
 	</select>
 
 

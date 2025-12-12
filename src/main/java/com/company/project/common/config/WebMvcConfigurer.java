@@ -72,6 +72,8 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/index/login")
                 .excludePathPatterns("/sys/user/login")
                 .excludePathPatterns("/sys/getVerify")
+                .excludePathPatterns("/appVersion/checkUpdate")
+                .excludePathPatterns("/appVersion/downloadApp")
 
                 .excludePathPatterns("/app/api/**")
                 .addPathPatterns("/**");

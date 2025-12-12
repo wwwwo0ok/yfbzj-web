@@ -1,9 +1,11 @@
 package com.company.project.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
@@ -38,5 +40,7 @@ public interface DataElectricSeederMessageService extends IService<DataElectricS
 	boolean saveByHexStr(DataBzjDeviceEntity device, Date dataTime, String hexData);
 
 	void insertNewData(String lotId);
+
+	IPage<DataElectricSeederMessageEntity> getMessageList(DataElectricSeederMessageEntity queryEntity);
 }
 

@@ -5,6 +5,8 @@ import java.util.Date;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
 
@@ -18,4 +20,11 @@ import com.company.project.entity.DataElectricSeederMessageEntity;
 public interface DataElectricSeederMessageMapper extends BaseMapper<DataElectricSeederMessageEntity> {
 	
     Date selectMaxDataTimeByDevice(@Param("device") DataBzjDeviceEntity device);
+
+	IPage<DataElectricSeederMessageEntity> selectAll(
+			Page<DataElectricSeederMessageEntity> page, 
+			@Param("query") DataElectricSeederMessageEntity queryEntity
+			);
+
+    
 }

@@ -1,4 +1,4 @@
-package com.company.project.util;
+package com.company.project.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -6,9 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 
- * 2025年上线并且之前的批次的解码方式。
- * 
  * @author bzj
  * @date 2025/4/6
  */
@@ -23,7 +20,7 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "OK"表示启用，"取消"表示禁用
      */
-    public static int parseSeedEnable(String hexData, int line) {
+    public static String parseSeedEnable(String hexData, int line) {
         // 1. 截取384-389的6字符（3字节）
         String enableHex = hexData.substring(384, 390);
         // 2. 十六进制字符串转字节数组
@@ -42,8 +39,7 @@ public class BzjUtil {
         int byteValue = bytes[byteIndex] & 0xFF; // 转为无符号
         int bitValue = (byteValue >> bitOffset) & 0x01;
 
-//        return bitValue == 1 ? "OK" : "取消";
-        return bitValue;
+        return bitValue == 1 ? "OK" : "取消";
     }
 
     // public static void main(String[] args) {
@@ -64,14 +60,14 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "A"表示A通道，"B"表示B通道
      */
-    public static int parseABSelection(String hexData, int line) {
+    public static String parseABSelection(String hexData, int line) {
         String abHex = hexData.substring(358, 364);
         byte[] bytes = hexStringToByteArray(abHex);
         int bitIndex = line - 1;
         int byteIndex = 2 - (bitIndex / 8);
         int bitOffset = bitIndex % 8;
         int bitValue = (bytes[byteIndex] >> bitOffset) & 0x01;
-        return bitValue;
+        return bitValue == 1 ? "B" : "A";
     }
 
     /**
@@ -118,32 +114,39 @@ public class BzjUtil {
      * @param seedEnableStatus 种子使能状态（用于状态验证）
      * @return 实际数量（单位：个）或"取消"
      */
-    public static int parseSeedQuantity(String hexData, int line) {
+    public static String parseSeedQuantity(String hexData, int line, String seedEnableStatus) {
+        if ("取消".equals(seedEnableStatus)) {
+            return "取消";
+        }
         int startAddr = (line - 1) * 4;
         String valueHex = hexData.substring(startAddr, startAddr + 4);
         int value = Integer.parseInt(valueHex, 16);
-        return value;
+        return String.valueOf(value);
     }
 
     // 4. 多种百分比（地址96-143，单位0.1%）
-    public static int parseMultiPercentage(String hexData, int line) {
+    public static String parseMultiPercentage(String hexData, int line, String seedEnableStatus) {
+        if ("取消".equals(seedEnableStatus)) {
+            return "取消";
+        }
         int startAddr = 96 + (line - 1) * 2;
         String valueHex = hexData.substring(startAddr, startAddr + 2);
-//        double value = Integer.parseInt(valueHex, 16) * 0.1;
+        double value = Integer.parseInt(valueHex, 16) * 0.1;
         // log.info("多种百分比: line={}, value={}, formatValue={}", line, value, formatValue);
-        return Integer.parseInt(valueHex, 16);
-//        return String.format("%.1f%%", value);
+        return String.format("%.1f%%", value);
     }
 
     // 5. 播种百分比（地址144-191，显示值=1000-数值，单位0.1%）
-    public static int parseSowingPercentage(String hexData, int line) {
+    public static String parseSowingPercentage(String hexData, int line, String seedEnableStatus) {
+        if ("取消".equals(seedEnableStatus)) {
+            return "取消";
+        }
         int startAddr = 144 + (line - 1) * 2;
         String valueHex = hexData.substring(startAddr, startAddr + 2);
         int rawValue = Integer.parseInt(valueHex, 16);
-        int value = 1000 - rawValue;
+        double value = 1000 - rawValue;
         // log.info("播种百分比: line={}, rawValue={}, value={}, formatValue={}", line, rawValue, value, formatValue);
-        return value;
-//        return String.format("%.1f%%", value * 0.1);
+        return String.format("%.1f%%", value * 0.1);
     }
 
     /**
@@ -152,14 +155,14 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "OK"表示监控正常，"取消"表示监控异常
      */
-    public static int parseMainFertMonitor(String hexData, int line) {
+    public static String parseMainFertMonitor(String hexData, int line) {
         String monitorHex = hexData.substring(402, 408);
         byte[] bytes = hexStringToByteArray(monitorHex);
         int bitIndex = line - 1;
         int byteIndex = 2 - (bitIndex / 8);
         int bitOffset = bitIndex % 8;
         int bitValue = (bytes[byteIndex] >> bitOffset) & 0x01;
-        return bitValue;
+        return bitValue == 1 ? "OK" : "取消";
     }
 
     /**
@@ -168,14 +171,14 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "OK"表示电机正常，"取消"表示电机异常
      */
-    public static int parseMainFertMotor(String hexData, int line) {
+    public static String parseMainFertMotor(String hexData, int line) {
         String motorHex = hexData.substring(390, 396); // 390-395地址对应6字节
         byte[] bytes = hexStringToByteArray(motorHex);
         int bitIndex = line - 1;
         int byteIndex = 2 - (bitIndex / 8);
         int bitOffset = bitIndex % 8;
         int bitValue = (bytes[byteIndex] >> bitOffset) & 0x01;
-        return bitValue ;
+        return bitValue == 1 ? "OK" : "取消";
     }
 
     /**
@@ -184,14 +187,14 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "正转"或"反转"
      */
-    public static int parseMotorDirection(String hexData, int line) {
+    public static String parseMotorDirection(String hexData, int line) {
         String dirHex = hexData.substring(372, 378); // 372-377地址对应6字节
         byte[] bytes = hexStringToByteArray(dirHex);
         int bitIndex = line - 1;
         int byteIndex = 2 - (bitIndex / 8);
         int bitOffset = bitIndex % 8;
         int bitValue = (bytes[byteIndex] >> bitOffset) & 0x01;
-        return bitValue;
+        return bitValue == 1 ? "反转" : "正转";
     }
 
     /**
@@ -254,14 +257,14 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "OK"表示电机正常，"取消"表示电机异常
      */
-    public static int parseMouthFertMotor(String hexData, int line) {
+    public static String parseMouthFertMotor(String hexData, int line) {
         String motorHex = hexData.substring(396, 402);
         byte[] bytes = hexStringToByteArray(motorHex);
         int bitIndex = line - 1;
         int byteIndex = 2 - (bitIndex / 8);
         int bitOffset = bitIndex % 8;
         int bitValue = (bytes[byteIndex] >> bitOffset) & 0x01;
-        return bitValue;
+        return bitValue == 1 ? "OK" : "取消";
     }
 
     /**
@@ -270,14 +273,14 @@ public class BzjUtil {
      * @param line 检测线路编号（1-24）
      * @return "正转"或"反转"
      */
-    public static int parseMouthMotorDirection(String hexData, int line) {
+    public static String parseMouthMotorDirection(String hexData, int line) {
         String dirHex = hexData.substring(378, 384);
         byte[] bytes = hexStringToByteArray(dirHex);
         int bitIndex = line - 1;
         int byteIndex = 2 - (bitIndex / 8);
         int bitOffset = bitIndex % 8;
         int bitValue = (bytes[byteIndex] >> bitOffset) & 0x01;
-        return bitValue;
+        return bitValue == 1 ? "反转" : "正转";
     }
 
     /**
@@ -442,10 +445,10 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return 减速比（单位：0.1）
      */
-    public static int parseReductionRatio(String hexData) {
+    public static double parseReductionRatio(String hexData) {
         String valueHex = hexData.substring(296, 300);
         int rawValue = Integer.parseInt(valueHex, 16);
-        return rawValue;
+        return rawValue * 0.1;
     }
 
     /**
@@ -504,10 +507,10 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return 减速比（单位：0.1）
      */
-    public static int parseReductionRatioA(String hexData) {
+    public static double parseReductionRatioA(String hexData) {
         String valueHex = hexData.substring(316, 320);
         int rawValue = Integer.parseInt(valueHex, 16);
-        return rawValue;
+        return rawValue * 0.1;
     }
 
     /**
@@ -557,9 +560,14 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return A系数值（8位）或"无"（当主肥电机取消时）
      */
-    public static int parseMainFertSowingCoeffA(String hexData) {
+    public static String parseMainFertSowingCoeffA(String hexData) {
+        Map<String, String> stringStringMap = parseStatusFlags(hexData);
+        String mainFertMotor = stringStringMap.get("mainFertMotor");
+        if ("取消".equals(mainFertMotor)) {
+            return "无";
+        }
         String valueHex = hexData.substring(334, 336);
-        return Integer.parseInt(valueHex, 16);
+        return String.valueOf(Integer.parseInt(valueHex, 16));
     }
 
     /**
@@ -569,6 +577,10 @@ public class BzjUtil {
      * @return A系数值（8位）或"无"（当主肥电机取消时）
      */
     public static String parseMainFertSowingCoeffA(String hexData,int line) {
+        String mainFertMotor = parseMainFertMotor(hexData, line);
+        if ("取消".equals(mainFertMotor)) {
+            return "无";
+        }
         String valueHex = hexData.substring(334, 336);
         return String.valueOf(Integer.parseInt(valueHex, 16));
     }
@@ -578,9 +590,14 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return A系数值（8位）或"无"（当主肥电机取消时）
      */
-    public static int parseMouthFertSowingCoeffA(String hexData) {
+    public static String parseMouthFertSowingCoeffA(String hexData) {
+        Map<String, String> stringStringMap = parseStatusFlags(hexData);
+        String mainFertMotor = stringStringMap.get("mainFertMotor");
+        if ("取消".equals(mainFertMotor)) {
+            return "无";
+        }
         String valueHex = hexData.substring(336, 338);
-        return Integer.parseInt(valueHex, 16);
+        return String.valueOf(Integer.parseInt(valueHex, 16));
     }
 
     /**
@@ -634,17 +651,16 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return 苗带类型描述（单苗带/双苗带/三苗带）
      */
-    public static int parseSeedBeltSelection(String hexData) {
+    public static String parseSeedBeltSelection(String hexData) {
         String valueHex = hexData.substring(344, 346);
         int value = Integer.parseInt(valueHex, 16);
 
-//        switch (value) {
-//            case 0: return "单苗带";
-//            case 1: return "双苗带";
-//            case 2: return "三苗带";
-//            default: return "未知类型";
-//        }
-        return value;
+        switch (value) {
+            case 0: return "单苗带";
+            case 1: return "双苗带";
+            case 2: return "三苗带";
+            default: return "未知类型";
+        }
     }
 
     /**
@@ -754,9 +770,9 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return 电压值（单位：0.1伏）
      */
-    public static int parseSystemVoltage(String hexData) {
+    public static double parseSystemVoltage(String hexData) {
         String valueHex = hexData.substring(418, 422);
-        return Integer.parseInt(valueHex, 16);
+        return Integer.parseInt(valueHex, 16) * 0.1;
     }
 
     /**
@@ -782,9 +798,9 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return 压力值（单位：0.01千帕）
      */
-    public static int parseFanPressure(String hexData) {
+    public static double parseFanPressure(String hexData) {
         String valueHex = hexData.substring(500, 504);
-        return Integer.parseInt(valueHex, 16);
+        return Integer.parseInt(valueHex, 16) * 0.01;
     }
 
     /**
@@ -802,24 +818,22 @@ public class BzjUtil {
      * @param hexData 十六进制数据字符串
      * @return 数据上传类型描述
      */
-    public static int parseUploadType(String hexData) {
+    public static String parseUploadType(String hexData) {
         String valueHex = hexData.substring(508, 509);
         int value = Integer.parseInt(valueHex, 16);
 
-//        switch (value) {
-//            case 0:
-//                return "蓝牙连接";
-//            case 1:
-//                // 解析412-415地址段的单次播种距离，单位1米
-//                int distance = parseSowingDistance(hexData);
-//                return distance + "米";
-//            case 2:
-//                return "限制";
-//            default:
-//                return "未知类型";
-//        }
-        
-        return value;
+        switch (value) {
+            case 0:
+                return "蓝牙连接";
+            case 1:
+                // 解析412-415地址段的单次播种距离，单位1米
+                int distance = parseSowingDistance(hexData);
+                return distance + "米";
+            case 2:
+                return "限制";
+            default:
+                return "未知类型";
+        }
     }
 
     /**

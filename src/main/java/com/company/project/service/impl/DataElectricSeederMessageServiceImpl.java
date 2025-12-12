@@ -21,6 +21,8 @@ import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataResponse;
 import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataResponseBody;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
@@ -48,12 +50,22 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	DataElectricSeederMessageLineService dataElectricSeederMessageLineService;
 	
 	 @Autowired
-	    private DataElectricSeederMessageMapper electricMessageMapper;
+	    private DataElectricSeederMessageMapper dataElectricSeederMessageMapper;
 
     DataElectricSeederMessageServiceImpl(DataBzjDeviceServiceImpl dataBzjDeviceService_1) {
         this.dataBzjDeviceService_1 = dataBzjDeviceService_1;
     }
 	
+ // Service层示例
+    @Override
+    public IPage<DataElectricSeederMessageEntity> getMessageList(DataElectricSeederMessageEntity queryEntity) {
+    	 Page<DataElectricSeederMessageEntity> page = new Page<>(queryEntity.getPage(), queryEntity.getLimit());
+
+        IPage<DataElectricSeederMessageEntity> list = dataElectricSeederMessageMapper.selectAll(page,queryEntity);
+        return list;
+    }
+    
+    
     /**
      * 增量同步全部电驱消息内容（2025年12月开始）
      */
@@ -158,7 +170,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	                String timestamp = data.get("timestamp").toString();
 	                String hexData = data.get("BZJ").toString().trim();
 	                
-	                DataElectricSeederMessageEntity entity = DataAnalysisUtil.analysisElectricHexStr(hexData);
+	                DataElectricSeederMessageEntity entity = DataAnalysisUtil.transToEntity(hexData);
 	                
 	                entity.setLotId(iotId);
 	                entity.setDeviceName(deviceName);
@@ -197,14 +209,14 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 
 	@Override
 	public Date selectMaxDataTimeByDevice(DataBzjDeviceEntity device) {
-		return electricMessageMapper.selectMaxDataTimeByDevice(device);
+		return dataElectricSeederMessageMapper.selectMaxDataTimeByDevice(device);
 	}
 
 
 	@Override
 	public boolean saveByHexStr(DataBzjDeviceEntity device,Date dataTime,String hexData) {
 		
-		DataElectricSeederMessageEntity entity = DataAnalysisUtil.analysisElectricHexStr(hexData);
+		DataElectricSeederMessageEntity entity = DataAnalysisUtil.transToEntity(hexData);
         
         entity.setLotId(device.getLotId());
         entity.setDeviceName(device.getDeviceName());

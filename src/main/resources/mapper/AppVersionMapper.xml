@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.project.mapper.AppVersionMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.company.project.entity.AppVersionEntity" id="appVersionMap">
+        <result property="id" column="id"/>
+        <result property="versionCode" column="version_code"/>
+        <result property="versionName" column="version_name"/>
+        <result property="apkUrl" column="apk_url"/>
+        <result property="isForceUpdate" column="is_force_update"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="fileSize" column="file_size"/>
+    </resultMap>
+    
+ <!--   
+    <select id="selectLatestVersion" resultMap="appVersionMap">
+		select * from app_version where release_Time = (select max(release_Time) from app_version)    
+    </select>-->
+
+
+</mapper>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--公共模块-->
+  <div th:replace="~{layout}"></div>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info">
+  <input name="id" id="id" hidden/>
+    <div class="layui-form-item">
+      <label class="layui-form-label">版本号</label>
+      <div class="layui-input-block">
+        <input type="versionCode" name="versionCode" placeholder="请输入版本号" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">版本说明</label>
+      <div class="layui-input-block">
+        <input type="versionName" name="versionName" placeholder="请输入版本说明" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">下载地址</label>
+      <div class="layui-input-block">
+        <input type="apkUrl" name="apkUrl" placeholder="请输入下载地址" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">是否强制更新（0否，1是）</label>
+      <div class="layui-input-block">
+        <input type="isForceUpdate" name="isForceUpdate" placeholder="请输入是否强制更新（0否，1是）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">上架时间</label>
+      <div class="layui-input-block">
+        <input type="releaseTime" name="releaseTime" placeholder="请输入上架时间" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+	<div class="layui-form-item">
+        <label class="layui-form-label">上传</label>
+        <div class="layui-input-inline">
+            <button type="button" class="layui-btn" id="uploadApp">
+                <i class="layui-icon"></i>上传
+            </button>
+        </div>
+        <div class="upload-show"></div>
+    </div>
+	
+	
+      <div class="layui-form-item">
+      <label class="layui-form-label">文件大小</label>
+      <div class="layui-input-block">
+        <input type="fileSize" name="fileSize" placeholder="请输入文件大小" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  sa:hasPermission="appVersion:list">
+    <form class="layui-form ">
+      <div class="layui-form-item">
+        <div class="layui-input-inline">
+          <input type="text" name="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+        </div>
+        <div class="layui-input-inline ">
+          <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container oper">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="appVersion:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="appVersion:delete">删除</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="appVersion:update">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="appVersion:delete">删除</a>
+</script>
+
+</body>
+</html>
+<script>
+  layui.use(function () {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+	var upload = layui.upload;
+    //加载table
+    var tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , page: true //开启分页
+      , url: ctx + 'appVersion/listByPage' //数据接口
+      , method: 'POST'
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'id', title: '', sort: true},
+          {field: 'versionCode', title: '版本号', sort: true},
+          {field: 'versionName', title: '版本说明', sort: true},
+          {field: 'apkUrl', title: '下载地址', sort: true,width: 300},
+          {field: 'isForceUpdate', title: '是否强制更新', sort: true},
+          {field: 'releaseTime', title: '上架时间', sort: true},
+          {field: 'fileSize', title: '文件大小', sort: true},
+          {width: 180, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          toUnDisabled();
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          setTimeout(function () {
+            form.val('info', {
+              "test": "test"
+              , "id": ""
+              , "versionCode": ""
+              , "versionName": ""
+              , "apkUrl": ""
+              , "isForceUpdate": ""
+              , "releaseTime": ""
+              , "fileSize": ""
+            });
+          }, 200);
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'look':
+          backshow(data);
+          toDisabled();
+          break;
+        case 'edit':
+          backshow(data);
+          $(".title").html("编辑");
+          toUnDisabled();
+          break;
+      }
+    });
+
+	//执行实例
+     var uploadInst = upload.render({
+         elem: '#uploadApp' //绑定元素
+         ,url:  ctx + 'appVersion/uploadApp' // 上传接口，实际使用时改成您自己的上传接口即可。
+		 ,data: {id:function() {
+		             return $('#id').val();
+		         }}
+
+		 ,exts: 'app|ipa|apk|zip' // 允许的扩展名
+         ,done: function(res){
+             layer.msg("上传成功，返回url："+ res.data);
+         }
+         ,error: function(){
+             //请求异常回调
+             layer.msg("上传失败");
+         }
+     });
+	 
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete(ctx + "appVersion/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              tableIns1.reload();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.id===undefined || data.field.id===null || data.field.id===""){
+        CoreUtil.sendPost(ctx + "appVersion/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }else {
+        CoreUtil.sendPut(ctx + "appVersion/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }
+
+      return false;
+    });
+
+    // 监听搜索操作
+    form.on('submit(data-search-btn)', function (data) {
+      //执行搜索重载
+      tableIns1.reload({
+        page: {
+          curr: 1
+        }
+        , where: data.field
+      });
+      return false;
+    });
+
+    //回显
+    var backshow = function (data) {
+      $(".table_div").hide();
+      $(".operation").show();
+      $(".title").html("查看");
+      setTimeout(function () {
+        form.val('info', {
+          "test": "test"
+                      , "id": data.id
+                      , "versionCode": data.versionCode
+                      , "versionName": data.versionName
+                      , "apkUrl": data.apkUrl
+                      , "isForceUpdate": data.isForceUpdate
+                      , "releaseTime": data.releaseTime
+                      , "fileSize": data.fileSize
+                  });
+      }, 200);
+    }
+
+    //禁用输入
+    var toDisabled = function () {
+      $(".oper").hide();
+      $(".disabled").each(function (index, elem) {
+        $(elem).attr("disabled", "")
+      })
+    }
+
+    //放开输入
+    var toUnDisabled = function () {
+      $(".oper").show();
+      $(".disabled").each(function (index, elem) {
+        $(elem).removeAttr("disabled", "")
+      })
+    }
+  });
+</script>

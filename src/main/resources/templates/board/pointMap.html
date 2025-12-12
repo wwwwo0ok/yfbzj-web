@@ -3,231 +3,184 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>大屏显示 - 店铺地图</title>
-    <!-- 引入 ECharts 库 -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <!-- 引入中国地图数据 -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/map/js/china.js"></script>
-    <!-- 引入 jQuery（如果你已经引入可以省略） -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
-    <!-- 引入 ECharts 扩展：BMap（百度地图扩展，用于更详细的街道地图） -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/extension/bmap.min.js"></script>
-    <!-- 引入百度地图API（需要申请AK） -->
-    <script src="https://api.map.baidu.com/api?v=3.0&ak=6Huz8qCYdn58and6nmuhVEugk0XgEL7A"></script>
-    <style>
-        #map-container {
-            width: 100%;
-            height: 800px;
-            margin: 0 auto;
-        }
-        .table_div {
-            padding: 20px;
-        }
-    </style>
+    <title>大屏显示</title>
+	<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- 如果有特殊样式可以保留，否则删除 -->
+    <div th:replace="~{layout}"></div>
 </head>
 <body>
+<!-- 表格部分（保留） -->
 <div class="table_div">
-    <h5>店铺分布地图</h5>
-    <!-- 地图容器 -->
-    <div id="map-container"></div>
+	
+	<h5>测试大屏页面</h5>
+	<button id="bu">按钮</button>
+
+	<div id="echartDemo" style="width: 1920px; height: 1080px;"></div>
 </div>
 
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&&type=webgl&ak=3P8xyD2iYXPnT1uFzUfdzJiMt5x9HQPt">
+</script
+
+<!-- 工具栏模板（保留） -->
+<script type="text/html" id="toolbar">
+	
+</script>
+<script type="text/html" id="tool">
+	
+</script>
+
 <script>
-// 初始化地图
-$(document).ready(function() {
-    // 初始化ECharts实例
-    var myChart = echarts.init(document.getElementById('map-container'));
-    
-    // 模拟店铺数据（实际项目中应该从后端API获取）
-    var shopData = [
-        {name: "北京旗舰店", value: [116.404, 39.915, 100], address: "北京市朝阳区建国路87号"},
-        {name: "上海分店", value: [121.474, 31.230, 80], address: "上海市黄浦区南京东路829号"},
-        {name: "广州店", value: [113.264, 23.129, 70], address: "广州市天河区天河路208号"},
-        {name: "深圳店", value: [114.058, 22.544, 90], address: "深圳市福田区福华三路118号"},
-        {name: "成都店", value: [104.066, 30.657, 60], address: "成都市锦江区红星路三段1号"}
-    ];
-    
-    // 配置项
-    var option = {
-        // 标题
-        title: {
-            text: '全国店铺分布图',
-            left: 'center'
-        },
-        // 工具箱
-        toolbox: {
-            show: true,
-            feature: {
-                dataView: {readOnly: true},
-                restore: {},
-                saveAsImage: {}
-            }
-        },
-        // 提示框
-        tooltip: {
-            trigger: 'item',
-            formatter: function(params) {
-                if (params.seriesType === 'scatter') {
-                    return params.name + '<br/>地址: ' + params.data.address;
-                }
-                return params.name;
-            }
-        },
-        // 百度地图配置（使用BMap扩展）
-        bmap: {
-            center: [104.114129, 37.550339], // 中国中心点坐标
-            zoom: 5, // 初始缩放级别
-            roam: true, // 允许缩放和平移
-            mapStyle: {
-                styleJson: [{
-                    'featureType': 'water',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#d1d1d1'
-                    }
-                }, {
-                    'featureType': 'land',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#f3f3f3'
-                    }
-                }, {
-                    'featureType': 'railway',
-                    'elementType': 'all',
-                    'stylers': {
-                        'visibility': 'off'
-                    }
-                }, {
-                    'featureType': 'highway',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#fdfdfd'
-                    }
-                }, {
-                    'featureType': 'highway',
-                    'elementType': 'labels',
-                    'stylers': {
-                        'visibility': 'off'
-                    }
-                }, {
-                    'featureType': 'arterial',
-                    'elementType': 'geometry',
-                    'stylers': {
-                        'color': '#fefefe'
-                    }
-                }, {
-                    'featureType': 'arterial',
-                    'elementType': 'geometry.fill',
-                    'stylers': {
-                        'color': '#fefefe'
-                    }
-                }, {
-                    'featureType': 'poi',
-                    'elementType': 'all',
-                    'stylers': {
-                        'visibility': 'off'
-                    }
-                }, {
-                    'featureType': 'green',
-                    'elementType': 'all',
-                    'stylers': {
-                        'visibility': 'off'
-                    }
-                }, {
-                    'featureType': 'subway',
-                    'elementType': 'all',
-                    'stylers': {
-                        'visibility': 'off'
-                    }
-                }, {
-                    'featureType': 'manmade',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#d1d1d1'
-                    }
-                }, {
-                    'featureType': 'local',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#d1d1d1'
-                    }
-                }, {
-                    'featureType': 'arterial',
-                    'elementType': 'labels',
-                    'stylers': {
-                        'visibility': 'off'
-                    }
-                }, {
-                    'featureType': 'boundary',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#fefefe'
-                    }
-                }, {
-                    'featureType': 'building',
-                    'elementType': 'all',
-                    'stylers': {
-                        'color': '#d1d1d1'
-                    }
-                }, {
-                    'featureType': 'label',
-                    'elementType': 'labels.text.fill',
-                    'stylers': {
-                        'color': '#999999'
-                    }
-                }]
-            }
-        },
-        // 系列列表
-        series: [
-            {
-                name: '店铺',
-                type: 'scatter',
-                coordinateSystem: 'bmap', // 使用百度地图坐标系
-                data: shopData,
-                symbolSize: function(val) {
-                    return val[2] / 10; // 根据值调整点的大小
-                },
-                encode: {
-                    value: 2
-                },
-                label: {
-                    formatter: '{b}',
-                    position: 'right',
-                    show: false
-                },
-                emphasis: {
-                    label: {
-                        show: true
-                    }
-                },
-                itemStyle: {
-                    color: '#dd4541'
-                }
-            }
-        ]
-    };
-    
-    // 使用配置项显示图表
-    myChart.setOption(option);
-    
-    // 获取百度地图实例并设置最小最大缩放级别
-    var bmap = myChart.getModel().getComponent('bmap').getBMap();
-    bmap.setMinZoom(5);  // 最小缩放级别（国家级别）
-    bmap.setMaxZoom(20); // 最大缩放级别（街道级别）
-    
-    // 添加点击事件，点击店铺标记时显示详细信息
-    myChart.on('click', function(params) {
-        if (params.seriesType === 'scatter') {
-            alert('店铺名称: ' + params.name + '\n地址: ' + params.data.address);
-        }
-    });
-    
-    // 窗口大小变化时重新调整图表大小
-    window.addEventListener('resize', function() {
-        myChart.resize();
-    });
-});
+// JavaScript 逻辑（保留框架，但需要修改API和字典引用）
+
+layui.use(function () {
+        var form = layui.form;
+        var upload = layui.upload;
+        var laydate = layui.laydate;
+		
+		
+		var map = new BMapGL.Map("echartDemo",{
+		    enableRotate: false,//禁用旋转
+		    enableTilt: false,//禁用倾斜
+		});
+		
+		var point = new BMapGL.Point(116.404, 39.915); //初始中心点
+		map.centerAndZoom(point, 5);  //初始大小
+		map.enableScrollWheelZoom();    //启用滚动
+		
+		// 创建城市选择控件
+       var cityControl = new BMapGL.CityListControl({
+           // 控件的停靠位置（可选，默认左上角）
+           anchor: BMAP_ANCHOR_TOP_LEFT,
+           // 控件基于停靠位置的偏移量（可选）
+           offset: new BMapGL.Size(10, 5)
+       });
+       // 将控件添加到地图上
+       map.addControl(cityControl);
+		
+	   
+	   
+	   //定义一个控件类【重点：自定义控件】
+          function ZoomControl() {
+              this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+              this.defaultOffset = new BMapGL.Size(10, 50)
+          }
+          //通过JavaScript的prototype属性继承于BMap.Control
+          ZoomControl.prototype = new BMapGL.Control();
+
+          //自定义控件必须实现自己的initialize方法，并且将控件的DOM元素返回
+          //在本方法中创建个div元素作为控件的容器，并将其添加到地图容器中
+          ZoomControl.prototype.initialize = function(map) {
+               //创建一个dom元素
+              var div = document.createElement('div');
+               //添加文字说明
+              div.appendChild(document.createTextNode('放大2级'));
+                // 设置样式
+              div.style.cursor = "pointer";
+              div.style.padding = "7px 10px";
+              div.style.boxShadow = "0 2px 6px 0 rgba(27, 142, 236, 0.5)";
+              div.style.borderRadius = "5px";
+              div.style.backgroundColor = "white";
+              // 绑定事件,点击一次放大两级
+              div.onclick = function(e){
+                  map.setZoom(map.getZoom() + 2);
+              }
+              // 添加DOM元素到地图中
+              map.getContainer().appendChild(div);
+              // 将DOM元素返回
+              return div;
+          }
+          //创建控件元素
+          var myZoomCtrl = new ZoomControl();
+          //添加到地图中
+          map.addControl(myZoomCtrl);
+		  
+		  //电驱列表
+		  var dq_data = [];
+//		  [
+//		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
+//		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
+//		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
+//		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
+//		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
+//		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
+//		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
+//		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
+//		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
+//		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
+		  
+//		  ]
+		  
+		  $.ajax({
+              type: 'POST',
+              url: ctx + 'dataBzjDevice/listByPage',
+              dataType: "JSON",
+              data: JSON.stringify({deviceType:'2',deviceStatus:'ONLINE'}),
+              contentType: "application/json",
+              success: function (res) {
+				console.dir(res)
+                  if (res.code == 0) {
+					dq_data = res.data.records;
+					// 遍历数据创建标记点
+							  dq_data.forEach(function(device) {
+							    // 创建标记点坐标
+							    var markerPoint = new BMapGL.Point(device.latestX, device.latestY);
+							    
+							    // 创建标记点
+							    var marker = new BMapGL.Marker(markerPoint);
+							    map.addOverlay(marker);
+							    
+							    // 创建信息窗口内容
+							    var content = `
+							      <div class="custom-info-window">
+							        <p>姓名：${device.username}</p>
+							        <p>电话：${device.telephone}</p>
+							        <p>
+							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
+							            [详情]
+							          </a>
+							        </p>
+							      </div>
+							    `;
+							    
+							    // 创建信息窗口
+							    var infoWindow = new BMapGL.InfoWindow(content, {
+							      width: 250,
+							      height: 150,
+							      title: device.username + '的播种机'
+							    });
+							    
+							    // 为标记点添加点击事件
+							    marker.addEventListener('click', function() {
+							      map.openInfoWindow(infoWindow, markerPoint);
+							    });
+							  });
+                  } else {
+                      layer.msg(res.msg);
+                      $("#img").click();
+                  }
+              }
+          })
+		  
+		  
+		  
+		  
+		  
+		  
+		  			  
+		 
+		  
+		  
+		  map.addEventListener('tilesloaded', function () {
+		      <!--alert('目前放大系数为：'+map.getZoom());-->
+			  // 在地图上添加点标记
+		  });
+		  
+			  
+		//
+	});
+
+
+
 </script>
 </body>
 </html>

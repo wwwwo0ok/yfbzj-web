@@ -12,366 +12,395 @@
 <div class="layui-card-body">
 <form class="layui-form " action="" lay-filter="info">
   <input name="lotId" hidden/>
-    <div class="layui-form-item">
-      <label class="layui-form-label">设备名称</label>
-      <div class="layui-input-block">
-        <input type="deviceName" name="deviceName" placeholder="请输入设备名称" autocomplete="off" class="layui-input disabled">
+   <div class="layui-input-inline">
+        <label class="layui-form-label">设备名称</label>
+        <div class="layui-input-block">
+          <input type="deviceName" name="deviceName" placeholder="请输入设备名称" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">数据发生时刻（硬件时刻）</label>
-      <div class="layui-input-block">
-        <input type="dataTime" name="dataTime" placeholder="请输入数据发生时刻（硬件时刻）" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">数据时间</label>
+        <div class="layui-input-block">
+          <input type="dataTime" name="dataTime" placeholder="请输入数据发生时刻（硬件时刻）" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">电子齿轮比</label>
-      <div class="layui-input-block">
-        <input type="electronicGearRatio" name="electronicGearRatio" placeholder="请输入电子齿轮比" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">电子齿轮比</label>
+        <div class="layui-input-block">
+          <input type="electronicGearRatio" name="electronicGearRatio" placeholder="请输入电子齿轮比" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">B组孔盘数。</label>
-      <div class="layui-input-block">
-        <input type="bHolesNum" name="bHolesNum" placeholder="请输入B组孔盘数。" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">B组孔盘数</label>
+        <div class="layui-input-block">
+          <input type="bHolesNum" name="bHolesNum" placeholder="请输入B组孔盘数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">B组株距</label>
-      <div class="layui-input-block">
-        <input type="bSowInterval" name="bSowInterval" placeholder="请输入B组株距" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">B组株距</label>
+        <div class="layui-input-block">
+          <input type="bSowInterval" name="bSowInterval" placeholder="请输入B组株距" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">B组电机与主轴的减速比,单位0.1</label>
-      <div class="layui-input-block">
-        <input type="bReductionRatio" name="bReductionRatio" placeholder="请输入B组电机与主轴的减速比,单位0.1" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">B减速比</label>
+        <div class="layui-input-block">
+          <input type="bReductionRatio" name="bReductionRatio" placeholder="请输入B组电机与主轴的减速比" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">B组电机一圈需要的脉冲数</label>
-      <div class="layui-input-block">
-        <input type="bSendPulse" name="bSendPulse" placeholder="请输入B组电机一圈需要的脉冲数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">B组脉冲数</label>
+        <div class="layui-input-block">
+          <input type="bSendPulse" name="bSendPulse" placeholder="请输入B组电机一圈需要的脉冲数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">B组电机电机一圈需要的脉冲数</label>
-      <div class="layui-input-block">
-        <input type="bRecievePulse" name="bRecievePulse" placeholder="请输入B组电机电机一圈需要的脉冲数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">B反脉冲数</label>
+        <div class="layui-input-block">
+          <input type="bRecievePulse" name="bRecievePulse" placeholder="请输入B组电机电机一圈需要的脉冲数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">A组孔盘数。</label>
-      <div class="layui-input-block">
-        <input type="aHolesNum" name="aHolesNum" placeholder="请输入A组孔盘数。" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">A组孔盘数</label>
+        <div class="layui-input-block">
+          <input type="aHolesNum" name="aHolesNum" placeholder="请输入A组孔盘数。" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">A组株距</label>
-      <div class="layui-input-block">
-        <input type="aSowInterval" name="aSowInterval" placeholder="请输入A组株距" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">A组株距</label>
+        <div class="layui-input-block">
+          <input type="aSowInterval" name="aSowInterval" placeholder="请输入A组株距" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">A组电机与主轴的减速比,单位0.1</label>
-      <div class="layui-input-block">
-        <input type="aReductionRatio" name="aReductionRatio" placeholder="请输入A组电机与主轴的减速比,单位0.1" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">A减速比</label>
+        <div class="layui-input-block">
+          <input type="aReductionRatio" name="aReductionRatio" placeholder="请输入A组电机与主轴的减速比,单位0.1" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">A组电机一圈需要的脉冲数</label>
-      <div class="layui-input-block">
-        <input type="aSendPulse" name="aSendPulse" placeholder="请输入A组电机一圈需要的脉冲数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">A脉冲数</label>
+        <div class="layui-input-block">
+          <input type="aSendPulse" name="aSendPulse" placeholder="请输入A组电机一圈需要的脉冲数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">A组电机电机一圈需要的脉冲数，单位个</label>
-      <div class="layui-input-block">
-        <input type="aRecievePulse" name="aRecievePulse" placeholder="请输入A组电机电机一圈需要的脉冲数，单位个" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">A反脉冲数</label>
+        <div class="layui-input-block">
+          <input type="aRecievePulse" name="aRecievePulse" placeholder="请输入A组电机电机一圈需要的脉冲数，单位个" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">新头重复</label>
-      <div class="layui-input-block">
-        <input type="newHeadRepeatFlag" name="newHeadRepeatFlag" placeholder="请输入新头重复" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">新头重复</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="newHeadRepFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="newHeadRepFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">限制距离到强制停机</label>
-      <div class="layui-input-block">
-        <input type="shutDownDistanceFlag" name="shutDownDistanceFlag" placeholder="请输入限制距离到强制停机" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">限制距离到强制停机</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="shutDownDistanceFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="shutDownDistanceFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">种电机报警</label>
-      <div class="layui-input-block">
-        <input type="seedMotorAlarmFlag" name="seedMotorAlarmFlag" placeholder="请输入种电机报警" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">种电机报警</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="seedMotorAlarmFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="seedMotorAlarmFlag" value="1" title="有" lay-filter="radio-type">
+		  
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">编码器取反</label>
-      <div class="layui-input-block">
-        <input type="eNCODERMODEFlag" name="eNCODERMODEFlag" placeholder="请输入编码器取反" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">编码器取反</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="encoderModeFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="encoderModeFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">行程开关方向取反控制</label>
-      <div class="layui-input-block">
-        <input type="dRIVINGDIRECTIONFlag" name="dRIVINGDIRECTIONFlag" placeholder="请输入行程开关方向取反控制" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">行程开关方向取反</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="drivingDirectionFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="drivingDirectionFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">有无编码器</label>
-      <div class="layui-input-block">
-        <input type="hASENCODERFlag" name="hASENCODERFlag" placeholder="请输入有无编码器" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">有无编码器</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="hasEncoderFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="hasEncoderFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">测试主肥量</label>
-      <div class="layui-input-block">
-        <input type="realMainFertilizerValue" name="realMainFertilizerValue" placeholder="请输入测试主肥量" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">测试主肥量</label>
+        <div class="layui-input-block">
+          <input type="realMainFertilizerValue" name="realMainFertilizerValue" placeholder="请输入测试主肥量" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">设定主肥量</label>
-      <div class="layui-input-block">
-        <input type="setMainFertilizerValue" name="setMainFertilizerValue" placeholder="请输入设定主肥量" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">设定主肥量</label>
+        <div class="layui-input-block">
+          <input type="setMainFertilizerValue" name="setMainFertilizerValue" placeholder="请输入设定主肥量" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">主肥系数</label>
-      <div class="layui-input-block">
-        <input type="mainFertilizerRate" name="mainFertilizerRate" placeholder="请输入主肥系数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">主肥系数</label>
+        <div class="layui-input-block">
+          <input type="mainFertilizerRate" name="mainFertilizerRate" placeholder="请输入主肥系数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">测试口肥量</label>
-      <div class="layui-input-block">
-        <input type="realDeputyFertilizerValue" name="realDeputyFertilizerValue" placeholder="请输入测试口肥量" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">测试口肥量</label>
+        <div class="layui-input-block">
+          <input type="realDeputyFertilizerValue" name="realDeputyFertilizerValue" placeholder="请输入测试口肥量" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">设定口肥量</label>
-      <div class="layui-input-block">
-        <input type="setDeputyFertilizerValue" name="setDeputyFertilizerValue" placeholder="请输入设定口肥量" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">设定口肥量</label>
+        <div class="layui-input-block">
+          <input type="setDeputyFertilizerValue" name="setDeputyFertilizerValue" placeholder="请输入设定口肥量" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">口肥系数</label>
-      <div class="layui-input-block">
-        <input type="deputyFertilizerRate" name="deputyFertilizerRate" placeholder="请输入口肥系数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">口肥系数</label>
+        <div class="layui-input-block">
+          <input type="deputyFertilizerRate" name="deputyFertilizerRate" placeholder="请输入口肥系数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">主肥监控的缺肥灵敏度</label>
-      <div class="layui-input-block">
-        <input type="lackFertilizerRate" name="lackFertilizerRate" placeholder="请输入主肥监控的缺肥灵敏度" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">主肥监控的缺肥灵敏度</label>
+        <div class="layui-input-block">
+          <input type="lackFertilizerRate" name="lackFertilizerRate" placeholder="请输入主肥监控的缺肥灵敏度" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">主肥监控标志</label>
-      <div class="layui-input-block">
-        <input type="mainFertilizerMonitoringFlag" name="mainFertilizerMonitoringFlag" placeholder="请输入主肥监控标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">主肥监控标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="mainFertilizerMonitoringFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="mainFertilizerMonitoringFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">主肥电机标志</label>
-      <div class="layui-input-block">
-        <input type="mainFertilizerMotorFlag" name="mainFertilizerMotorFlag" placeholder="请输入主肥电机标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">主肥电机标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="mainFertilizerMotorFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="mainFertilizerMotorFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">口肥电机标志</label>
-      <div class="layui-input-block">
-        <input type="deputyFertilizerMotorFlag" name="deputyFertilizerMotorFlag" placeholder="请输入口肥电机标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">口肥电机标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="deputyFertilizerMotorFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="deputyFertilizerMotorFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">种物位标志</label>
-      <div class="layui-input-block">
-        <input type="seedLocationFlag" name="seedLocationFlag" placeholder="请输入种物位标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">种物位标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="seedLocationFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="seedLocationFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">主肥物位标志</label>
-      <div class="layui-input-block">
-        <input type="mainFertilizerLocationFlag" name="mainFertilizerLocationFlag" placeholder="请输入主肥物位标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">主肥物位标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="mainFertilizerLocationFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="mainFertilizerLocationFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">口肥物位标志</label>
-      <div class="layui-input-block">
-        <input type="deputyFertilizerLocationFlag" name="deputyFertilizerLocationFlag" placeholder="请输入口肥物位标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">口肥物位标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="deputyFertilizerLocationFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="deputyFertilizerLocationFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">报声音</label>
-      <div class="layui-input-block">
-        <input type="soundFlag" name="soundFlag" placeholder="请输入报声音" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">报声音</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="soundFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="soundFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">平行播种</label>
-      <div class="layui-input-block">
-        <input type="sowType" name="sowType" placeholder="请输入平行播种" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">平行播种</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="sowType" value="0" title="常规" lay-filter="radio-type">
+		  <input type="radio" name="sowType" value="1" title="平行播种" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">播种苗带选择；=0是单苗带，=1是双苗带，=2是三苗带；</label>
-      <div class="layui-input-block">
-        <input type="sowMode" name="sowMode" placeholder="请输入播种苗带选择；=0是单苗带，=1是双苗带，=2是三苗带；" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">苗带选择</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="sowMode" value="0" title="单苗带" lay-filter="radio-type">
+		  <input type="radio" name="sowMode" value="1" title="双苗带" lay-filter="radio-type">
+		  <input type="radio" name="sowMode" value="2" title="三苗带" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">播种行数</label>
-      <div class="layui-input-block">
-        <input type="sowLine" name="sowLine" placeholder="请输入播种行数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">播种行数</label>
+        <div class="layui-input-block">
+          <input type="sowLine" name="sowLine" placeholder="请输入播种行数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">总播种宽度</label>
-      <div class="layui-input-block">
-        <input type="sowingWidth" name="sowingWidth" placeholder="请输入总播种宽度" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">总播种宽度</label>
+        <div class="layui-input-block">
+          <input type="sowingWidth" name="sowingWidth" placeholder="请输入总播种宽度" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">种预判时间</label>
-      <div class="layui-input-block">
-        <input type="predictedTime" name="predictedTime" placeholder="请输入种预判时间" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">种预判时间</label>
+        <div class="layui-input-block">
+          <input type="predictedTime" name="predictedTime" placeholder="请输入种预判时间" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">急停阈值</label>
-      <div class="layui-input-block">
-        <input type="decelerationValue" name="decelerationValue" placeholder="请输入急停阈值" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">急停阈值</label>
+        <div class="layui-input-block">
+          <input type="decelerationValue" name="decelerationValue" placeholder="请输入急停阈值" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">无电机主肥监控的缺肥底线</label>
-      <div class="layui-input-block">
-        <input type="lackFertilizerLine" name="lackFertilizerLine" placeholder="请输入无电机主肥监控的缺肥底线" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">无电机主肥监控的缺肥底线</label>
+        <div class="layui-input-block">
+          <input type="lackFertilizerLine" name="lackFertilizerLine" placeholder="请输入无电机主肥监控的缺肥底线" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">单次播种运行时记录的运行时间</label>
-      <div class="layui-input-block">
-        <input type="runningTime" name="runningTime" placeholder="请输入单次播种运行时记录的运行时间" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">单次播种运行时记录的运行时间</label>
+        <div class="layui-input-block">
+          <input type="runningTime" name="runningTime" placeholder="请输入单次播种运行时记录的运行时间" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">单次播种的距离显示</label>
-      <div class="layui-input-block">
-        <input type="sowDistance" name="sowDistance" placeholder="请输入单次播种的距离显示" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">单次播种的距离显示</label>
+        <div class="layui-input-block">
+          <input type="sowDistance" name="sowDistance" placeholder="请输入单次播种的距离显示" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">雷达频率</label>
-      <div class="layui-input-block">
-        <input type="radarFrequency" name="radarFrequency" placeholder="请输入雷达频率" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">雷达频率</label>
+        <div class="layui-input-block">
+          <input type="radarFrequency" name="radarFrequency" placeholder="请输入雷达频率" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">运行8秒时系统电压</label>
-      <div class="layui-input-block">
-        <input type="systemVoltage" name="systemVoltage" placeholder="请输入运行8秒时系统电压" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">运行8秒时系统电压</label>
+        <div class="layui-input-block">
+          <input type="systemVoltage" name="systemVoltage" placeholder="请输入运行8秒时系统电压" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">有新头标志</label>
-      <div class="layui-input-block">
-        <input type="systemNewHeadFlag" name="systemNewHeadFlag" placeholder="请输入有新头标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">有新头标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="systemNewHeadFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="systemNewHeadFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">压行程（运输中）标志</label>
-      <div class="layui-input-block">
-        <input type="systemCompressionStrokeFlag" name="systemCompressionStrokeFlag" placeholder="请输入压行程（运输中）标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">压行程（运输中）标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="systemCompressionStrokeFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="systemCompressionStrokeFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">种手动中标志</label>
-      <div class="layui-input-block">
-        <input type="systemSeedManuallyFlag" name="systemSeedManuallyFlag" placeholder="请输入种手动中标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">种手动中标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="systemSeedManuallyFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="systemSeedManuallyFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">主肥测试手动中标志</label>
-      <div class="layui-input-block">
-        <input type="systemMainFertilizerTestingFlag" name="systemMainFertilizerTestingFlag" placeholder="请输入主肥测试手动中标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">主肥测试手动中标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="systemMainFertilizerTestingFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="systemMainFertilizerTestingFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">有编码器时编码器报警标志</label>
-      <div class="layui-input-block">
-        <input type="encoderAlarmFlag" name="encoderAlarmFlag" placeholder="请输入有编码器时编码器报警标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">有编码器时编码器报警标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="encoderAlarmFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="encoderAlarmFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">播种中标志</label>
-      <div class="layui-input-block">
-        <input type="sowingFlag" name="sowingFlag" placeholder="请输入播种中标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">播种中标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="sowingFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="sowingFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">屏连接标志</label>
-      <div class="layui-input-block">
-        <input type="padConnectFlag" name="padConnectFlag" placeholder="请输入屏连接标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">屏连接标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="padConnectFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="padConnectFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">雷达报警标志</label>
-      <div class="layui-input-block">
-        <input type="systemRadarWarnFlag" name="systemRadarWarnFlag" placeholder="请输入雷达报警标志" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">雷达报警标志</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="systemRadarWarnFlag" value="0" title="无" lay-filter="radio-type">
+		  <input type="radio" name="systemRadarWarnFlag" value="1" title="有" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">单次播种，种子报警次数</label>
-      <div class="layui-input-block">
-        <input type="seedAlarmCount" name="seedAlarmCount" placeholder="请输入单次播种，种子报警次数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">单次播种，种子报警次数</label>
+        <div class="layui-input-block">
+          <input type="seedAlarmCount" name="seedAlarmCount" placeholder="请输入单次播种，种子报警次数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">单次播种肥报警次数</label>
-      <div class="layui-input-block">
-        <input type="fertilizerAlarmCount" name="fertilizerAlarmCount" placeholder="请输入单次播种肥报警次数" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">单次播种肥报警次数</label>
+        <div class="layui-input-block">
+          <input type="fertilizerAlarmCount" name="fertilizerAlarmCount" placeholder="请输入单次播种肥报警次数" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">运行8秒时风机压力</label>
-      <div class="layui-input-block">
-        <input type="fanPressure" name="fanPressure" placeholder="请输入运行8秒时风机压力" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">运行8秒时风机压力</label>
+        <div class="layui-input-block">
+          <input type="fanPressure" name="fanPressure" placeholder="请输入运行8秒时风机压力" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">运行8秒时风机转速</label>
-      <div class="layui-input-block">
-        <input type="fanSpeed" name="fanSpeed" placeholder="请输入运行8秒时风机转速" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">运行8秒时风机转速</label>
+        <div class="layui-input-block">
+          <input type="fanSpeed" name="fanSpeed" placeholder="请输入运行8秒时风机转速" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">物联上传数据类型</label>
-      <div class="layui-input-block">
-        <input type="uploadType" name="uploadType" placeholder="请输入物联上传数据类型" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">物联上传数据类型</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="uploadType" value="0" title="蓝牙连接" lay-filter="radio-type">
+		  <input type="radio" name="uploadType" value="1" title="运行停止" lay-filter="radio-type">
+		  <input type="radio" name="uploadType" value="2" title="物联控制" lay-filter="radio-type">
+		  <input type="radio" name="uploadType" value="3" title="设置改变" lay-filter="radio-type">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">当前到限里程停止时的剩余路程，4095是无限里程，单位是512米</label>
-      <div class="layui-input-block">
-        <input type="remainingMileage" name="remainingMileage" placeholder="请输入当前到限里程停止时的剩余路程，4095是无限里程，单位是512米" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">当前到限里程停止时的剩余路程，4095是无限里程，单位是512米</label>
+        <div class="layui-input-block">
+          <input type="remainingMileage" name="remainingMileage" placeholder="请输入当前到限里程停止时的剩余路程，4095是无限里程，单位是512米" autocomplete="off" class="layui-input disabled">
+        </div>
       </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">数据状态(1.正常 0.忽略 )</label>
-      <div class="layui-input-block">
-        <input type="status" name="status" placeholder="请输入数据状态(1.正常 0.忽略 )" autocomplete="off" class="layui-input disabled">
+        <div class="layui-input-inline">
+        <label class="layui-form-label">数据状态(1.正常 0.忽略 )</label>
+        <div class="layui-input-block">
+		  <input type="radio" name="status" value="0" title="忽略" checked="" lay-filter="radio-type">
+         <input type="radio" name="status" value="1" title="正常" lay-filter="radio-type">
+        </div>
       </div>
+    <div class="layui-input-inline">
+    <div class="layui-input-block">
+      <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
     </div>
-  <div class="layui-form-item">
-  <div class="layui-input-block">
-    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
-    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+	<table class="layui-table" id="showTable1" lay-filter="showTable1" ></table>
   </div>
-</div>
 </form>
 </div>
 </div>
@@ -421,6 +450,7 @@
     var layer = layui.layer;
 	var laydate = layui.laydate;
 	var router = layui.router();
+	debugger;
 	var bbb = router.search;
 	console.log('当前路由:', layui.router());//这里不显示参数
 	var aaa = $("#lotId").val();//这个有显示参数
@@ -445,66 +475,52 @@
       , cols: [
         [
           {type: 'checkbox', fixed: 'left'},
-          {field: 'lotId', title: '设备id', sort: true},
           {field: 'deviceName', title: '设备名称', sort: true},
           {field: 'dataTime', title: '数据发生时刻（硬件时刻）', sort: true},
-          {field: 'electronicGearRatio', title: '电子齿轮比', sort: true},
-          {field: 'bHolesNum', title: 'B组孔盘数。', sort: true},
-          {field: 'bSowInterval', title: 'B组株距', sort: true},
-          {field: 'bReductionRatio', title: 'B组电机与主轴的减速比,单位0.1', sort: true},
-          {field: 'bSendPulse', title: 'B组电机一圈需要的脉冲数', sort: true},
-          {field: 'bRecievePulse', title: 'B组电机电机一圈需要的脉冲数', sort: true},
-          {field: 'aHolesNum', title: 'A组孔盘数。', sort: true},
-          {field: 'aSowInterval', title: 'A组株距', sort: true},
-          {field: 'aReductionRatio', title: 'A组电机与主轴的减速比,单位0.1', sort: true},
-          {field: 'aSendPulse', title: 'A组电机一圈需要的脉冲数', sort: true},
-          {field: 'aRecievePulse', title: 'A组电机电机一圈需要的脉冲数，单位个', sort: true},
-          {field: 'newHeadRepeatFlag', title: '新头重复', sort: true},
-          {field: 'shutDownDistanceFlag', title: '限制距离到强制停机', sort: true},
-          {field: 'seedMotorAlarmFlag', title: '种电机报警', sort: true},
-          {field: 'eNCODERMODEFlag', title: '编码器取反', sort: true},
-          {field: 'dRIVINGDIRECTIONFlag', title: '行程开关方向取反控制', sort: true},
-          {field: 'hASENCODERFlag', title: '有无编码器', sort: true},
-          {field: 'realMainFertilizerValue', title: '测试主肥量', sort: true},
-          {field: 'setMainFertilizerValue', title: '设定主肥量', sort: true},
-          {field: 'mainFertilizerRate', title: '主肥系数', sort: true},
-          {field: 'realDeputyFertilizerValue', title: '测试口肥量', sort: true},
-          {field: 'setDeputyFertilizerValue', title: '设定口肥量', sort: true},
-          {field: 'deputyFertilizerRate', title: '口肥系数', sort: true},
-          {field: 'lackFertilizerRate', title: '主肥监控的缺肥灵敏度', sort: true},
-          {field: 'mainFertilizerMonitoringFlag', title: '主肥监控标志', sort: true},
-          {field: 'mainFertilizerMotorFlag', title: '主肥电机标志', sort: true},
-          {field: 'deputyFertilizerMotorFlag', title: '口肥电机标志', sort: true},
-          {field: 'seedLocationFlag', title: '种物位标志', sort: true},
-          {field: 'mainFertilizerLocationFlag', title: '主肥物位标志', sort: true},
-          {field: 'deputyFertilizerLocationFlag', title: '口肥物位标志', sort: true},
-          {field: 'soundFlag', title: '报声音', sort: true},
-          {field: 'sowType', title: '平行播种', sort: true},
-          {field: 'sowMode', title: '播种苗带选择；=0是单苗带，=1是双苗带，=2是三苗带；', sort: true},
-          {field: 'sowLine', title: '播种行数', sort: true},
-          {field: 'sowingWidth', title: '总播种宽度', sort: true},
-          {field: 'predictedTime', title: '种预判时间', sort: true},
-          {field: 'decelerationValue', title: '急停阈值', sort: true},
-          {field: 'lackFertilizerLine', title: '无电机主肥监控的缺肥底线', sort: true},
-          {field: 'runningTime', title: '单次播种运行时记录的运行时间', sort: true},
-          {field: 'sowDistance', title: '单次播种的距离显示', sort: true},
-          {field: 'radarFrequency', title: '雷达频率', sort: true},
-          {field: 'systemVoltage', title: '运行8秒时系统电压', sort: true},
-          {field: 'systemNewHeadFlag', title: '有新头标志', sort: true},
-          {field: 'systemCompressionStrokeFlag', title: '压行程（运输中）标志', sort: true},
-          {field: 'systemSeedManuallyFlag', title: '种手动中标志', sort: true},
-          {field: 'systemMainFertilizerTestingFlag', title: '主肥测试手动中标志', sort: true},
-          {field: 'encoderAlarmFlag', title: '有编码器时编码器报警标志', sort: true},
-          {field: 'sowingFlag', title: '播种中标志', sort: true},
-          {field: 'padConnectFlag', title: '屏连接标志', sort: true},
-          {field: 'systemRadarWarnFlag', title: '雷达报警标志', sort: true},
-          {field: 'seedAlarmCount', title: '单次播种，种子报警次数', sort: true},
-          {field: 'fertilizerAlarmCount', title: '单次播种肥报警次数', sort: true},
-          {field: 'fanPressure', title: '运行8秒时风机压力', sort: true},
-          {field: 'fanSpeed', title: '运行8秒时风机转速', sort: true},
-          {field: 'uploadType', title: '物联上传数据类型', sort: true},
-          {field: 'remainingMileage', title: '当前到限里程停止时的剩余路程，4095是无限里程，单位是512米', sort: true},
-          {field: 'status', title: '数据状态(1.正常 0.忽略 )', sort: true},
+          {field: 'uploadType', title: '上传方式', templet : function(item){
+  			if (item.uploadType == '0') {
+  		          return '  <a class="" >蓝牙连接</a>';
+  		      }
+  		      if (item.uploadType == '1') {
+  		          return '<a class="" >运行停止</a>';
+  		      }
+  			if (item.uploadType == '2') {
+  		          return '  <a class="" >物联控制</a>';
+  		      }
+  		      if (item.uploadType == '3') {
+  		          return '<a class="" >设置改变</a>';
+  		      }
+  						
+		  }},
+		  {field: 'sowType', title: '平行播种', templet : function(item){
+	  			if (item.sowType == '1') {
+	  		          return '  <a class="" >平行播种</a>';
+	  		      }
+	  		      else if (item.sowType == '0') {
+	  		          return '<a class="" >常规</a>';
+	  		      }
+	  						
+  		  }},
+		  {field: 'sowMode', title: '苗带', templet : function(item){
+			if (item.sowMode == '0') {
+		          return '  <a class="" >单苗带</a>';
+		      }
+		      else if (item.sowMode == '1') {
+		          return '<a class="ll" >双苗带</a>';
+		      }
+		      else if (item.sowMode == '2') {
+		          return '<a class=" " >三苗带</a>';
+		      }
+		      else  {
+		          return '<a class="" >未知</a>';
+		      }
+						
+		  }},
+		  {field: 'sowLine', title: '播种行数', sort: true},
+		  {field: 'runningTime', title: '运行时间', sort: true},
+		  {field: 'sowDistance', title: '播种距离', sort: true},
+		  {field: 'seedAlarmCount', title: '种报警数', sort: true},
+		  {field: 'fertilizerAlarmCount', title: '肥报警数', sort: true},
           {width: 120, toolbar: "#tool", title: '操作'}
         ]
       ]
@@ -516,7 +532,6 @@
 
 	tableIns1.reload(	'showTable', {
 				    where: {lotId:aaa},
-				    page: { curr: 1 }
 				  });
     //表头工具
     table.on('toolbar(showTable)', function(obj){
@@ -542,66 +557,13 @@
           setTimeout(function () {
             form.val('info', {
               "test": "test"
-              , "lotId": ""
               , "deviceName": ""
               , "dataTime": ""
-              , "electronicGearRatio": ""
-              , "bHolesNum": ""
-              , "bSowInterval": ""
-              , "bReductionRatio": ""
-              , "bSendPulse": ""
-              , "bRecievePulse": ""
-              , "aHolesNum": ""
-              , "aSowInterval": ""
-              , "aReductionRatio": ""
-              , "aSendPulse": ""
-              , "aRecievePulse": ""
-              , "newHeadRepeatFlag": ""
-              , "shutDownDistanceFlag": ""
-              , "seedMotorAlarmFlag": ""
-              , "eNCODERMODEFlag": ""
-              , "dRIVINGDIRECTIONFlag": ""
-              , "hASENCODERFlag": ""
-              , "realMainFertilizerValue": ""
-              , "setMainFertilizerValue": ""
-              , "mainFertilizerRate": ""
-              , "realDeputyFertilizerValue": ""
-              , "setDeputyFertilizerValue": ""
-              , "deputyFertilizerRate": ""
-              , "lackFertilizerRate": ""
-              , "mainFertilizerMonitoringFlag": ""
-              , "mainFertilizerMotorFlag": ""
-              , "deputyFertilizerMotorFlag": ""
-              , "seedLocationFlag": ""
-              , "mainFertilizerLocationFlag": ""
-              , "deputyFertilizerLocationFlag": ""
-              , "soundFlag": ""
-              , "sowType": ""
-              , "sowMode": ""
-              , "sowLine": ""
-              , "sowingWidth": ""
-              , "predictedTime": ""
-              , "decelerationValue": ""
-              , "lackFertilizerLine": ""
-              , "runningTime": ""
-              , "sowDistance": ""
-              , "radarFrequency": ""
-              , "systemVoltage": ""
-              , "systemNewHeadFlag": ""
-              , "systemCompressionStrokeFlag": ""
-              , "systemSeedManuallyFlag": ""
-              , "systemMainFertilizerTestingFlag": ""
-              , "encoderAlarmFlag": ""
-              , "sowingFlag": ""
-              , "padConnectFlag": ""
-              , "systemRadarWarnFlag": ""
-              , "seedAlarmCount": ""
-              , "fertilizerAlarmCount": ""
-              , "fanPressure": ""
-              , "fanSpeed": ""
-              , "uploadType": ""
-              , "remainingMileage": ""
-              , "status": ""
+			  , "sowType": ""
+			  , "sowMode": ""
+			  , "sowLine": ""
+			  , "runningTime": ""
+			  , "sowDistance": ""
             });
           }, 200);
           break;
@@ -692,6 +654,40 @@
       return false;
     });
 
+	var tableIns2 = table.render({
+		      elem: '#showTable1'
+		      , contentType: 'application/json'
+		      , page: true //开启分页
+		      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+		        return {
+		          "code": res.code, //解析接口状态
+		          "msg": res.msg, //解析提示文本
+		          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+		          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+		        }
+		      }
+		      , cols: [
+		        [
+		          {type: 'checkbox', fixed: 'left'},
+		          {field: 'lineNo', title: '行数', sort: true,width:90},
+		          {field: 'seedNum', title: '种数', sort: true,width:100},
+		          {field: 'excessSeeds', title: '多种', sort: true,width:90},
+		          {field: 'lackSeeds', title: '缺种', sort: true,width:90},
+		          {field: 'fertilizerSpeedRatio', title: '主肥检测转速反馈比', sort: true,width:140},
+		          {field: 'seedAlarmRatio', title: '种报警', sort: true,width:90},
+		          {field: 'seedAbType', title: 'AB模式', sort: true,width:90},
+		          {field: 'mainFertilizerDirect', title: '主肥电机方向', sort: true,width:130},
+		          {field: 'deputyFertilizerDirect', title: '口肥电机方向', sort: true,width:130},
+		          {field: 'seedSwtich', title: '种使能', sort: true,width:90},
+		          {field: 'mainFertilizerSwtich', title: '主肥电机使能', sort: true,width:130},
+		          {field: 'deputyFertilizerSwtich', title: '口肥电机使能', sort: true,width:130},
+		          {field: 'mainFertilizerMonitorSwtich', title: '主肥监控使能', sort: true,width:130},
+		          {field: 'fertilizerAlarmRatio', title: '肥报警', sort: true,width:90}
+		          
+		        ]
+		      ]
+		      
+		    });
     //回显
     var backshow = function (data) {
       $(".table_div").hide();
@@ -717,9 +713,9 @@
                       , "newHeadRepeatFlag": data.newHeadRepeatFlag
                       , "shutDownDistanceFlag": data.shutDownDistanceFlag
                       , "seedMotorAlarmFlag": data.seedMotorAlarmFlag
-                      , "eNCODERMODEFlag": data.eNCODERMODEFlag
-                      , "dRIVINGDIRECTIONFlag": data.dRIVINGDIRECTIONFlag
-                      , "hASENCODERFlag": data.hASENCODERFlag
+                      , "encoderModeFlag": data.encoderModeFlag
+                      , "drivingDirectionFlag": data.drivingDirectionFlag
+                      , "hasEncoderFlag": data.hasEncoderFlag
                       , "realMainFertilizerValue": data.realMainFertilizerValue
                       , "setMainFertilizerValue": data.setMainFertilizerValue
                       , "mainFertilizerRate": data.mainFertilizerRate
@@ -761,6 +757,12 @@
                       , "remainingMileage": data.remainingMileage
                       , "status": data.status
                   });
+				  // 关键优化：使用reload更新数据而非重新渲染
+				      tableIns2.reload({
+				        data: data.lines, // 直接使用新数据
+				        page: { curr: 1 } // 重置到第一页
+				      });  
+				  
       }, 200);
     }
 

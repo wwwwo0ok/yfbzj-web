@@ -24,4 +24,11 @@
     </resultMap>
 
 
+	 <!-- 4. 子表查询语句 (根据主表联合主键查询) -->
+    <select id="selectLinesByPrimary" resultMap="dataElectricSeederMessageLineMap">
+        SELECT * 
+        FROM data_electric_seeder_message_line
+        WHERE lot_id = #{lotId} AND data_time = #{dataTime}
+    </select>
+
 </mapper>
