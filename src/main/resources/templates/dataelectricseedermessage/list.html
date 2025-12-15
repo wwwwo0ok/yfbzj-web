@@ -423,22 +423,18 @@
         </div>
       </div>
     </form>
-        <div class="layui-input-inline ">
-          <button  class="layui-btn" id="back_btn"  >返  回</button>
-        </div>
   </div>
   <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
 </div>
 <script type="text/html" id="toolbar">
   <div class="layui-btn-container oper">
-    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataElectricSeederMessage:add">添加</button>
-    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataElectricSeederMessage:delete">删除</button>
+    <button class="layui-btn layui-btn-sm" lay-event="comeBack">返回</button>
+    <button class="layui-btn layui-btn-sm" lay-event="refresh">更新</button>
   </div>
 </script>
 <script type="text/html" id="tool">
   <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataElectricSeederMessage:update">编辑</a>
-  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="dataElectricSeederMessage:delete">删除</a>
 </script>
 
 </body>
@@ -474,9 +470,9 @@
       , cols: [
         [
           {type: 'checkbox', fixed: 'left'},
-          {field: 'deviceName', title: '设备名称', sort: true},
-          {field: 'dataTime', title: '数据发生时刻（硬件时刻）', sort: true},
-          {field: 'uploadType', title: '上传方式', templet : function(item){
+          {width: 200, field: 'deviceName', title: '设备名称', sort: true},
+          {width: 160, field: 'dataTime', title: '数据时间', sort: true},
+          {width: 120, field: 'uploadType', title: '上传方式', templet : function(item){
   			if (item.uploadType == '0') {
   		          return '  <a class="" >蓝牙连接</a>';
   		      }
@@ -491,7 +487,7 @@
   		      }
   						
 		  }},
-		  {field: 'sowType', title: '平行播种', templet : function(item){
+		  {width: 120, field: 'sowType', title: '平行播种', templet : function(item){
 	  			if (item.sowType == '1') {
 	  		          return '  <a class="" >平行播种</a>';
 	  		      }
@@ -500,7 +496,7 @@
 	  		      }
 	  						
   		  }},
-		  {field: 'sowMode', title: '苗带', templet : function(item){
+		  {width: 100, field: 'sowMode', title: '苗带', templet : function(item){
 			if (item.sowMode == '0') {
 		          return '  <a class="" >单苗带</a>';
 		      }
@@ -515,12 +511,12 @@
 		      }
 						
 		  }},
-		  {field: 'sowLine', title: '播种行数', sort: true},
-		  {field: 'runningTime', title: '运行时间', sort: true},
-		  {field: 'sowDistance', title: '播种距离', sort: true},
-		  {field: 'seedAlarmCount', title: '种报警数', sort: true},
-		  {field: 'fertilizerAlarmCount', title: '肥报警数', sort: true},
-          {width: 120, toolbar: "#tool", title: '操作'}
+		  {width: 110, field: 'sowLine', title: '播种行数', sort: true},
+		  {width: 110, field: 'runningTime', title: '运行时间', sort: true},
+		  {width: 110, field: 'sowDistance', title: '播种距离', sort: true},
+		  {width: 110, field: 'seedAlarmCount', title: '种报警数', sort: true},
+		  {width: 110, field: 'fertilizerAlarmCount', title: '肥报警数', sort: true},
+          {width: 130, toolbar: "#tool", title: '操作'}
         ]
       ]
       , toolbar: '#toolbar'
@@ -535,37 +531,14 @@
     //表头工具
     table.on('toolbar(showTable)', function(obj){
       switch(obj.event){
-        case 'batchDeleted':
-          var checkStatus = table.checkStatus(obj.config.id);
-          var data = checkStatus.data;
-          if(data.length==0){
-            layer.msg("请选择要批量删除的列");
-          }else {
-            var ids = [];
-            $(data).each(function (index,item) {
-              ids.push(item.id);
-            });
-            tipDialog(ids);
-          }
-          break;
-        case 'add':
-          toUnDisabled();
-          $(".table_div").hide();
-          $(".operation").show();
-          $(".title").html("新增");
-          setTimeout(function () {
-            form.val('info', {
-              "test": "test"
-              , "deviceName": ""
-              , "dataTime": ""
-			  , "sowType": ""
-			  , "sowMode": ""
-			  , "sowLine": ""
-			  , "runningTime": ""
-			  , "sowDistance": ""
-            });
-          }, 200);
-          break;
+		case 'refresh':
+		  refreshData();
+		  break;
+		case 'comeBack':
+			const targetUrl = "http://localhost:8080/manager/index/dataBzjDevice2";
+		    // 直接跳转到新页面
+			window.location.href = targetUrl;
+		  break;
       };
     });
 	
@@ -600,6 +573,30 @@
       }
     });
 
+	var refreshData = function(){
+		$.ajax({
+            type: 'POST',
+            url: ctx + 'dataElectricSeederMessage/refreshData',
+            dataType: "JSON",
+            data: JSON.stringify({lotId:aaa}),
+            contentType: "application/json",
+            success: function (res) {
+                if (res.code == 0) {
+					tableIns1.reload({
+					        page: {
+					          curr: 1
+					        }
+					        , where: {lotId:aaa}
+					      });
+                } else {
+                    layer.msg(res.msg);
+                    $("#img").click();
+                }
+            }
+        })
+		
+	}
+	
     //删除
     var tipDialog=function (ids) {
       layer.open({
@@ -765,15 +762,6 @@
       }, 200);
     }
 
-	$('#back_btn').click(function(){
-		
-		const targetUrl = "http://localhost:8080/manager/index/dataBzjDevice2?";
-		    
-		    // 直接跳转到新页面（放弃Tab模式）
-		    window.location.href = targetUrl;
-		
-	})
-	
     //禁用输入
     var toDisabled = function () {
       $(".oper").hide();

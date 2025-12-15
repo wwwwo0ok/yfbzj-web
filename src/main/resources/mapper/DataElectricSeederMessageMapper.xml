@@ -5,6 +5,7 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.company.project.entity.DataElectricSeederMessageEntity" id="dataElectricSeederMessageMap">
+        <result property="id" column="id"/>
         <result property="lotId" column="lot_id"/>
         <result property="deviceName" column="device_name"/>
         <result property="dataTime" column="data_time"/>
@@ -67,10 +68,11 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="status" column="status"/>
+        <result property="aliyun" column="aliyun"/>
          <collection property="lines"
                     ofType="com.company.project.entity.DataElectricSeederMessageLineEntity"
-                    select="com.company.project.mapper.DataElectricSeederMessageLineMapper.selectLinesByPrimary"
-                    column="{lotId=lot_id, dataTime=data_time}"/>
+                    select="com.company.project.mapper.DataElectricSeederMessageLineMapper.selectLinesByMessageId"
+                    column="id"/>
     </resultMap>
 
 	<select id="selectMaxDataTimeByDevice" resultType="java.util.Date" parameterType="com.company.project.entity.DataBzjDeviceEntity">
@@ -97,10 +99,10 @@
 	            AND data_time = #{query.dataTime}
 	        </if>
 	        <if test="query.createTimeBegin != null">
-	            AND create_time >= #{query.createTimeBegin}
+	            AND data_time >= #{query.createTimeBegin}
 	        </if>
 	        <if test="query.createTimeEnd != null">
-	            AND create_time &lt;= #{query.createTimeEnd}
+	            AND data_time &lt;= #{query.createTimeEnd}
 	        </if>
 	        <if test="query.status != null and status != ''">
 	            AND status = #{query.status}

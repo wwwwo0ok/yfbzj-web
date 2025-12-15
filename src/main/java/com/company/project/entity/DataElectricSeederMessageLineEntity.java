@@ -16,7 +16,7 @@ import lombok.Data;
  *
  * @author wenbin
  * @email *****@mail.com
- * @date 2025-12-02 09:54:02
+ * @date 2025-12-12 18:24:42
  */
 @Data
 @TableName("data_electric_seeder_message_line")
@@ -24,16 +24,16 @@ public class DataElectricSeederMessageLineEntity extends BaseEntity implements S
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 设备id
+	 * 
 	 */
-	@TableId("lot_id")
-	private String lotId;
+	@TableId("id")
+	private String id;
 
 	/**
-	 * 数据发生时刻（硬件时刻）
+	 * 
 	 */
-		@TableField("data_time")
-		private Date dataTime;
+		@TableField("message_id")
+		private String messageId;
 
 	/**
 	 * 行数

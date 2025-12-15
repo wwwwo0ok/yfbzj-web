@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
+import com.company.project.entity.DataElectricSeederMessageLineEntity;
 import com.company.project.mapper.DataElectricSeederMessageMapper;
 import com.company.project.service.DataBzjDeviceService;
 import com.company.project.service.DataElectricSeederMessageLineService;
@@ -175,17 +176,23 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	                entity.setLotId(iotId);
 	                entity.setDeviceName(deviceName);
 	                entity.setDataTime(new Date(Long.parseLong(timestamp)));
+	                entity.setAliyun(hexData);
 	                
-	                entity.getLines().forEach(li -> {
-	                	li.setLotId(iotId);
-	                	li.setDataTime(entity.getDataTime());
-	                });
 	                
-	                dataElectricSeederMessageLineService.saveBatch(entity.getLines());
 	                iotLit.add(entity);
 	            }
 	            
 	            saveBatch(iotLit);
+	            
+	            iotLit.forEach(li -> {
+	            	String id = li.getId();
+	            	List<DataElectricSeederMessageLineEntity> lines = li.getLines();
+	            	lines.forEach(line -> line.setMessageId(id));
+	            	dataElectricSeederMessageLineService.saveBatch(lines);
+	            	
+	            });
+	            
+	            
 	            
 	            ListAnalyticsDataResponseBody body = resp.getBody();
 	            
@@ -212,27 +219,28 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 		return dataElectricSeederMessageMapper.selectMaxDataTimeByDevice(device);
 	}
 
-
-	@Override
-	public boolean saveByHexStr(DataBzjDeviceEntity device,Date dataTime,String hexData) {
-		
-		DataElectricSeederMessageEntity entity = DataAnalysisUtil.transToEntity(hexData);
-        
-        entity.setLotId(device.getLotId());
-        entity.setDeviceName(device.getDeviceName());
-        entity.setDataTime(dataTime);
-        
-        entity.getLines().forEach(li -> {
-        	li.setLotId(device.getLotId());
-        	li.setDataTime(entity.getDataTime());
-        });
-        
-        dataElectricSeederMessageLineService.saveBatch(entity.getLines());
-		
-        save(entity);
-        
-        return true;
-	}
+//
+//	@Override
+//	public boolean saveByHexStr(DataBzjDeviceEntity device,Date dataTime,String hexData) {
+//		
+//		DataElectricSeederMessageEntity entity = DataAnalysisUtil.transToEntity(hexData);
+//        
+//        entity.setLotId(device.getLotId());
+//        entity.setDeviceName(device.getDeviceName());
+//        entity.setDataTime(dataTime);
+//        entity.setAliyun(hexData);
+//        
+//        entity.getLines().forEach(li -> {
+//        	li.setLotId(device.getLotId());
+//        	li.setDataTime(entity.getDataTime());
+//        });
+//        
+//        dataElectricSeederMessageLineService.saveBatch(entity.getLines());
+//		
+//        save(entity);
+//        
+//        return true;
+//	}
 	
 	/**
 	 * 联合主键更新

@@ -48,8 +48,8 @@ public class DataElectricSeederMessageLineController {
     public DataResult findListByPage(@RequestBody DataElectricSeederMessageLineEntity dataElectricSeederMessageLine){
         LambdaQueryWrapper<DataElectricSeederMessageLineEntity> queryWrapper = Wrappers.lambdaQuery();
         //查询条件示例
-        queryWrapper.eq(dataElectricSeederMessageLine.getLotId() != null, DataElectricSeederMessageLineEntity::getLotId, dataElectricSeederMessageLine.getLotId());
-        queryWrapper.orderByDesc(DataElectricSeederMessageLineEntity::getLotId);
+        queryWrapper.eq(dataElectricSeederMessageLine.getMessageId() != null, DataElectricSeederMessageLineEntity::getMessageId, dataElectricSeederMessageLine.getMessageId());
+        queryWrapper.orderByAsc(DataElectricSeederMessageLineEntity::getLineNo);
         IPage<DataElectricSeederMessageLineEntity> iPage = dataElectricSeederMessageLineService.page(dataElectricSeederMessageLine.getQueryPage(), queryWrapper);
         return DataResult.success(iPage);
     }

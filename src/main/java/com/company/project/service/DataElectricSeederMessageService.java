@@ -37,7 +37,7 @@ public interface DataElectricSeederMessageService extends IService<DataElectricS
 	
 	Date selectMaxDataTimeByDevice(@Param("device") DataBzjDeviceEntity device);
 
-	boolean saveByHexStr(DataBzjDeviceEntity device, Date dataTime, String hexData);
+//	boolean saveByHexStr(DataBzjDeviceEntity device, Date dataTime, String hexData);
 
 	void insertNewData(String lotId);
 

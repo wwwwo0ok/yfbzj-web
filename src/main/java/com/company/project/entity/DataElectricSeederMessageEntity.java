@@ -4,10 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -16,7 +17,7 @@ import lombok.Data;
  *
  * @author wenbin
  * @email *****@mail.com
- * @date 2025-12-02 13:37:41
+ * @date 2025-12-12 18:24:41
  */
 @Data
 @TableName("data_electric_seeder_message")
@@ -24,14 +25,19 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * 
+	 */
+	@TableId("id")
+	private String id;
+
+	/**
 	 * 设备id
 	 */
-	@TableId("lot_id")
-	private String lotId;
-	
 	@TableField(exist = false)
 	private List<DataElectricSeederMessageLineEntity> lines;
 	
+		@TableField("lot_id")
+		private String lotId;
 
 	/**
 	 * 设备名称
@@ -44,7 +50,7 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 */
 		@TableField("data_time")
 		private Date dataTime;
-
+		
 	/**
 	 * 电子齿轮比
 	 */
@@ -384,13 +390,13 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	/**
 	 * 创建时间
 	 */
-		@TableField(value="create_time",fill = FieldFill.INSERT)
+		@TableField("create_time")
 		private Date createTime;
 
 	/**
 	 * 更新时间
 	 */
-		@TableField(value="update_time",fill = FieldFill.UPDATE)
+		@TableField("update_time")
 		private Date updateTime;
 
 	/**
@@ -398,6 +404,16 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 */
 		@TableField("status")
 		private Integer status;
+
+	/**
+	 * 阿里云原数据
+	 */
+		@TableField("aliyun")
+		@JsonIgnore
+		private String aliyun;
+		
+
+	   
 
 
 }

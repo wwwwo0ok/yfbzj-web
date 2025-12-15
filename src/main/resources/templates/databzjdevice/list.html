@@ -87,10 +87,10 @@
 		              </div>
 		<div class="layui-input-inline layui-form">
 		                  <select name="deviceType">
-		                      <option value="0">未知</option>
+		                      <option value="">全部</option>
 		                      <option value="1">监控器</option>
 		                      <option value="2">电驱</option>
-		                      <option value="">全部</option>
+		                      <option value="0">未知</option>
 		                  </select>
 		              </div>
         <div class="layui-input-inline ">
@@ -103,14 +103,11 @@
 </div>
 <script type="text/html" id="toolbar">
   <div class="layui-btn-container oper">
-    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataBzjDevice:add">添加</button>
-    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataBzjDevice:delete">删除</button>
   </div>
 </script>
 <script type="text/html" id="tool">
   <a class="layui-btn layui-btn-xs" lay-event="data">数据</a>
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataBzjDevice:update">编辑</a>
-  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="dataBzjDevice:delete">删除</a>
 </script>
 
 </body>

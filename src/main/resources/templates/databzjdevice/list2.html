@@ -12,12 +12,6 @@
 <div class="layui-card-body">
 <form class="layui-form " action="" lay-filter="info">
   <input name="lotId" hidden/>
-    <div class="layui-form-item">
-      <label class="layui-form-label">组织机构id</label>
-      <div class="layui-input-block">
-        <input type="deptId" name="deptId" placeholder="请输入组织机构id" autocomplete="off" class="layui-input disabled">
-      </div>
-    </div>
       <div class="layui-form-item">
       <label class="layui-form-label">用户名</label>
       <div class="layui-input-block">
@@ -37,39 +31,15 @@
       </div>
     </div>
       <div class="layui-form-item">
-      <label class="layui-form-label">设备名称</label>
-      <div class="layui-input-block">
-        <input type="deviceName" name="deviceName" placeholder="请输入设备名称" autocomplete="off" class="layui-input disabled">
-      </div>
-    </div>
-      <div class="layui-form-item">
       <label class="layui-form-label">备注名称</label>
       <div class="layui-input-block">
         <input type="nickname" name="nickname" placeholder="请输入备注名称" autocomplete="off" class="layui-input disabled">
       </div>
     </div>
       <div class="layui-form-item">
-      <label class="layui-form-label">产品 ProductKey</label>
-      <div class="layui-input-block">
-        <input type="productKey" name="productKey" placeholder="请输入产品 ProductKey" autocomplete="off" class="layui-input disabled">
-      </div>
-    </div>
-      <div class="layui-form-item">
       <label class="layui-form-label">设备信息最后一次更新时的时间</label>
       <div class="layui-input-block">
-        <input type="deviceModified" name="deviceModified" placeholder="请输入设备信息最后一次更新时的时间" autocomplete="off" class="layui-input disabled">
-      </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用</label>
-      <div class="layui-input-block">
-        <input type="deviceStatus" name="deviceStatus" placeholder="请输入设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用" autocomplete="off" class="layui-input disabled">
-      </div>
-    </div>
-      <div class="layui-form-item">
-      <label class="layui-form-label">设备密钥</label>
-      <div class="layui-input-block">
-        <input type="deviceSecret" name="deviceSecret" placeholder="请输入设备密钥" autocomplete="off" class="layui-input disabled">
+        <input type="text" name="deviceModified" placeholder="请输入设备信息最后一次更新时的时间" autocomplete="off" class="layui-input disabled">
       </div>
     </div>
       <div class="layui-form-item">
@@ -101,39 +71,35 @@
     <form class="layui-form ">
       <div class="layui-form-item">
         <div class="layui-input-inline">
-          <input type="text" name="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+          <input type="hidden" name="lotId" id="lotId" class="layui-input"  autocomplete="off" placeholder="请输入" th:value="${param.lotId}">
         </div>
-		<div class="layui-input-inline">
-		          <input type="hidden" name="deviceType" class="layui-input"  autocomplete="off" value="2">
-		        </div>
+        <div class="layui-input-inline">
+          <input type="text" name="device_name" id="device_name" class="layui-input"  autocomplete="off" placeholder="设备名称">
+        </div>
 		<div class="layui-input-inline layui-form">
-		                  <select name="status">
-		                      <option value="">在线状态</option>
+		                  <select name="deviceStatus">
 		                      <option value="ONLINE">在线</option>
 		                      <option value="OFFLINE">离线</option>
 		                      <option value="UNACTIVE">未激活</option>
+		                      <option value="DISABLE">禁用</option>
 		                      <option value="">全部</option>
 		                  </select>
 		              </div>
         <div class="layui-input-inline ">
           <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
-        </div>
-      </div>
+      	</div>
+	  </div>
     </form>
   </div>
   <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
 </div>
 <script type="text/html" id="toolbar">
   <div class="layui-btn-container oper">
-    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataBzjDevice:add">添加</button>
-    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataBzjDevice:delete">删除</button>
   </div>
 </script>
 <script type="text/html" id="tool">
-  <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
   <a class="layui-btn layui-btn-xs" lay-event="data">数据</a>
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataBzjDevice:update">编辑</a>
-  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="dataBzjDevice:delete">删除</a>
 </script>
 
 </body>
@@ -144,6 +110,9 @@
     var form = layui.form;
     var layer = layui.layer;
     var element = layui.element;
+	var deviceType = 2;
+	
+	var initLotId = $('#lotId').val();
     //加载table
     var tableIns1 = table.render({
       elem: '#showTable'
@@ -151,7 +120,7 @@
       , page: true //开启分页
       , url: ctx + 'dataBzjDevice/listByPage' //数据接口
       , method: 'POST'
-	  , where:{deviceType:'2'}
+	  , where: {deviceStatus:'ONLINE',lotId:initLotId,deviceType:deviceType}
       , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
         return {
           "code": res.code, //解析接口状态
@@ -163,14 +132,26 @@
       , cols: [
         [
           {type: 'checkbox', fixed: 'left'},
-          {field: 'deptId', title: '组织机构id', sort: true},
           {field: 'username', title: '用户名', sort: true},
           {field: 'address', title: '地址', sort: true},
           {field: 'telephone', title: '电话', sort: true},
-          {field: 'deviceName', title: '设备名称', sort: true},
           {field: 'nickname', title: '备注名称', sort: true},
           {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
-          {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', sort: true},
+          {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', templet : function(item){
+			if (item.deviceStatus == 'ONLINE') {
+					              return '  <a class="layui-btn layui-btn-xs" >在线</a>';
+					          }
+					          if (item.deviceStatus == 'OFFLINE') {
+					              return '<a class="layui-btn layui-btn-xs layui-btn-normal" >离线</a>';
+					          }
+					          if (item.deviceStatus == 'UNACTIVE') {
+					              return '<a class="layui-btn layui-btn-xs layui-btn-warm " >未激活</a>';
+					          }
+					          if (item.deviceStatus == 'DISABLE') {
+					              return '<a class="layui-btn layui-btn-xs layui-btn-warm " >禁用</a>';
+					          }
+			
+		  }},
 		  {
 		      field: 'deviceType', width: 70, title: '类型', templet: function (item) {
 		          if (item.deviceType == 0) {
@@ -191,19 +172,6 @@
       , toolbar: '#toolbar'
     });
 
-
-	// 监听搜索操作
-	form.on('submit(data-search-btn)', function (data) {
-	  //执行搜索重载
-	  tableIns1.reload({
-	    page: {
-	      curr: 1
-	    }
-	    , where: data.field
-	  });
-	  return false;
-	});
-	
 
     //表头工具
     table.on('toolbar(showTable)', function(obj){
@@ -309,6 +277,17 @@
       return false;
     });
 
+    // 监听搜索操作
+    form.on('submit(data-search-btn)', function (data) {
+      //执行搜索重载
+      tableIns1.reload({
+        page: {
+          curr: 1
+        }
+        , where: data.field
+      });
+      return false;
+    });
 
     //回显
     var backshow = function (data) {
@@ -335,11 +314,11 @@
 	
 	var lookData = function(param)	{
 		if(param.deviceType == 2){
-	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?param=`+param.lotId;
+	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=`+param.lotId;
 		    window.location.href = targetUrl;
 		}
 		if(param.deviceType == 1){
-	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?param=`+param.lotId;
+	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=`+param.lotId;
 		}
 		if(param.deviceType == 0){
 			alert("不确定播种机类型，无法查看数据")

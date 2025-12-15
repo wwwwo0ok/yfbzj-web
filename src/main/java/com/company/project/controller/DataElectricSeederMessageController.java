@@ -1,14 +1,6 @@
 package com.company.project.controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,28 +13,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.aliyun.auth.credentials.Credential;
-import com.aliyun.auth.credentials.provider.StaticCredentialProvider;
-import com.aliyun.sdk.service.iot20180120.AsyncClient;
-import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataRequest;
-import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataResponse;
-import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataResponseBody;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.company.project.common.utils.DataResult;
 import com.company.project.entity.DataElectricSeederMessageEntity;
-import com.company.project.entity.DataElectricSeederMessageLineEntity;
 import com.company.project.service.DataElectricSeederMessageLineService;
 import com.company.project.service.DataElectricSeederMessageService;
-import com.company.project.util.AliyunIotConstants;
-import com.company.project.util.BzjUtil;
-import com.company.project.util.DataAnalysisUtil;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import darabonba.core.client.ClientOverrideConfiguration;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -75,7 +54,7 @@ public class DataElectricSeederMessageController {
 
     @ApiOperation(value = "查询分页数据")
     @PostMapping("dataElectricSeederMessage/listByPage")
-//    @SaCheckPermission("dataElectricSeederMessage:list")
+    @SaCheckPermission("dataElectricSeederMessage:list")
     @ResponseBody
     public DataResult findListByPage(@RequestBody DataElectricSeederMessageEntity dataElectricSeederMessage){
         LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
@@ -85,7 +64,6 @@ public class DataElectricSeederMessageController {
         	return DataResult.success();
         }
         //单数据同步
-        dataElectricSeederMessageService.insertNewData(dataElectricSeederMessage.getLotId());
         //查询条件示例
 //        queryWrapper.eq(dataElectricSeederMessage.getLotId() != null, DataElectricSeederMessageEntity::getLotId, dataElectricSeederMessage.getLotId());
 //        queryWrapper.orderByDesc(DataElectricSeederMessageEntity::getDataTime);
@@ -93,6 +71,19 @@ public class DataElectricSeederMessageController {
         
         IPage<DataElectricSeederMessageEntity> iPage = dataElectricSeederMessageService.getMessageList(dataElectricSeederMessage);
         return DataResult.success(iPage);
+    }
+    @ApiOperation(value = "更新数据")
+    @PostMapping("dataElectricSeederMessage/refreshData")
+    @ResponseBody
+    public DataResult refreshData(@RequestBody DataElectricSeederMessageEntity dataElectricSeederMessage){
+    	LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
+    	//空不查询
+    	if(StringUtils.isBlank(dataElectricSeederMessage.getLotId())) {
+    		return DataResult.success();
+    	}
+    	//单数据同步
+    	dataElectricSeederMessageService.insertNewData(dataElectricSeederMessage.getLotId());
+    	return DataResult.success();
     }
 
 
