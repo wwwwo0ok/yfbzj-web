@@ -77,7 +77,18 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 		long timeMillis = System.currentTimeMillis();
     	
 		//获取所有的设备
-		List<DataBzjDeviceEntity> list = dataBzjDeviceService.list(new QueryWrapper<DataBzjDeviceEntity>().eq("device_type",2));
+		List<DataBzjDeviceEntity> dqlist = dataBzjDeviceService.list(new QueryWrapper<DataBzjDeviceEntity>().eq("device_type",2));
+		
+		dqlist.forEach(this::insertNewData);
+		
+		
+		
+		//获取所有的设备
+		List<DataBzjDeviceEntity> jxlist = dataBzjDeviceService.list(new QueryWrapper<DataBzjDeviceEntity>().eq("device_type",1));
+		
+		jxlist.forEach(this::insertNewData);
+		
+		
 		
 		
 //		DataBzjDeviceEntity dq = new DataBzjDeviceEntity();
@@ -86,13 +97,9 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 //		dq.setDeviceName("iiAriJtCvsFLPW5zfn1E");//监控器
 //		List<DataBzjDeviceEntity> list = new ArrayList<>(Arrays.asList(dq,jx));
 		
-		
-		
 		//循环调用增量保存
-		list.forEach(this::insertNewData);
-		
-
         timeMillis = System.currentTimeMillis()- timeMillis ;
+        
         
         return true;
     }
@@ -120,6 +127,9 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     	try {
 	    	//查询最大结束时间位起始时间
 	    	Date beginTimeDate = selectMaxDataTimeByDevice(device);
+	    	
+	    	
+	    	String deviceType = device.getDeviceType();
 	    	
 	    	if(beginTimeDate == null) {
 	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -170,8 +180,13 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	                String deviceName = data.get("device_name").toString();
 	                String timestamp = data.get("timestamp").toString();
 	                String hexData = data.get("BZJ").toString().trim();
-	                
-	                DataElectricSeederMessageEntity entity = DataAnalysisUtil.transToEntity(hexData);
+	                DataElectricSeederMessageEntity entity = new DataElectricSeederMessageEntity();
+	                if("2".equals(deviceType)) {
+	                	entity = DataAnalysisUtil.analysisElectricHexStr(hexData);
+	                }
+	                if("1".equals(deviceType)) {
+	                	entity = DataAnalysisUtil.analysisMachineHexStr(hexData);
+	                }
 	                
 	                entity.setLotId(iotId);
 	                entity.setDeviceName(deviceName);

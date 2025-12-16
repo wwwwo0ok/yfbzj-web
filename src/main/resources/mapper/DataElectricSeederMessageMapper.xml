@@ -69,6 +69,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="status" column="status"/>
         <result property="aliyun" column="aliyun"/>
+        <result property="seedFlag" column="seed_flag"/>
          <collection property="lines"
                     ofType="com.company.project.entity.DataElectricSeederMessageLineEntity"
                     select="com.company.project.mapper.DataElectricSeederMessageLineMapper.selectLinesByMessageId"

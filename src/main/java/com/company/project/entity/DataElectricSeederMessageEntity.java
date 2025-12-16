@@ -413,7 +413,8 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 		private String aliyun;
 		
 
-	   
+		@TableField("seed_flag")
+	   private int seedFlag;
 
 
 }

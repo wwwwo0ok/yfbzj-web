@@ -313,13 +313,8 @@
     }
 	
 	var lookData = function(param)	{
-		if(param.deviceType == 2){
-	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=`+param.lotId;
-		    window.location.href = targetUrl;
-		}
-		if(param.deviceType == 1){
-	  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=`+param.lotId;
-		}
+  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=`+param.lotId;
+	    window.location.href = targetUrl;
 		if(param.deviceType == 0){
 			alert("不确定播种机类型，无法查看数据")
 		}

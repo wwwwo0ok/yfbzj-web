@@ -189,17 +189,14 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
     /**
      *  定时同步未知类型的数据，并且试图绑定类型，绑定失败的不处理。
      */
-    @Scheduled(cron = "0 10/30 * * * ?")
+//    @Scheduled(cron = "0 10/30 * * * ?")
 	public void syncOtherMessage() {
 		
 		//查询列表
 		List<DataBzjDeviceEntity> list = list(new QueryWrapper<DataBzjDeviceEntity>().eq("device_type",0));
 		
-		
-
 		//循环调用增量保存
 		list.forEach(this::selectAndCheck);
-		
 		
 	}
     
