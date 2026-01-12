@@ -1,0 +1,9 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden
+}
+/* 方法2：更精确的控制（避免影响输入框等交互元素） */
+body, .layui-text, .layui-table, .layui-card, .layui-elem-field {
+    color: #00AAD7;
+}

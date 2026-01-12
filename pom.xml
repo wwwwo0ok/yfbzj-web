@@ -59,6 +59,20 @@
             <version>${druid.version}</version>
         </dependency>
 
+		<!-- pom.xml -->
+		<dependency>
+		    <groupId>net.objecthunter</groupId>
+		    <artifactId>exp4j</artifactId>
+		    <version>0.4.8</version>
+		</dependency>
+
+        <!--nashorn-->
+	<!--	<dependency>
+		    <groupId>org.openjdk.nashorn</groupId>
+		    <artifactId>nashorn-core</artifactId>
+		    <version>15.0</version> 
+		</dependency>-->
+
         <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -187,4 +201,32 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+    
+    <profiles>
+	    <profile>
+	        <id>prod</id>
+	        <build>
+	            <plugins>
+	                <plugin>
+					    <groupId>org.springframework.boot</groupId>
+					    <artifactId>spring-boot-maven-plugin</artifactId>
+					    <configuration>
+					        <!-- 确保 META-INF/services 被打包进去 -->
+					        <includeSystemScope>true</includeSystemScope>
+					        <!-- 或者使用自定义布局 -->
+					        <layout>JAR</layout>
+					    </configuration>
+					    <executions>
+					        <execution>
+					            <goals>
+					                <goal>repackage</goal>
+					            </goals>
+					        </execution>
+					    </executions>
+					</plugin>
+	            </plugins>
+	        </build>
+	    </profile>
+	</profiles>
+    
 </project>

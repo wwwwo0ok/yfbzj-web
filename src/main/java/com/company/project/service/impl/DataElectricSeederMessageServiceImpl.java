@@ -9,6 +9,7 @@ import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	AsyncClient client;
 	
 	@Autowired
+	@Lazy
 	DataBzjDeviceService dataBzjDeviceService;
 	
 	@Autowired

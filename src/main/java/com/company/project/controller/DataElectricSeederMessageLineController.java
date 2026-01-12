@@ -43,7 +43,6 @@ public class DataElectricSeederMessageLineController {
 
     @ApiOperation(value = "查询分页数据")
     @PostMapping("dataElectricSeederMessageLine/listByPage")
-    @SaCheckPermission("dataElectricSeederMessageLine:list")
     @ResponseBody
     public DataResult findListByPage(@RequestBody DataElectricSeederMessageLineEntity dataElectricSeederMessageLine){
         LambdaQueryWrapper<DataElectricSeederMessageLineEntity> queryWrapper = Wrappers.lambdaQuery();
@@ -57,7 +56,6 @@ public class DataElectricSeederMessageLineController {
 
     @ApiOperation(value = "新增")
     @PostMapping("dataElectricSeederMessageLine/add")
-    @SaCheckPermission("dataElectricSeederMessageLine:add")
     @ResponseBody
     public DataResult add(@RequestBody DataElectricSeederMessageLineEntity dataElectricSeederMessageLine){
             dataElectricSeederMessageLineService.save(dataElectricSeederMessageLine);
@@ -66,7 +64,6 @@ public class DataElectricSeederMessageLineController {
 
     @ApiOperation(value = "删除")
     @DeleteMapping("dataElectricSeederMessageLine/delete")
-    @SaCheckPermission("dataElectricSeederMessageLine:delete")
     @ResponseBody
     public DataResult delete(@RequestBody @ApiParam(value = "id集合") List<String> ids){
             dataElectricSeederMessageLineService.removeByIds(ids);
@@ -75,7 +72,6 @@ public class DataElectricSeederMessageLineController {
 
     @ApiOperation(value = "更新")
     @PutMapping("dataElectricSeederMessageLine/update")
-    @SaCheckPermission("dataElectricSeederMessageLine:update")
     @ResponseBody
     public DataResult update(@RequestBody DataElectricSeederMessageLineEntity dataElectricSeederMessageLine){
             dataElectricSeederMessageLineService.updateById(dataElectricSeederMessageLine);

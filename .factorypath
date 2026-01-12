@@ -41,6 +41,7 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/com/alibaba/druid/1.1.10/druid-1.1.10.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/slf4j/slf4j-api/1.7.26/slf4j-api-1.7.26.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-autoconfigure/2.1.6.RELEASE/spring-boot-autoconfigure-2.1.6.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/net/objecthunter/exp4j/0.4.8/exp4j-0.4.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/projectlombok/lombok/1.18.8/lombok-1.18.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/alibaba/fastjson/1.2.83/fastjson-1.2.83.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-starter-thymeleaf/2.1.6.RELEASE/spring-boot-starter-thymeleaf-2.1.6.RELEASE.jar" enabled="true" runInBatchMode="false"/>

@@ -314,7 +314,7 @@
     }
 	
 	var lookData = function(param)	{
-  		const targetUrl = `http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=`+param.lotId;
+  		const targetUrl = ctx+"index/dataElectricSeederMessage?lotId="+param.lotId;
 	    window.location.href = targetUrl;
 	}
 	

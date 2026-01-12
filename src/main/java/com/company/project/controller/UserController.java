@@ -14,12 +14,12 @@ import com.company.project.entity.SysUserRole;
 import com.company.project.service.HomeService;
 import com.company.project.service.UserRoleService;
 import com.company.project.service.UserService;
+import com.company.project.util.ArithmeticCaptchaWithoutJS;
+import com.company.project.util.CaptchaUtil;
 import com.company.project.vo.req.UserRoleOperationReqVO;
 import com.company.project.vo.resp.HomeRespVO;
 import com.company.project.vo.resp.LoginRespVO;
 import com.company.project.vo.resp.UserOwnRoleRespVO;
-import com.wf.captcha.ArithmeticCaptcha;
-import com.wf.captcha.utils.CaptchaUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -64,8 +64,15 @@ public class UserController {
      */
     @RequestMapping("/getVerify")
     public void getCaptchaCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 48);
-        captcha.setLen(2);
+//        ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 48);
+//        captcha.setLen(2);
+//        CaptchaUtil.out(captcha, request, response);
+    	
+    	// 使用自定义的验证码（不依赖JavaScript引擎）
+        ArithmeticCaptchaWithoutJS captcha = new ArithmeticCaptchaWithoutJS(130, 48);
+        captcha.setLen(2); // 设置两个操作数
+        
+        // 输出验证码
         CaptchaUtil.out(captcha, request, response);
     }
 
@@ -74,9 +81,9 @@ public class UserController {
     @ApiOperation(value = "用户登录接口")
     public LoginRespVO login(@RequestBody @Valid SysUser vo, HttpServletRequest request) {
         //判断验证码
-        if (!CaptchaUtil.ver(vo.getCaptcha(), request)) {
+        if (!CaptchaUtil.verify(vo.getCaptcha(), request)) {
             // 清除session中的验证码
-            CaptchaUtil.clear(request);
+//            CaptchaUtil.clear(request);
             throw new BusinessException("验证码错误！");
         }
         return userService.login(vo);

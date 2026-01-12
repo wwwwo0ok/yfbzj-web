@@ -7,20 +7,10 @@ spring:
       primary: master #设置默认的数据源或者数据源组,默认值即为master
       datasource:
         master:
-          username: root
-          password: 123456
+          username: bzj
+          password: mdjj7HE78ZMCz3c6
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/company_project?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
-        oracle:
-          username: root
-          password: 123456
-          driver-class-name: oracle.jdbc.driver.OracleDriver
-          url: jdbc:oracle:thin:@localhost:1521/company_project
-        sqlServer:
-          username: sa
-          password: 123456
-          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-          url: jdbc:sqlserver://localhost:1433;databaseName=company_project
+          url: jdbc:mysql://127.0.0.1:3306/bzj?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
 
 file:
   #文件上传目录 绝对路径 末尾请加 /

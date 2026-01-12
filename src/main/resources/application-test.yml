@@ -8,9 +8,9 @@ spring:
       datasource:
         master:
           username: bzj
-          password: BoZhongJi123
+          password: mdjj7HE78ZMCz3c6
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/bzj?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true&useSSL=false
+          url: jdbc:mysql://116.62.36.44:3306/bzj?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&useSSL=false
 file:
   #文件上传目录 绝对路径 末尾请加 /
   path: F:/files/ #windows

@@ -1,13 +1,11 @@
 package com.company.project.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.company.project.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 
@@ -27,7 +25,7 @@ public class AppVersionEntity extends BaseEntity implements Serializable {
 	 * 
 	 */
 	@TableId("id")
-	private Integer id;
+	private String id;
 
 	/**
 	 * 版本号
