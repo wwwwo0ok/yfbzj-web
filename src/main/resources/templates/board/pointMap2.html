@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>大屏显示</title>
 	<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <!-- 如果有特殊样式可以保留，否则删除 -->
     <div th:replace="~{layout}"></div>
 	<link rel="stylesheet" th:href="@{/static/css/pointMap.css}">
@@ -82,7 +84,7 @@
 																		display: flex;          /* 启用flex布局 */
 																		justify-content: center; /* 水平居中 */
 																		align-items: center;     /* 垂直居中 - 关键修正 */">设备总数</div>
-															<div style="flex:1;height:50%;text-align: center;
+															<div id="deviceNum" style="flex:1;height:50%;text-align: center;
 																		display: flex;          /* 启用flex布局 */
 																		justify-content: center; /* 水平居中 */
 																		align-items: center;     /* 垂直居中 - 关键修正 */
@@ -111,7 +113,7 @@
 																	display: flex;          /* 启用flex布局 */
 																	justify-content: center; /* 水平居中 */
 																	align-items: center;     /* 垂直居中 - 关键修正 */">在线总数</div>
-														<div style="flex:1;height:50%;text-align: center;
+														<div id="onlineNum" style="flex:1;height:50%;text-align: center;
 																	display: flex;          /* 启用flex布局 */
 																	justify-content: center; /* 水平居中 */
 																	align-items: center;     /* 垂直居中 - 关键修正 */
@@ -143,7 +145,7 @@
 																	display: flex;          /* 启用flex布局 */
 																	justify-content: center; /* 水平居中 */
 																	align-items: center;     /* 垂直居中 - 关键修正 */">离线总数</div>
-														<div style="flex:1;height:50%;text-align: center;
+														<div id="offlineNum" style="flex:1;height:50%;text-align: center;
 																	display: flex;          /* 启用flex布局 */
 																	justify-content: center; /* 水平居中 */
 																	align-items: center;     /* 垂直居中 - 关键修正 */
@@ -172,7 +174,7 @@
 																	display: flex;          /* 启用flex布局 */
 																	justify-content: center; /* 水平居中 */
 																	align-items: center;     /* 垂直居中 - 关键修正 */">报警总数</div>
-														<div style="flex:1;height:50%;text-align: center;
+														<div id="alarmNum" style="flex:1;height:50%;text-align: center;
 																	display: flex;          /* 启用flex布局 */
 																	justify-content: center; /* 水平居中 */
 																	align-items: center;     /* 垂直居中 - 关键修正 */
@@ -241,7 +243,7 @@
 											line-height: 60px;
 											font-size:20px;
 											
-											">2</div>
+											">0</div>
 							<div style="flex:1;height:20%;
 
 							text-align: center;
@@ -263,7 +265,7 @@
 																		line-height: 60px;
 																		font-size:20px;
 																		
-																		">4</div>
+																		">0</div>
 														<div style="flex:1;height:20%;
 
 														text-align: center;
@@ -285,7 +287,7 @@
 																		line-height: 60px;
 																		font-size:20px;
 																		
-																		">12</div>
+																		">0</div>
 														<div style="flex:1;height:20%;
 
 														text-align: center;
@@ -339,7 +341,7 @@
 																							justify-content: center; /* 水平居中 */
 																							align-items: center;     /* 垂直居中 - 关键修正 */
 																							">播种设备</div>
-																							<div style="flex:1;height:20%;
+																							<div id="seedingDeviceNum" style="flex:1;height:20%;
 
 																							text-align: center;
 																							display: flex;          /* 启用flex布局 */
@@ -369,7 +371,7 @@
 																							justify-content: center; /* 水平居中 */
 																							align-items: center;     /* 垂直居中 - 关键修正 */
 																							">播种行数</div>
-																							<div style="flex:1;height:20%;
+																							<div id="seedingLineNum" style="flex:1;height:20%;
 
 																							text-align: center;
 																							display: flex;          /* 启用flex布局 */
@@ -392,14 +394,14 @@
 																											justify-content: center; /* 水平居中 */
 																											align-items: center;     /* 垂直居中 - 关键修正 */
 																											"></div>
-																							<div style="flex:1;height:20%;
+																							<div  style="flex:1;height:20%;
 
 																							text-align: center;
 																							display: flex;          /* 启用flex布局 */
 																							justify-content: center; /* 水平居中 */
 																							align-items: center;     /* 垂直居中 - 关键修正 */
 																							">平均行数</div>
-																							<div style="flex:1;height:20%;
+																							<div id="avgLineNum" style="flex:1;height:20%;
 
 																							text-align: center;
 																							display: flex;          /* 启用flex布局 */
@@ -442,7 +444,7 @@ layui.use(function () {
         var form = layui.form;
         var upload = layui.upload;
         var laydate = layui.laydate;
-		
+		var screenData = {};
 		
 		var map = new BMapGL.Map("echartDemo",{
 		    enableRotate: false,//禁用旋转
@@ -482,6 +484,29 @@ layui.use(function () {
 //		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
 		  
 //		  ]
+		  
+// 定时获取数据并更新页面
+        function fetchData() {
+		  $.ajax({
+              type: 'POST',
+              url: ctx + 'dataBzjDevice/pointMap',
+              dataType: "JSON",
+              data: JSON.stringify({deviceType:'2',deviceStatus:'ONLINE'}),
+              contentType: "application/json",
+              success: function (res) {
+				if (res.code == 0) {
+					screenData = res.data;
+					refreshPage();
+					}
+			  }
+          })
+		}
+
+		// 每 1 秒刷新一次
+		        setInterval(fetchData, 1000);
+				
+			
+				
 		  
 		  $.ajax({
               type: 'POST',
@@ -536,8 +561,6 @@ layui.use(function () {
 		  
 		  
 		  
-		  
-		  
 		  map.setMapStyleV2({
 		             styleId: "843f82bb7b6cf081859a105b2a9fbfae" // 替换为你的样式ID
 		         });
@@ -553,12 +576,11 @@ layui.use(function () {
 		
 		  
 		  
-		  var leftChart = function(divName){
-			var chartDom = document.getElementById(divName);
-						var myChart = echarts.init(chartDom);
-						var option;
-
-						option = {
+		  
+		  
+			var leftChartDom = document.getElementById('deviceOnline');
+						var leftChart = echarts.init(leftChartDom);
+						var leftOption  = {
 						  tooltip: {
 						    trigger: 'item'
 						  },
@@ -606,15 +628,13 @@ layui.use(function () {
 						  ]
 						};
 
-						option && myChart.setOption(option);
-		  }
-		  var rightChart = function(divName){
+						leftOption && leftChart.setOption(leftOption);
 			
-			var chartDom = document.getElementById(divName);
-			var myChart = echarts.init(chartDom);
-			var option;
+			var rightChartDom = document.getElementById('deviceFb');
+			var rightChart = echarts.init(rightChartDom);
+			var rightOption;
 
-			option = {
+			rightOption = {
 			  tooltip: {
 			    trigger: 'item'
 			  },
@@ -660,14 +680,45 @@ layui.use(function () {
 			  ]
 			};
 
-			option && myChart.setOption(option);
+			rightOption && rightChart.setOption(rightOption);
 
-			
-		  }
-		  
-		  leftChart('deviceOnline')
-		  rightChart('deviceFb')
-			  
+
+			//刷新页面
+			var refreshPage = function(){
+
+			$("#deviceNum").text(parseInt(screenData.online)+parseInt(screenData.offline));
+			$("#onlineNum").text(screenData.online);
+			$("#offlineNum").text(screenData.offline);
+			$("#alarmNum").text(0);
+			$("#seedingDeviceNum").text(screenData.seedDeviceCount);
+			$("#seedingLineNum").text(screenData.seedLineCount);
+			if(screenData.seedDeviceCount && screenData.seedDeviceCount!=0){
+				var avg = parseInt(screenData.seedLineCount)/parseInt(screenData.seedDeviceCount);
+				$("#avgLineNum").text(avg);
+			}
+
+			const leftData = [
+							
+							{value:screenData.online,name:"在线"},
+							{value:screenData.offline,name:"离线"},
+							
+						];
+
+			leftChart.setOption	({
+				series: [{ data: leftData }]
+			});
+			const rightData = [
+							
+							{value:screenData.dq,name:"电驱"},
+							{value:screenData.jkq,name:"监控器"},
+							
+						];
+
+			rightChart.setOption	({
+				series: [{ data: rightData }]
+			});
+
+			}
 		//
 	});
 

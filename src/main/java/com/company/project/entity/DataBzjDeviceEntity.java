@@ -142,6 +142,14 @@ public class DataBzjDeviceEntity extends BaseEntity implements Serializable {
 	 */
 		@TableField("remark")
 		private String remark;
+		/**
+		 * 备注
+		 */
+		@TableField("farm_id")
+		private String farmId;
 
+		
+		
+		
 
 }

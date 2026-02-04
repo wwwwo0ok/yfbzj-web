@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.alibaba.fastjson.JSONObject;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody.DeviceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.company.project.entity.DataBzjDeviceEntity;
@@ -23,6 +24,12 @@ public interface DataBzjDeviceService extends IService<DataBzjDeviceEntity> {
 	 * 同步物联网数据
 	 */
 	boolean sync();
+
+	/**
+	 * 显示界面的数据
+	 * @return
+	 */
+	JSONObject pointMap();
 
 }
 

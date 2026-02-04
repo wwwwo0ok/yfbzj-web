@@ -42,6 +42,21 @@
         <input type="text" name="deviceModified" placeholder="请输入设备信息最后一次更新时的时间" autocomplete="off" class="layui-input disabled">
       </div>
     </div>
+	
+	<div class="layui-form-item">
+		                            <label class="layui-form-label" >农场/合作社</label>
+		                            <div class="layui-input-inline" style="width:30%;">
+		                                <select id="farmId" name="farmId" lay-filter="farmFilter">
+		                                    <option value=""></option>
+		                                    <option value="0">写作</option>
+		                                    <option value="1">阅读</option>
+		                                    <option value="2">游戏</option>
+		                                    <option value="3">音乐</option>
+		                                    <option value="4">旅行</option>
+		                                </select>
+		                            </div>
+		                        </div>
+	
       <div class="layui-form-item">
       <label class="layui-form-label">设备类型（1机械；2电驱）</label>
 	  <div class="layui-input-block">
@@ -243,6 +258,31 @@
       }
     });
 
+	
+	initProvince();
+			 // 初始化省数据（AJAX）
+			   function initProvince() {
+			     $.ajax({
+			       url: ctx + 'sysFarm/select', 				
+			       type: 'POST',
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择省</option>';
+			           $.each(res.data, function(key, value) {
+			             html += '<option value="' + key + '">' + value + '</option>';
+			           });
+			           $('#farmId').html(html);
+			           form.render('select'); // 重新渲染下拉框
+			         } else {
+			           layer.msg('加载省数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+	
     //删除
     var tipDialog=function (ids) {
       layer.open({

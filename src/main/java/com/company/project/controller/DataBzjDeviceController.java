@@ -1,24 +1,40 @@
 package com.company.project.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import cn.dev33.satoken.annotation.SaCheckPermission;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.company.project.common.utils.DataResult;
+import com.company.project.entity.DataBzjDeviceEntity;
+import com.company.project.entity.SysFarmEntity;
+import com.company.project.entity.SysUser;
+import com.company.project.service.DataBzjDeviceService;
+import com.company.project.service.SysFarmService;
+import com.company.project.service.UserService;
+
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.util.List;
-import com.company.project.common.utils.DataResult;
-
-import com.company.project.entity.DataBzjDeviceEntity;
-import com.company.project.service.DataBzjDeviceService;
-import com.company.project.util.DataAnalysisUtil;
 
 
 
@@ -34,7 +50,14 @@ import com.company.project.util.DataAnalysisUtil;
 public class DataBzjDeviceController {
     @Autowired
     private DataBzjDeviceService dataBzjDeviceService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private SysFarmService sysFarmService;
+
+    @Resource
+    private UserService userService;
     /**
     * 跳转到页面
     */
@@ -67,6 +90,8 @@ public class DataBzjDeviceController {
 //    	DataAnalysisUtil.test();
     	
     	
+    	
+    	
         LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
         //查询条件示例
         queryWrapper
@@ -75,11 +100,45 @@ public class DataBzjDeviceController {
         .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceType()),DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceType())
         .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceStatus()),DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatus())
         .orderByDesc(DataBzjDeviceEntity::getLotId);
+        
+        Object loginId = StpUtil.getLoginId();
+    	if(loginId!=null) {
+    		
+    		SysUser byId = userService.getById(loginId.toString());
+    		
+    		LambdaQueryWrapper<SysFarmEntity> lambdaQuery = Wrappers.lambdaQuery();
+    		
+    		lambdaQuery.eq(SysFarmEntity::getPhone, byId.getUsername());
+    		
+    		SysFarmEntity one = sysFarmService.getOne(lambdaQuery);
+    		
+    		if(one!=null) {
+    			queryWrapper.eq
+    			(StringUtils.isNotBlank(one.getId()),DataBzjDeviceEntity::getFarmId,one.getId());
+    		}
+    	}
+        
         IPage<DataBzjDeviceEntity> iPage = dataBzjDeviceService.page(dataBzjDevice.getQueryPage(), queryWrapper);
         return DataResult.success(iPage);
     }
     
 
+    @ApiOperation(value = "查询分页数据")
+    @PostMapping("dataBzjDevice/pointMap")
+    @SaCheckPermission("dataBzjDevice:list")
+    @ResponseBody
+    public DataResult pointMap(){
+    	
+//    	DataAnalysisUtil.test();
+    	
+    	
+        
+        JSONObject json = dataBzjDeviceService.pointMap();
+        
+        
+        return DataResult.success(json);
+    }
+    
 
     @ApiOperation(value = "新增")
     @PostMapping("dataBzjDevice/add")
@@ -108,6 +167,16 @@ public class DataBzjDeviceController {
         return DataResult.success();
     }
 
+    
+//    // 每 1 秒推送一次数据
+//    @Scheduled(fixedRate = 1000)
+//    public void sendRealTimeData() {
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("time", System.currentTimeMillis());
+//        data.put("value", Math.random() * 100);
+//        
+//        messagingTemplate.convertAndSend("/topic/realtime", data);
+//    }
 
 
 }

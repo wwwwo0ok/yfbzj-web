@@ -28,4 +28,30 @@
     </resultMap>
 
 
+
+	<select id="pointMap" resultType="java.util.Map">
+			select 
+-- 在线数量
+    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_status='ONLINE') as online ,
+    	
+    	-- 离线数量
+    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_status='OFFLINE') as offline ,
+    	-- 监控器数量
+    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_type='1') as jkq ,
+    	-- 播种机数量
+    	
+    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_type='2') as dq ,
+    	-- 报警总数
+    	
+    	-- 种报警
+    	
+    	-- 播种设备
+    	(select count(distinct lot_Id) from data_electric_seeder_message desm where data_time >= CURDATE()          
+  AND DATE_ADD(CURDATE(), INTERVAL 1 DAY)> data_time)  as seedDeviceCount ,
+    	-- 播种行数
+    	(select sum(sow_line) from data_electric_seeder_message desm where data_time >= CURDATE()          
+  AND  DATE_ADD(CURDATE(), INTERVAL 1 DAY) >data_time)  as seedLineCount 
+	
+	</select>
+
 </mapper>
