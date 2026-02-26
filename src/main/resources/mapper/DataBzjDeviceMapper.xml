@@ -19,6 +19,8 @@
         <result property="deviceType" column="device_type"/>
         <result property="latestX" column="latest_x"/>
         <result property="latestY" column="latest_y"/>
+        <result property="baiduX" column="baidu_x"/>
+        <result property="baiduY" column="baidu_y"/>
         <result property="delFlag" column="del_flag"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>

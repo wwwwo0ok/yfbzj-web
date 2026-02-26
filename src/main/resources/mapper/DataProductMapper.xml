@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.project.mapper.DataProductMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.company.project.entity.DataProductEntity" id="dataProductMap">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="level" column="level"/>
+        <result property="deviceNum" column="device_num"/>
+    </resultMap>
+
+
+
+
+	<select id="getByProductKey" parameterType="String" resultMap="dataProductMap">
+		select * from data_product where 1=1 and code = #{code}
+	</select>
+
+</mapper>

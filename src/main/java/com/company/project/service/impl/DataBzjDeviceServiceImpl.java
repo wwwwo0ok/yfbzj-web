@@ -1,11 +1,17 @@
 package com.company.project.service.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,29 +21,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.sdk.service.iot20180120.AsyncClient;
-import com.aliyun.sdk.service.iot20180120.models.QueryDeviceRequest;
-import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponse;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody;
+import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody.DeviceInfo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.company.project.aliyun.AliYunService;
 import com.company.project.common.exception.BusinessException;
 import com.company.project.common.exception.code.BaseResponseCode;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.mapper.DataBzjDeviceMapper;
 import com.company.project.service.DataBzjDeviceService;
-import com.company.project.util.AliyunIotConstants;
+import com.company.project.util.BaiduCoordConverterHttp;
 
 import lombok.extern.slf4j.Slf4j;
-
 
 @Service("dataBzjDeviceService")
 @Slf4j
 public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, DataBzjDeviceEntity> implements DataBzjDeviceService {
 
 	@Autowired
-	AsyncClient client;
+	private AliYunService aliYunService;
 	
 	
 	 /**
@@ -51,29 +54,77 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
     public boolean sync() {
     	
     		long timeMillis = System.currentTimeMillis();
-    	
-    		List<QueryDeviceResponseBody.DeviceInfo> iotBzjDeviceList  = queryIotBzjDevice();
-
-            log.info("查询到 {} 条设备数据", iotBzjDeviceList.size());
             
-            // 确保每次转换创建新的对象
-            List<DataBzjDeviceEntity> bzjDeviceList = iotBzjDeviceList.stream()
-                    .map(device -> {
-                        DataBzjDeviceEntity entity = convertToDataBzjDeviceEntity(device);
-                        log.debug("转换设备: {}, 实体: {}", device.getDeviceId(), entity.getLotId());
-                        return entity;
-                    })
-                    .collect(Collectors.toList());
-    		
-            log.info("转换后得到 {} 条实体数据", bzjDeviceList.size());
+            List<DeviceInfo> queryIotBzjDevice = aliYunService.getBzjDevice();
 
+            List<DataBzjDeviceEntity> bzjDeviceList = queryIotBzjDevice.stream()
+	                .map(device -> {
+	                    DataBzjDeviceEntity entity = convertToDataBzjDeviceEntity(device);
+	                    return entity;
+	                })
+	                .collect(Collectors.toList());
             boolean batchResult = saveOrUpdateBatch(bzjDeviceList);
-            
             timeMillis = System.currentTimeMillis()- timeMillis ;
             
-            
-            
             return false;
+    }
+
+    
+    /**
+     *  更新定位信息
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Scheduled(cron = "0 3/10 * * * ?")
+    public void syncLocation() {
+
+    	List<DataBzjDeviceEntity> list = list();
+    	
+    	list.forEach(entity -> {
+    		
+    		try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                //只处理新版代码之后的数据。
+    	    	
+    	    	Date endTimeDate = new Date();
+                long endTimeTimestamp = endTimeDate.getTime();
+                
+             // 转换为Instant（时间戳）
+                Instant endInstant = endTimeDate.toInstant();
+                
+             // 或者更推荐的方式：
+                Instant thirtyDaysBeforeInstant2 = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault())
+                                                              .minusDays(30)
+                                                              .atZone(ZoneId.systemDefault())
+                                                              .toInstant();
+
+                // 转换回Date
+                Date thirtyDaysBefore = Date.from(thirtyDaysBeforeInstant2);
+                long beginTimeTimestamp = thirtyDaysBefore.getTime();
+                
+                Map<String, Double> location = aliYunService.getLocation(entity.getDeviceName(),entity.getRawdata(),entity.getProductKey(),beginTimeTimestamp, endTimeTimestamp);
+                
+                if(location!=null) {
+                	entity.setLatestX(location.get("x"));
+                	entity.setLatestY(location.get("y"));
+                	Map<String, Double> wgs84ToBd09 = BaiduCoordConverterHttp.wgs84ToBd09(location);
+                	if(wgs84ToBd09!=null) {
+                		entity.setBaiduX(wgs84ToBd09.get("x"));
+                		entity.setBaiduY(wgs84ToBd09.get("y"));
+                		updateById(entity);
+                	}
+                }
+                
+                
+            } catch (Exception e) {
+            	// TODO Auto-generated catch block
+            	e.printStackTrace();
+            }
+    		
+    	});
+    	
+        
     }
     
  // 实体转换封装方法
@@ -113,43 +164,7 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
 	
     
     
-    /**
-     * 查询指定产品下的所有的设备列表
-     *
-     * @return -
-     */
-    public List<QueryDeviceResponseBody.DeviceInfo> queryIotBzjDevice() {
-        List<QueryDeviceResponseBody.DeviceInfo> deviceInfos = new ArrayList<>();
-        int currentPage = 1;
-        final int pageSize = 100;
-        
-        
-        try {
-	        while (true) {
-	            QueryDeviceResponse resp = client.queryDevice(createRequest(currentPage,pageSize)).get();
-	            List<QueryDeviceResponseBody.DeviceInfo> pageData = resp.getBody().getData().getDeviceInfo();
-	            deviceInfos.addAll(pageData);
-	            Integer pageCount = resp.getBody().getPageCount();
-	            // 关键：正确判断是否还有下一页
-	            if (currentPage >= resp.getBody().getPageCount()) {
-	                break;
-	            }
-	            currentPage++;
-	        }
-        }catch(Exception e) {
-        	e.printStackTrace();
-        }
-        return deviceInfos;
-    }
-
-    private QueryDeviceRequest createRequest(int currentPage, int pageSize) {
-        return QueryDeviceRequest.builder()
-            .iotInstanceId(AliyunIotConstants.IOT_INSTANCE_ID)
-            .productKey(AliyunIotConstants.PRODUCT_KEY)
-            .pageSize(pageSize)       // 显式设置每页大小
-            .currentPage(currentPage) // 设置当前页码
-            .build();
-    }
+    
     
     
     @Override

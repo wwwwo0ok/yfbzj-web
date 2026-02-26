@@ -12,8 +12,4 @@ public class AliyunIotConstants {
     public static final String RAM_ACCESS_KEY_SECRET = "jA2gfLAoH6BtMUecPD8n0i2us3716m";//过去好使的
     /** 实例 */
     public static final String IOT_INSTANCE_ID = "iot-06z00h13y2s40qz";
-    /** 产品key */
-    public static final String PRODUCT_KEY = "h25yqWE2Hdg";
-    /** 播种机原始数据查询 */
-    public static final String RAWDATA_GET = "/" + PRODUCT_KEY + "/rawdata/get";
 }

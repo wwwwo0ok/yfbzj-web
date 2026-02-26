@@ -56,92 +56,95 @@ layui.use(function () {
        // 将控件添加到地图上
        map.addControl(cityControl);
 		
+
+	   
+	   var dq_data =[
+	   		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',latestX:128.615,latestY:47.721},
+	   		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',latestX:128.115,latestY:47.461},
+	   		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',latestX:128.265,latestY:46.931},
+	   		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',latestX:128.935,latestY:47.121},
+	   		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",latestX:128.315,latestY:47.701},
+	   		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",latestX:129.115,latestY:48.921},
+	   		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',latestX:128.235,latestY:47.211},
+	   		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',latestX:128.673,latestY:47.321},
+	   		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',latestX:128.235,latestY:47.741},
+	   		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',latestX:128.605,latestY:47.763},	  
+	   		  ]
+	   		  
+			  $.ajax({
+	                type: 'POST',
+	                url: ctx + 'dataBzjDevice/selectForMap',
+	                dataType: "JSON",
+	                data: JSON.stringify({deviceStatus:'ONLINE'}),
+	                contentType: "application/json",
+	                success: function (res) {
+	  				console.dir(res)
+	                    if (res.code == 0) {
+//	  					dq_data = res.data.records;
+	  					// 遍历数据创建标记点
+	  							  res.data.forEach(function(device) {
+	  							    // 创建标记点坐标
+	  							    var markerPoint = new BMapGL.Point(device.latestX, device.latestY);
+	  							    
+	  							    // 创建标记点
+	  							    var marker = new BMapGL.Marker(markerPoint);
+	  							    map.addOverlay(marker);
+	  							    
+	  							    // 创建信息窗口内容
+	  							    var content = `
+	  							      <div class="custom-info-window">
+	  							        <p>姓名：${device.username}</p>
+	  							        <p>电话：${device.telephone}</p>
+	  							        <p>
+	  							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
+	  							            [详情]
+	  							          </a>
+	  							        </p>
+	  							      </div>
+	  							    `;
+	  							    
+	  							    // 创建信息窗口
+	  							    var infoWindow = new BMapGL.InfoWindow(content, {
+	  							      width: 250,
+	  							      height: 150,
+	  							      title: device.username + '的播种机'
+	  							    });
+	  							    
+	  							    // 为标记点添加点击事件
+	  							    marker.addEventListener('click', function() {
+	  							      map.openInfoWindow(infoWindow, markerPoint);
+	  							    });
+	  							  });
+	                    } else {
+	                        layer.msg(res.msg);
+	                        $("#img").click();
+	                    }
+	                }
+	            })
+   
 	   
 	   
-	   //定义一个控件类【重点：自定义控件】
-		  //电驱列表
-		  var dq_data = [];
-//		  [
-//		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
-//		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
-//		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
-//		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
-//		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
-//		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
-//		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
-//		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
-//		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
-//		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
+	   
+	   
+	   
+	   
+	   
+	   
+	   		  
 		  
-//		  ]
-		  
-		  $.ajax({
-              type: 'POST',
-              url: ctx + 'dataBzjDevice/listByPage',
-              dataType: "JSON",
-              data: JSON.stringify({deviceType:'2',deviceStatus:'ONLINE'}),
-              contentType: "application/json",
-              success: function (res) {
-				console.dir(res)
-                  if (res.code == 0) {
-					dq_data = res.data.records;
-					// 遍历数据创建标记点
-							  dq_data.forEach(function(device) {
-							    // 创建标记点坐标
-							    var markerPoint = new BMapGL.Point(device.latestX, device.latestY);
-							    
-							    // 创建标记点
-							    var marker = new BMapGL.Marker(markerPoint);
-							    map.addOverlay(marker);
-							    
-							    // 创建信息窗口内容
-							    var content = `
-							      <div class="custom-info-window">
-							        <p>姓名：${device.username}</p>
-							        <p>电话：${device.telephone}</p>
-							        <p>
-							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
-							            [详情]
-							          </a>
-							        </p>
-							      </div>
-							    `;
-							    
-							    // 创建信息窗口
-							    var infoWindow = new BMapGL.InfoWindow(content, {
-							      width: 250,
-							      height: 150,
-							      title: device.username + '的播种机'
-							    });
-							    
-							    // 为标记点添加点击事件
-							    marker.addEventListener('click', function() {
-							      map.openInfoWindow(infoWindow, markerPoint);
-							    });
-							  });
-                  } else {
-                      layer.msg(res.msg);
-                      $("#img").click();
-                  }
-              }
-          })
-		  
-		  
-		  
-		  
-		  map.setMapStyleV2({
-		               styleId: "843f82bb7b6cf081859a105b2a9fbfae" // 替换为你的样式ID
-		           });
-		    			   
-		  
-		  			  
-		 
-		  
-		  
-		  map.addEventListener('tilesloaded', function () {
-		      <!--alert('目前放大系数为：'+map.getZoom());-->
-			  // 在地图上添加点标记
-		  });
+	  map.setMapStyleV2({
+	               styleId: "843f82bb7b6cf081859a105b2a9fbfae" // 替换为你的样式ID
+	           });
+	    			   
+	  
+	  			  
+	 
+	  
+	  
+	  map.addEventListener('tilesloaded', function () {
+	      <!--alert('目前放大系数为：'+map.getZoom());-->
+		  // 在地图上添加点标记
+	  });
 		  
 			  
 		//

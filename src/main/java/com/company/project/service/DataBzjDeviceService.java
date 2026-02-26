@@ -31,5 +31,10 @@ public interface DataBzjDeviceService extends IService<DataBzjDeviceEntity> {
 	 */
 	JSONObject pointMap();
 
+	/**
+	 *  更新定位信息
+	 */
+	void syncLocation();
+
 }
 

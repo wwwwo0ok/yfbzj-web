@@ -106,6 +106,17 @@ public class DataBzjDeviceEntity extends BaseEntity implements Serializable {
 	 */
 		@TableField("latest_y")
 		private Double latestY;
+		/**
+		 * 最新定位X坐标
+		 */
+		@TableField("baidu_x")
+		private Double baiduX;
+		
+		/**
+		 * 最新定位Y坐标
+		 */
+		@TableField("baidu_y")
+		private Double baiduY;
 
 	/**
 	 * 删除标志（0代表存在 2代表删除）
@@ -149,7 +160,10 @@ public class DataBzjDeviceEntity extends BaseEntity implements Serializable {
 		private String farmId;
 
 		
-		
+		public String getRawdata() {
+			
+			return "/" + productKey + "/rawdata/get" ;
+		}
 		
 
 }

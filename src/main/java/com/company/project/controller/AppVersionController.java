@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,11 +27,16 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.company.project.aliyun.AliYunService;
 import com.company.project.common.exception.BusinessException;
 import com.company.project.common.utils.DataResult;
 import com.company.project.common.utils.FileUtils;
 import com.company.project.entity.AppVersionEntity;
+import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.service.AppVersionService;
+import com.company.project.service.DataBzjDeviceService;
+import com.company.project.service.DataElectricSeederMessageService;
+import com.company.project.util.AliYunDataUtil;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.ApiOperation;
@@ -51,6 +57,13 @@ public class AppVersionController {
     @Autowired
     private AppVersionService appVersionService;
 
+    @Autowired
+    private DataBzjDeviceService bzjDeviceService;
+    @Autowired
+    private DataElectricSeederMessageService messageService;
+    @Autowired
+    private AliYunService aliYunService;
+    
     /**
     * 跳转到页面
     */
@@ -70,6 +83,17 @@ public class AppVersionController {
         queryWrapper.eq(appVersion.getId() != null, AppVersionEntity::getId, appVersion.getId());
         queryWrapper.orderByDesc(AppVersionEntity::getId);
         IPage<AppVersionEntity> iPage = appVersionService.page(appVersion.getQueryPage(), queryWrapper);
+        
+//        bzjDeviceService.syncLocation();
+        
+//        DataBzjDeviceEntity device = new DataBzjDeviceEntity();
+//        device.setDeviceName("DQBZJ1");
+//        device.setProductKey("h25yejp0P5j");
+        
+//        messageService.insertNewData(device);
+        
+//        Map<String, Double> location = aliYunService.getLocation(device.getDeviceName(), device.getRawdata(), device.getProductKey(), 1769496990128l, 1772088990128l);
+        
         return DataResult.success(iPage);
     }
 

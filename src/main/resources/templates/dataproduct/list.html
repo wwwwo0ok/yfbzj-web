@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--公共模块-->
+  <div th:replace="~{layout}"></div>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info">
+  <input name="id" hidden/>
+    <div class="layui-form-item">
+      <label class="layui-form-label">批次编码</label>
+      <div class="layui-input-block">
+        <input type="code" name="code" placeholder="请输入批次编码" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">批次名称</label>
+      <div class="layui-input-block">
+        <input type="name" name="name" placeholder="请输入批次名称" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">描述</label>
+      <div class="layui-input-block">
+        <input type="description" name="description" placeholder="请输入描述" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">维护级别</label>
+      <div class="layui-input-block">
+		<input type="radio" name="level" value="0" title="不维护" checked="" lay-filter="radio-type">
+         <input type="radio" name="level" value="2" title="消息维护" lay-filter="radio-type">
+      </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  sa:hasPermission="dataProduct:list">
+    <form class="layui-form ">
+      <div class="layui-form-item">
+        <div class="layui-input-inline">
+          <input type="text" name="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+        </div>
+        <div class="layui-input-inline ">
+          <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container oper">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataProduct:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="update"  sa:hasPermission="dataProduct:update">更新</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataProduct:update">编辑</a>
+</script>
+
+</body>
+</html>
+<script>
+  layui.use(function () {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+    //加载table
+    var tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , page: true //开启分页
+      , url: ctx + 'dataProduct/listByPage' //数据接口
+      , method: 'POST'
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'code', title: '批次编码', sort: true},
+          {field: 'name', title: '批次名称', sort: true},
+          {field: 'description', title: '描述', sort: true},
+          {field: 'level', title: '维护级别', templet : function(item){
+		          if (item.level == '0') {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-warm" >不维护</a>';
+		          }
+		          if (item.level == '1') {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-normal" >设备维护</a>';
+		          }
+		          if (item.level == '2') {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-normal" >消息维护</a>';
+		          }
+		  			
+  		  }},
+          {width: 220, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          toUnDisabled();
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          setTimeout(function () {
+            form.val('info', {
+              "test": "test"
+              , "id": ""
+              , "code": ""
+              , "name": ""
+              , "description": ""
+              , "level": ""
+            });
+          }, 200);
+          break;
+        case 'update':
+          updateProduct();
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'look':
+          backshow(data);
+          toDisabled();
+          break;
+        case 'edit':
+          backshow(data);
+          $(".title").html("编辑");
+          toUnDisabled();
+          break;
+      }
+    });
+
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete(ctx + "dataProduct/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              tableIns1.reload();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.id===undefined || data.field.id===null || data.field.id===""){
+        CoreUtil.sendPost(ctx + "dataProduct/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }else {
+        CoreUtil.sendPut(ctx + "dataProduct/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }
+
+      return false;
+    });
+
+    // 监听搜索操作
+    form.on('submit(data-search-btn)', function (data) {
+      //执行搜索重载
+      tableIns1.reload({
+        page: {
+          curr: 1
+        }
+        , where: data.field
+      });
+      return false;
+    });
+
+    //回显
+    var backshow = function (data) {
+      $(".table_div").hide();
+      $(".operation").show();
+      $(".title").html("查看");
+      setTimeout(function () {
+        form.val('info', {
+          "test": "test"
+                      , "id": data.id
+                      , "code": data.code
+                      , "name": data.name
+                      , "description": data.description
+                      , "level": data.level
+                  });
+      }, 200);
+    }
+
+	var updateProduct = function(){
+		
+		$.ajax({
+            type: 'POST',
+            url: ctx + "dataProduct/updateProduct",
+            contentType: "application/json",
+            success: function (res) {
+                if (res.code == 0) {
+					//执行搜索重载
+				      tableIns1.reload({
+				        page: {
+				          curr: 1
+				        }
+				        , where: data.field
+				      });
+                } else {
+                }
+            }
+        })
+		
+	}
+	
+    //禁用输入
+    var toDisabled = function () {
+      $(".oper").hide();
+      $(".disabled").each(function (index, elem) {
+        $(elem).attr("disabled", "")
+      })
+    }
+
+    //放开输入
+    var toUnDisabled = function () {
+      $(".oper").show();
+      $(".disabled").each(function (index, elem) {
+        $(elem).removeAttr("disabled", "")
+      })
+    }
+  });
+</script>

@@ -35,6 +35,11 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 */
 	@TableField(exist = false)
 	private List<DataElectricSeederMessageLineEntity> lines;
+	/**
+	 * 设备id
+	 */
+	@TableField(exist = false)
+	private List<DataAlarmEntity> alarms;
 	
 		@TableField("lot_id")
 		private String lotId;

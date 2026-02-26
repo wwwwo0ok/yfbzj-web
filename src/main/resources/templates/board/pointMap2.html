@@ -471,19 +471,18 @@ layui.use(function () {
 		  
 		  //电驱列表
 		  var dq_data = [];
-//		  [
-//		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
-//		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
-//		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
-//		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
-//		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
-//		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
-//		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
-//		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
-//		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
-//		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
-		  
-//		  ]
+		  [
+		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
+		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
+		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
+		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
+		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
+		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
+		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
+		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
+		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
+		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
+		  ]
 		  
 // 定时获取数据并更新页面
         function fetchData() {
@@ -491,7 +490,7 @@ layui.use(function () {
               type: 'POST',
               url: ctx + 'dataBzjDevice/pointMap',
               dataType: "JSON",
-              data: JSON.stringify({deviceType:'2',deviceStatus:'ONLINE'}),
+              data: JSON.stringify({deviceStatus:'ONLINE'}),
               contentType: "application/json",
               success: function (res) {
 				if (res.code == 0) {
@@ -510,53 +509,53 @@ layui.use(function () {
 		  
 		  $.ajax({
               type: 'POST',
-              url: ctx + 'dataBzjDevice/listByPage',
+              url: ctx + 'dataBzjDevice/selectForMap',
               dataType: "JSON",
-              data: JSON.stringify({deviceType:'2',deviceStatus:'ONLINE'}),
+              data: JSON.stringify({deviceStatus:'ONLINE'}),
               contentType: "application/json",
-              success: function (res) {
-				console.dir(res)
-                  if (res.code == 0) {
-					dq_data = res.data.records;
-					// 遍历数据创建标记点
-							  dq_data.forEach(function(device) {
-							    // 创建标记点坐标
-							    var markerPoint = new BMapGL.Point(device.latestX, device.latestY);
-							    
-							    // 创建标记点
-							    var marker = new BMapGL.Marker(markerPoint);
-							    map.addOverlay(marker);
-							    
-							    // 创建信息窗口内容
-							    var content = `
-							      <div class="custom-info-window">
-							        <p>姓名：${device.username}</p>
-							        <p>电话：${device.telephone}</p>
-							        <p>
-							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
-							            [详情]
-							          </a>
-							        </p>
-							      </div>
-							    `;
-							    
-							    // 创建信息窗口
-							    var infoWindow = new BMapGL.InfoWindow(content, {
-							      width: 250,
-							      height: 150,
-							      title: device.username + '的播种机'
-							    });
-							    
-							    // 为标记点添加点击事件
-							    marker.addEventListener('click', function() {
-							      map.openInfoWindow(infoWindow, markerPoint);
-							    });
-							  });
-                  } else {
-                      layer.msg(res.msg);
-                      $("#img").click();
-                  }
-              }
+			  success: function (res) {
+  	  				console.dir(res)
+  	                    if (res.code == 0) {
+  //	  					dq_data = res.data.records;
+  	  					// 遍历数据创建标记点
+  	  							  res.data.forEach(function(device) {
+  	  							    // 创建标记点坐标
+  	  							    var markerPoint = new BMapGL.Point(device.baiduX, device.baiduY);
+  	  							    
+  	  							    // 创建标记点
+  	  							    var marker = new BMapGL.Marker(markerPoint);
+  	  							    map.addOverlay(marker);
+  	  							    
+  	  							    // 创建信息窗口内容
+  	  							    var content = `
+  	  							      <div class="custom-info-window">
+  	  							        <p>姓名：${device.username}</p>
+  	  							        <p>电话：${device.telephone}</p>
+  	  							        <p>
+  	  							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
+  	  							            [详情]
+  	  							          </a>
+  	  							        </p>
+  	  							      </div>
+  	  							    `;
+  	  							    
+  	  							    // 创建信息窗口
+  	  							    var infoWindow = new BMapGL.InfoWindow(content, {
+  	  							      width: 250,
+  	  							      height: 150,
+  	  							      title: device.username + '的播种机'
+  	  							    });
+  	  							    
+  	  							    // 为标记点添加点击事件
+  	  							    marker.addEventListener('click', function() {
+  	  							      map.openInfoWindow(infoWindow, markerPoint);
+  	  							    });
+  	  							  });
+  	                    } else {
+  	                        layer.msg(res.msg);
+  	                        $("#img").click();
+  	                    }
+  	                }
           })
 		  
 		  

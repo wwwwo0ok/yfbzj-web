@@ -3,6 +3,7 @@ package com.company.project.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -28,6 +29,7 @@ import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.SysFarmEntity;
 import com.company.project.entity.SysUser;
 import com.company.project.service.DataBzjDeviceService;
+import com.company.project.service.DataElectricSeederMessageService;
 import com.company.project.service.SysFarmService;
 import com.company.project.service.UserService;
 
@@ -58,6 +60,10 @@ public class DataBzjDeviceController {
 
     @Resource
     private UserService userService;
+    
+    @Autowired
+    private DataElectricSeederMessageService messageService;
+    
     /**
     * 跳转到页面
     */
@@ -81,6 +87,9 @@ public class DataBzjDeviceController {
     }
 
 
+    
+    
+    
     @ApiOperation(value = "查询分页数据")
     @PostMapping("dataBzjDevice/listByPage")
     @SaCheckPermission("dataBzjDevice:list")
@@ -88,8 +97,9 @@ public class DataBzjDeviceController {
     public DataResult findListByPage(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
 //    	DataAnalysisUtil.test();
-    	
-    	
+    	/**
+    	 * 
+    	 */
     	
     	
         LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
@@ -106,6 +116,7 @@ public class DataBzjDeviceController {
     		
     		SysUser byId = userService.getById(loginId.toString());
     		
+    		
     		LambdaQueryWrapper<SysFarmEntity> lambdaQuery = Wrappers.lambdaQuery();
     		
     		lambdaQuery.eq(SysFarmEntity::getPhone, byId.getUsername());
@@ -120,6 +131,51 @@ public class DataBzjDeviceController {
         
         IPage<DataBzjDeviceEntity> iPage = dataBzjDeviceService.page(dataBzjDevice.getQueryPage(), queryWrapper);
         return DataResult.success(iPage);
+    }
+    
+    
+    @ApiOperation(value = "查询地图数据(用作显示）")
+    @PostMapping("dataBzjDevice/selectForMap")
+    @ResponseBody
+    public DataResult selectForMap(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    	
+    	
+    	LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
+    	//查询条件示例
+    	queryWrapper
+    	.eq(StringUtils.isNotBlank(dataBzjDevice.getLotId()), DataBzjDeviceEntity::getLotId, dataBzjDevice.getLotId())
+    	.eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceName()),DataBzjDeviceEntity::getDeviceName,dataBzjDevice.getDeviceName())
+    	.eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceType()),DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceType())
+    	.eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceStatus()),DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatus())
+    	.eq(StringUtils.isNotBlank(dataBzjDevice.getProductKey()),DataBzjDeviceEntity::getProductKey,dataBzjDevice.getProductKey())
+    	.isNotNull(DataBzjDeviceEntity::getBaiduX)
+    	.isNotNull(DataBzjDeviceEntity::getBaiduY)
+    	.orderByDesc(DataBzjDeviceEntity::getLotId);
+    	
+    	Object loginId = StpUtil.getLoginId();
+    	if(loginId!=null) {
+    		
+    		SysUser byId = userService.getById(loginId.toString());
+    		
+    		
+    		LambdaQueryWrapper<SysFarmEntity> lambdaQuery = Wrappers.lambdaQuery();
+    		
+    		lambdaQuery.eq(SysFarmEntity::getPhone, byId.getUsername());
+    		
+    		SysFarmEntity one = sysFarmService.getOne(lambdaQuery);
+    		
+    		if(one!=null) {
+    			queryWrapper.eq
+    			(StringUtils.isNotBlank(one.getId()),DataBzjDeviceEntity::getFarmId,one.getId());
+    		}
+    	}
+    	
+    	List<DataBzjDeviceEntity> list = dataBzjDeviceService.list(queryWrapper);
+    	
+    	List<DataBzjDeviceEntity> collect = list.stream().filter(li -> li.getLatestX()!=null&&li.getLatestY()!=null&&li.getLatestX()!=0&&li.getLatestY()!=0).collect(Collectors.toList());
+    	
+    	
+    	return DataResult.success(collect);
     }
     
 
