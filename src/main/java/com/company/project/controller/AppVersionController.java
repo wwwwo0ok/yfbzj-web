@@ -89,8 +89,8 @@ public class AppVersionController {
 //        DataBzjDeviceEntity device = new DataBzjDeviceEntity();
 //        device.setDeviceName("DQBZJ1");
 //        device.setProductKey("h25yejp0P5j");
-        
 //        messageService.insertNewData(device);
+//          messageService.sync();
         
 //        Map<String, Double> location = aliYunService.getLocation(device.getDeviceName(), device.getRawdata(), device.getProductKey(), 1769496990128l, 1772088990128l);
         

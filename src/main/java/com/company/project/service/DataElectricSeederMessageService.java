@@ -42,5 +42,11 @@ public interface DataElectricSeederMessageService extends IService<DataElectricS
 	void insertNewData(String lotId);
 
 	IPage<DataElectricSeederMessageEntity> getMessageList(DataElectricSeederMessageEntity queryEntity);
+
+	/**
+	 * 重新加载消息
+	 * @param li
+	 */
+	void reRead(DataBzjDeviceEntity li);
 }
 

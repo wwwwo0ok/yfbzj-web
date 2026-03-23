@@ -36,5 +36,11 @@ public interface DataBzjDeviceService extends IService<DataBzjDeviceEntity> {
 	 */
 	void syncLocation();
 
+	/**
+	 * 根据批号重新加载消息
+	 * @param productKey
+	 */
+	void reRead(String productKey);
+
 }
 

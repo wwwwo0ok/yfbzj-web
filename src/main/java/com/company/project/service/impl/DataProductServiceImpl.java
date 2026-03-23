@@ -66,6 +66,7 @@ public class DataProductServiceImpl extends ServiceImpl<DataProductMapper, DataP
 			entity.setCreateTime(new Date(productInfo.getGmtCreate()));
 			save(entity);
 		}else {
+			entity.setDeviceNum(productInfo.getDeviceCount());
 			entity.setName(productInfo.getProductName());
 			entity.setDescription(productInfo.getDescription());
 			updateById(entity);

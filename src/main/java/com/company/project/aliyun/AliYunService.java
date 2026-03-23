@@ -163,18 +163,16 @@ public class AliYunService {
 	            for (Map<String, Object> data : list) {
 	                String iotId = data.get("iot_id").toString();
 	                String timestamp = data.get("timestamp").toString();
-	                String hexData = data.get("BZJ").toString().trim();
-	                DataElectricSeederMessageEntity entity = new DataElectricSeederMessageEntity();
-	                
-	                strategyMap.get(productKey).readCode(hexData);
-	                
-	                entity.setLotId(iotId);
-	                entity.setDeviceName(deviceName);
-	                entity.setDataTime(new Date(Long.parseLong(timestamp)));
-	                entity.setAliyun(hexData);
-	                
-	                
-	                iotLit.add(entity);
+	                if(data.containsKey("BZJ")) {
+	                	String hexData = data.get("BZJ").toString().trim();
+	                	DataElectricSeederMessageEntity entity = strategyMap.get(productKey).readCode(hexData);;
+	                	entity.setLotId(iotId);
+	                	entity.setDeviceName(deviceName);
+	                	entity.setDataTime(new Date(Long.parseLong(timestamp)));
+	                	entity.setAliyun(hexData);
+	                	
+	                	iotLit.add(entity);
+	                }
 	            }
 	            
 	            ListAnalyticsDataResponseBody body = resp.getBody();

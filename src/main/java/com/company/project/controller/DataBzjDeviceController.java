@@ -1,8 +1,6 @@
 package com.company.project.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -10,7 +8,6 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,22 +19,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.company.project.common.utils.DataResult;
 import com.company.project.entity.DataBzjDeviceEntity;
+import com.company.project.entity.DataElectricSeederMessageEntity;
 import com.company.project.entity.SysFarmEntity;
 import com.company.project.entity.SysUser;
 import com.company.project.service.DataBzjDeviceService;
 import com.company.project.service.DataElectricSeederMessageService;
 import com.company.project.service.SysFarmService;
 import com.company.project.service.UserService;
-
+import com.company.project.service.impl.DataBzjDeviceServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
 
 
 /**
@@ -50,6 +49,7 @@ import io.swagger.annotations.ApiParam;
 @Controller
 @RequestMapping("/")
 public class DataBzjDeviceController {
+
     @Autowired
     private DataBzjDeviceService dataBzjDeviceService;
     @Autowired
@@ -63,6 +63,10 @@ public class DataBzjDeviceController {
     
     @Autowired
     private DataElectricSeederMessageService messageService;
+
+    DataBzjDeviceController(DataBzjDeviceServiceImpl dataBzjDeviceService) {
+        this.dataBzjDeviceService = dataBzjDeviceService;
+    }
     
     /**
     * 跳转到页面
@@ -97,10 +101,6 @@ public class DataBzjDeviceController {
     public DataResult findListByPage(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
 //    	DataAnalysisUtil.test();
-    	/**
-    	 * 
-    	 */
-    	
     	
         LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
         //查询条件示例
@@ -134,10 +134,49 @@ public class DataBzjDeviceController {
     }
     
     
-    @ApiOperation(value = "查询地图数据(用作显示）")
-    @PostMapping("dataBzjDevice/selectForMap")
+    @ApiOperation(value = "重新加载批次数据")
+    @PostMapping("dataBzjDevice/reRead")
     @ResponseBody
-    public DataResult selectForMap(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    public DataResult reRead(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    	
+    	dataBzjDeviceService.reRead(dataBzjDevice.getProductKey());
+    	
+    	return DataResult.success();
+    	
+    }
+    @ApiOperation(value = "批量修改")
+    @PostMapping("dataBzjDevice/updateBatch")
+    @ResponseBody
+    public DataResult updateBatch(@RequestBody DataBzjDeviceEntity dataBzjDevice) {
+        // 1. 构造 LambdaUpdateWrapper
+        LambdaUpdateWrapper<DataBzjDeviceEntity> updateWrapper = new LambdaUpdateWrapper<>();
+        
+        // 2. 设置条件：where product_key = ?
+        // 使用方法引用，避免硬编码字符串
+        updateWrapper
+        			.eq(DataBzjDeviceEntity::getProductKey, dataBzjDevice.getProductKey())
+                    // 如果还有其他条件，比如 lot_id，继续加
+                    // .eq(DataBzjDeviceEntity::getLotId, dataBzjDevice.getLotId())
+                    
+                    // 3. 设置要修改的字段：set device_type = ?
+                    .set(DataBzjDeviceEntity::getDeviceType, dataBzjDevice.getDeviceType());
+        
+        // 4. 执行更新
+        // 注意：这里第一个参数传 null，因为更新的字段已经在 wrapper 里指定了
+        // 如果传 dataBzjDevice 对象，MyBatis-Plus 会把对象里所有非 null 字段都更新，可能覆盖掉你不想改的字段
+        boolean success = dataBzjDeviceService.update(null, updateWrapper);
+        
+        if (success) {
+            return DataResult.success("修改成功");
+        } else {
+            return DataResult.fail("修改失败，未找到对应数据");
+        }
+    }
+
+	@ApiOperation(value = "查询地图数据(用作显示）")
+	@PostMapping("dataBzjDevice/selectForMap")
+	@ResponseBody
+	public DataResult selectForMap(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
     	
     	LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();

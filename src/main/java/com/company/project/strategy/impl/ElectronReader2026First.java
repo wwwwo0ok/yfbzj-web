@@ -9,7 +9,7 @@ import com.company.project.entity.DataAlarmEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
 import com.company.project.entity.DataElectricSeederMessageLineEntity;
 import com.company.project.strategy.CodeReadStrategy;
-import com.company.project.util.DataAnalysisUtil;
+import com.company.project.util.DigitalTrans;
 
 @Component("h25yejp0P5j")
 public class ElectronReader2026First implements CodeReadStrategy{
@@ -39,7 +39,9 @@ public class ElectronReader2026First implements CodeReadStrategy{
 		
 		
 		DataElectricSeederMessageEntity entity = new DataElectricSeederMessageEntity();
-		
+		List<DataAlarmEntity> alarmEntities = new ArrayList<>();
+
+		entity.setAlarms(alarmEntities);
 		
 //		==========设置数据============
 //		电子齿轮比，单位。范围1-255;8位数****352-353
@@ -167,21 +169,91 @@ public class ElectronReader2026First implements CodeReadStrategy{
 //		当前到限里程停止时的剩余路程，4095是无限里程，单位是512米****573-575
 		entity.setRemainingMileage(subHexStr(hexStr,573-64,576-64));
 	
+
+		//TODO			统计肥报警的通道号（1-24高5-9位）和报警号（0-14低4位）共24个记录，12位数,****490-561
+
+        String hexStr490 = hexStr.substring(490-64, 562-64);
+        analysisAlarm(hexStr490,alarmEntities,24,DataAlarmEntity.FERT_ALARM_TYPE);
+		//TODO			统计种报警的通道号（1-24高5位）和报警号（0-7低3位）共24个记录,8位数,****304-351
+        String hexStr304 = hexStr.substring(304-64, 352-64);
+        analysisAlarm(hexStr304,alarmEntities,24,DataAlarmEntity.SEED_ALARM_TYPE);
 		
 		
 		List<DataElectricSeederMessageLineEntity> lines =  analysisLineData(hexStr,entity.getSowLine());
 		
-	     
-	      //种报警
-	  		List<DataAlarmEntity> seedAlarmList = parseSeedAlarm(hexStr);
-	  		//肥报警
-	  		List<DataAlarmEntity> ferAlarmList = parseFertAlarm(hexStr);
-	  		
-	  		seedAlarmList.addAll(ferAlarmList);
-	  		
-	  		entity.setAlarms(seedAlarmList);
+		entity.setLines(lines);
+		
 		return entity;
 	}
+	
+	/**
+	 * 解析报警
+	 * @param hexStr 串
+	 * @param size 长度
+	 * @param alarmType 
+	 * @return
+	 */
+	private void analysisAlarm(String hexStr, List<DataAlarmEntity> list, int size, int alarmType) {
+	    String binaryStr = DigitalTrans.hexStringToBinary(hexStr);
+	    int totalLength = binaryStr.length();
+	    int length = totalLength / size; // 每个报警块的长度
+
+	    // 检查 totalLength 是否能被 size 整除，否则调整 length 或处理错误
+	    if (totalLength % size != 0) {
+	        // 可以根据业务需求处理，例如抛出异常或调整 size
+	        // 这里简单起见，使用整数除法，但可能丢失数据，建议根据实际情况处理
+//	        log.warn("二进制字符串长度 {} 不能被 size {} 整除，可能数据不完整", totalLength, size);
+	        // 可选择返回或调整 length
+	        // length = totalLength / size; // 整数除法，但可能不准确
+	    }
+
+	    for (int i = 0; i < size; i++) {
+	        int start = i * length;
+	        int end = start + length;
+	        // 防止越界
+	        if (end > totalLength) {
+	            end = totalLength;
+	        }
+	        String substring = binaryStr.substring(start, end);
+
+	        int lineNo = 0;
+	        int no = 0;
+
+	        if (alarmType == DataAlarmEntity.FERT_ALARM_TYPE) {
+	            // 确保子串长度足够（至少12位：8位行号 + 4位原因）
+	            if (substring.length() < 12) {
+//	                log.warn("FERT_ALARM_TYPE 子串长度不足12位，跳过。子串: {}", substring);
+	                continue;
+	            }
+	            String high8Bits = substring.substring(0, 8); // 高8位为行号
+	            String low4Bits = substring.substring(8, 12); // 低4位为原因，明确取4位
+	            lineNo = DigitalTrans.binaryToAlgorism(high8Bits);
+	            no = DigitalTrans.binaryToAlgorism(low4Bits);
+	        } else if (alarmType == DataAlarmEntity.SEED_ALARM_TYPE) {
+	            // 确保子串长度足够（至少8位：5位行号 + 3位编号）
+	            if (substring.length() < 8) {
+//	                log.warn("SEED_ALARM_TYPE 子串长度不足8位，跳过。子串: {}", substring);
+	                continue;
+	            }
+	            String high5Bits = substring.substring(0, 5); // 高5位为行号
+	            String low3Bits = substring.substring(5, 8); // 低3位为编号，明确取3位
+	            lineNo = DigitalTrans.binaryToAlgorism(high5Bits);
+	            no = DigitalTrans.binaryToAlgorism(low3Bits);
+	        }
+
+	        // 只有行号不为0时才添加报警
+	        if (lineNo != 0) {
+	            DataAlarmEntity entity = new DataAlarmEntity();
+	            entity.setLineNo(lineNo);
+	            entity.setAlarmType(alarmType);
+	            entity.setCode(Integer.toString(no));
+	            list.add(entity);
+	        }
+	    }
+	}
+
+
+	
 	/**
 	 * 种报警 ,前三行为行数，后边是数字
 	 * @param subHexStr
@@ -232,7 +304,7 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	        int reasonCode = value & 0x0F;      // 低4位为原因
 	        
 	        dataAlarmEntity.setLineNo(lineNo);
-	        dataAlarmEntity.setAlarmType(DataAlarmEntity.FERT_ALARM_TYPE);
+//	        dataAlarmEntity.setAlarmType(DataAlarmEntity.FERT_ALARM_TYPE);
 	        dataAlarmEntity.setCode(Integer.toString(reasonCode));
 	    }
 	    
@@ -275,26 +347,26 @@ public class ElectronReader2026First implements CodeReadStrategy{
 //			每通道8位数,单趟多种百分比****160-207;
 			entity.setExcessSeeds(subHexStr(hexStr, 160-64+(i-1)*2, 162-64+(i-1)*2));
 //			每通道8位数,单趟缺种百分比****208-255
-			entity.setExcessSeeds(subHexStr(hexStr, 208-64+(i-1)*2, 210-64+(i-1)*2));
+			entity.setLackSeeds(subHexStr(hexStr, 208-64+(i-1)*2, 210-64+(i-1)*2));
 //			每通道8位数,上传的主肥检测转速反馈比****256-303
-			entity.setExcessSeeds(subHexStr(hexStr, 256-64+(i-1)*2, 258-64+(i-1)*2));
-//TODO			统计种报警的通道号（1-24高5位）和报警号（0-7低3位）共24个记录,8位数,****304-351
+			entity.setFertilizerSpeedRatio(subHexStr(hexStr, 256-64+(i-1)*2, 258-64+(i-1)*2));
 //			A,B选择,24位****422-427
 			entity.setSeedAbType(subHexStr(hexStr, 422-64, 428-64, i-1));
 //			主肥电机方向,24位****436-441
-			entity.setSeedAbType(subHexStr(hexStr, 436-64, 442-64, i-1));
+			entity.setMainFertilizerDirect(subHexStr(hexStr, 436-64, 442-64, i-1));
 //			口肥电机方向,24位****442-447
-			entity.setSeedAbType(subHexStr(hexStr, 442-64, 448-64, i-1));
+			entity.setDeputyFertilizerDirect(subHexStr(hexStr, 442-64, 448-64, i-1));
 //			种使能,24位****448-453
-			entity.setSeedAbType(subHexStr(hexStr, 448-64, 454-64, i-1));
+			entity.setSeedSwtich(subHexStr(hexStr, 448-64, 454-64, i-1));
 //			主肥电机使能,24位****454-459
-			entity.setSeedAbType(subHexStr(hexStr, 454-64, 460-64, i-1));
+			entity.setMainFertilizerSwtich(subHexStr(hexStr, 454-64, 460-64, i-1));
 //			口肥电机使能,24位****460-465
-			entity.setSeedAbType(subHexStr(hexStr, 460-64, 466-64, i-1));
+			entity.setDeputyFertilizerSwtich(subHexStr(hexStr, 460-64, 466-64, i-1));
 //			主肥监控使能,24位****466-471
-			entity.setSeedAbType(subHexStr(hexStr, 466-64, 472-64, i-1));
-//TODO			统计肥报警的通道号（1-24高5-9位）和报警号（0-14低4位）共24个记录，12位数,****490-561
+			entity.setMainFertilizerMonitorSwtich(subHexStr(hexStr, 466-64, 472-64, i-1));
 
+			entity.setLineNo(i);
+			
 			lines.add(entity);
 		}
 		return lines;
@@ -338,5 +410,17 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	    
 	    // 提取指定位
 	    return (fullBinary.charAt(bitIndex) & 1) == 1 ? 1 : 0;
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		String aaString = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000433B332B231B130000000000000000000000000000000000802800C80078190007D0092800C80078190007D0000A0F000000323F00081450FFFF0FFE0000000A000AFE0000FE00000000FF0000FF0000FF0000FF000900003500EB460708D07D06D05D04D03D02D01D00000000000000000000000000000000000000000000070708070800001FFF";
+		
+		ElectronReader2026First reader = new ElectronReader2026First();
+		
+		DataElectricSeederMessageEntity analysisMachineHexStr = reader.readCode(aaString);
+		
+		
 	}
 }

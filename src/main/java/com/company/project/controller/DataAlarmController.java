@@ -49,6 +49,8 @@ public class DataAlarmController {
         LambdaQueryWrapper<DataAlarmEntity> queryWrapper = Wrappers.lambdaQuery();
         //查询条件示例
         queryWrapper.eq(dataAlarm.getId() != null, DataAlarmEntity::getId, dataAlarm.getId());
+        queryWrapper.eq(dataAlarm.getMessageId() != null, DataAlarmEntity::getMessageId, dataAlarm.getMessageId());
+        queryWrapper.eq(dataAlarm.getLotId() != null, DataAlarmEntity::getLotId, dataAlarm.getLotId());
         queryWrapper.orderByDesc(DataAlarmEntity::getId);
         IPage<DataAlarmEntity> iPage = dataAlarmService.page(dataAlarm.getQueryPage(), queryWrapper);
         return DataResult.success(iPage);

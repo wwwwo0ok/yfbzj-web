@@ -6,10 +6,11 @@
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.company.project.entity.DataElectricSeederMessageLineEntity" id="dataElectricSeederMessageLineMap">
         <result property="id" column="id"/>
+        <result property="messageId" column="message_id"/>
         <result property="lotId" column="lot_id"/>
         <result property="dataTime" column="data_time"/>
         <result property="lineNo" column="line_no"/>
-        <result property="seedNum" column="seed_num_"/>
+        <result property="seedNum" column="seed_num"/>
         <result property="excessSeeds" column="excess_seeds"/>
         <result property="lackSeeds" column="lack_seeds"/>
         <result property="fertilizerSpeedRatio" column="fertilizer_speed_ratio"/>
@@ -25,11 +26,5 @@
     </resultMap>
 
 
-	 <!-- 4. 子表查询语句 (根据主表联合主键查询) -->
-    <select id="selectLinesByMessageId" resultMap="dataElectricSeederMessageLineMap">
-        SELECT * 
-        FROM data_electric_seeder_message_line
-        WHERE message_id = #{id}
-    </select>
 
 </mapper>

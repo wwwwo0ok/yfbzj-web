@@ -1,13 +1,11 @@
 package com.company.project.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.company.project.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 
@@ -28,9 +26,21 @@ public class DataAlarmEntity extends BaseEntity implements Serializable {
 	 */
 	public static int SEED_ALARM_TYPE = 0;
 	/**
-	 * 肥报警
+	 * 主肥监控报警
 	 */
-	public static int FERT_ALARM_TYPE = 1;
+	public static int FERT_MONITORING_TYPE_ = 1;
+	/**
+	 * 主肥电机报警
+	 */
+	public static int MAIN_FERT_ALARM_TYPE = 2;
+	/**
+	 * 口肥电机报警
+	 */
+	public static int DEPUTY_FERT_ALARM_TYPE = 3;
+	/**
+	 * 肥报警（电驱）
+	 */
+	public static int FERT_ALARM_TYPE = 4;
 	
 	/**
 	 * 

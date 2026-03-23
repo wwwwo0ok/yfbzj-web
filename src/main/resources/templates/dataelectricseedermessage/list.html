@@ -399,7 +399,8 @@
     <div class="layui-input-block">
       <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
     </div>
-	<table class="layui-table" id="showTable1" lay-filter="showTable1" ></table>
+	<table class="layui-table" id="lineTable" lay-filter="lineTable" ></table>
+	<table class="layui-table" id="alarmTable" lay-filter="alarmTable" ></table>
   </div>
 </form>
 </div>
@@ -446,7 +447,7 @@
 	var laydate = layui.laydate;
 	var router = layui.router();
 	var lotId = $("#lotId").val();//这个有显示参数
-	
+	var messageId;
 	
     //加载table
     var tableIns1 = table.render({
@@ -647,40 +648,7 @@
       return false;
     });
 
-	var tableIns2 = table.render({
-		      elem: '#showTable1'
-		      , contentType: 'application/json'
-		      , page: true //开启分页
-		      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
-		        return {
-		          "code": res.code, //解析接口状态
-		          "msg": res.msg, //解析提示文本
-		          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
-		          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
-		        }
-		      }
-		      , cols: [
-		        [
-		          {type: 'checkbox', fixed: 'left'},
-		          {field: 'lineNo', title: '行数', sort: true,width:90},
-		          {field: 'seedNum', title: '种数', sort: true,width:100},
-		          {field: 'excessSeeds', title: '多种', sort: true,width:90},
-		          {field: 'lackSeeds', title: '缺种', sort: true,width:90},
-		          {field: 'fertilizerSpeedRatio', title: '主肥检测转速反馈比', sort: true,width:140},
-		          {field: 'seedAlarmRatio', title: '种报警', sort: true,width:90},
-		          {field: 'seedAbType', title: 'AB模式', sort: true,width:90},
-		          {field: 'mainFertilizerDirect', title: '主肥电机方向', sort: true,width:130},
-		          {field: 'deputyFertilizerDirect', title: '口肥电机方向', sort: true,width:130},
-		          {field: 'seedSwtich', title: '种使能', sort: true,width:90},
-		          {field: 'mainFertilizerSwtich', title: '主肥电机使能', sort: true,width:130},
-		          {field: 'deputyFertilizerSwtich', title: '口肥电机使能', sort: true,width:130},
-		          {field: 'mainFertilizerMonitorSwtich', title: '主肥监控使能', sort: true,width:130},
-		          {field: 'fertilizerAlarmRatio', title: '肥报警', sort: true,width:90}
-		          
-		        ]
-		      ]
-		      
-		    });
+	
     //回显
     var backshow = function (data) {
       $(".table_div").hide();
@@ -750,13 +718,72 @@
                       , "remainingMileage": data.remainingMileage
                       , "status": data.status
                   });
-				  // 关键优化：使用reload更新数据而非重新渲染
-				      tableIns2.reload({
-				        data: data.lines, // 直接使用新数据
-				        page: { curr: 1 } // 重置到第一页
-				      });  
 				  
       }, 200);
+	  messageId = data.id;
+	  var lineTableIns = table.render({
+	  		      elem: '#lineTable'
+	  		      , contentType: 'application/json'
+	  		      , page: true //开启分页
+	  			  , url: ctx + 'dataElectricSeederMessageLine/listByPage' //数据接口
+	  		      , method: 'POST'
+	  		  	  , where:{messageId: messageId}
+	  		      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+	  		        return {
+	  		          "code": res.code, //解析接口状态
+	  		          "msg": res.msg, //解析提示文本
+	  		          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+	  		          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+	  		        }
+	  		      }
+	  		      , cols: [
+	  		        [
+	  		          {type: 'checkbox', fixed: 'left'},
+	  		          {field: 'lineNo', title: '行数', sort: true,width:90},
+	  		          {field: 'seedNum', title: '种数', sort: true,width:100},
+	  		          {field: 'excessSeeds', title: '多种', sort: true,width:90},
+	  		          {field: 'lackSeeds', title: '缺种', sort: true,width:90},
+	  		          {field: 'fertilizerSpeedRatio', title: '主肥检测转速反馈比', sort: true,width:140},
+	  		          {field: 'seedAlarmRatio', title: '种报警', sort: true,width:90},
+	  		          {field: 'seedAbType', title: 'AB模式', sort: true,width:90},
+	  		          {field: 'mainFertilizerDirect', title: '主肥电机方向', sort: true,width:130},
+	  		          {field: 'deputyFertilizerDirect', title: '口肥电机方向', sort: true,width:130},
+	  		          {field: 'seedSwtich', title: '种使能', sort: true,width:90},
+	  		          {field: 'mainFertilizerSwtich', title: '主肥电机使能', sort: true,width:130},
+	  		          {field: 'deputyFertilizerSwtich', title: '口肥电机使能', sort: true,width:130},
+	  		          {field: 'mainFertilizerMonitorSwtich', title: '主肥监控使能', sort: true,width:130},
+	  		          {field: 'fertilizerAlarmRatio', title: '肥报警', sort: true,width:90}
+	  		          
+	  		        ]
+	  		      ]
+	  		      
+	  		    });
+				
+				var alarmTableIns = table.render({
+					  		      elem: '#alarmTable'
+					  		      , contentType: 'application/json'
+					  		      , page: true //开启分页
+					  			  , url: ctx + 'dataAlarm/listByPage' //数据接口
+					  		      , method: 'POST'
+					  		  	  , where:{messageId: messageId}
+					  		      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+					  		        return {
+					  		          "code": res.code, //解析接口状态
+					  		          "msg": res.msg, //解析提示文本
+					  		          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+					  		          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+					  		        }
+					  		      }
+					  		      ,cols: [
+								          [
+								            {type: 'checkbox', fixed: 'left'},
+								            {field: 'alarmType', title: '报警类型（0种报警、1肥报警）', sort: true},
+								            {field: 'lineNo', title: '行号', sort: true},
+								            {field: 'code', title: '报警编码', sort: true},
+								          ]
+								        ]
+					  		      
+					  		    });
     }
 
     //禁用输入

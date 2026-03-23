@@ -34,6 +34,11 @@ public class DataElectricSeederMessageLineEntity extends BaseEntity implements S
 	 */
 		@TableField("message_id")
 		private String messageId;
+		/**
+		 * 
+		 */
+		@TableField("lot_id")
+		private String lotId;
 
 	/**
 	 * 行数
@@ -44,7 +49,7 @@ public class DataElectricSeederMessageLineEntity extends BaseEntity implements S
 	/**
 	 * 种数（最大16位二进制）
 	 */
-		@TableField("seed_num_")
+		@TableField("seed_num")
 		private Integer seedNum;
 
 	/**
@@ -118,6 +123,31 @@ public class DataElectricSeederMessageLineEntity extends BaseEntity implements S
 	 */
 		@TableField("fertilizer_alarm_ratio")
 		private Integer fertilizerAlarmRatio;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data1")
+		private String data1;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data2")
+		private String data2;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data3")
+		private String data3;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data4")
+		private String data4;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data5")
+		private String data5;
 
 
 }

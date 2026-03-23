@@ -7,6 +7,27 @@
   <!--公共模块-->
   <div th:replace="~{layout}"></div>
 <body>
+	<div id="ID-test-layer-wrapper" style="display: none;">
+		<form class="layui-form " action="" lay-filter="info">
+			<div class="layui-form-item">
+	            <label class="layui-form-label">单选框</label>
+	            <div class="layui-input-block">
+					<input type="radio" name="device_type" value="0" title="未知" checked="" lay-filter="radio-type">
+			        <input type="radio" name="device_type" value="1" title="机械" lay-filter="radio-type">
+			        <input type="radio" name="device_type" value="2" title="电驱" lay-filter="radio-type">
+	            </div>
+	        </div>
+			<div class="layui-form-item">
+	            <div class="layui-input-block">
+	                <button class="layui-btn ajax-submit" lay-submit="" lay-filter="submit-btn"><i class="fa fa-check-circle"></i> 保存</button>
+	                <button class="layui-btn btn-secondary close-popup"><i class="fa fa-times-circle"></i>
+	                    关闭
+	                </button>
+	            </div>
+	        </div>
+		</form>
+	</div>
+	
 <div class="panel panel-default operation" hidden>
   <div class="panel-heading title"></div>
 <div class="layui-card-body">
@@ -69,8 +90,9 @@
   </div>
 </script>
 <script type="text/html" id="tool">
-  <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataProduct:update">编辑</a>
+  <a class="layui-btn layui-btn-xs" lay-event="reRead" sa:hasPermission="dataProduct:update">重新解析</a>
+  <a class="layui-btn layui-btn-xs" lay-event="updateBatch" sa:hasPermission="dataProduct:update">批量设置</a>
 </script>
 
 </body>
@@ -100,6 +122,7 @@
           {type: 'checkbox', fixed: 'left'},
           {field: 'code', title: '批次编码', sort: true},
           {field: 'name', title: '批次名称', sort: true},
+          {field: 'deviceNum', title: '产品数量', sort: true},
           {field: 'description', title: '描述', sort: true},
           {field: 'level', title: '维护级别', templet : function(item){
 		          if (item.level == '0') {
@@ -166,9 +189,19 @@
           ids.push(data.id);
           tipDialog(ids);
           break;
-        case 'look':
-          backshow(data);
-          toDisabled();
+        case 'reRead':
+			if(data.level != 0){
+				confirmReread(data.code);
+			}else{
+				layer.msg("非维护状态禁止本操作！");
+			}
+          break;
+        case 'updateBatch':
+			if(data.level != 0){
+				updateBatch(data.code);
+			}else{
+				layer.msg("非维护状态禁止本操作！");
+			}
           break;
         case 'edit':
           backshow(data);
@@ -178,6 +211,88 @@
       }
     });
 
+	var updateBatch = function(productKey){
+	    // 页面层
+	    var layerIndex = layer.open({
+	        type: 1,
+	        shade: true,
+	        title: '批量修改设备类型', // 建议加个标题
+	        content: $('#ID-test-layer-wrapper'), // 捕获的元素
+	        success: function(layero, index){
+	            // 关键：因为内容是从隐藏div捕获的，需要重新渲染表单
+	            form.render();
+	            
+	            // 监听表单提交事件（核心）
+	            form.on('submit(submit-btn)', function(data){
+	                // 1. 获取单选框的值
+	                var deviceType = data.field.device_type;
+	                console.log('选中的设备类型:', deviceType);
+					
+	                
+	                // 2. 发送 AJAX 请求到后台
+	                $.ajax({
+	                    url: ctx + 'dataBzjDevice/updateBatch', // 替换成你的后台接口
+	                    type: 'POST',
+						dataType: "JSON",
+						data: JSON.stringify({
+	                        productKey: productKey,
+	                        deviceType: deviceType
+	                    }),
+						contentType: "application/json",
+	                    success: function(res){
+	                        if(res.code === 0){ // 假设成功状态码是0
+	                            // 3. 关闭弹窗
+	                            layer.close(layerIndex);
+	                            
+	                            // 4. 提示成功消息
+	                            layer.msg('修改成功', {icon: 1, time: 2000});
+	                            
+	                            // 5. 可选：刷新父页面的表格或列表
+	                            // table.reload('yourTableId');
+	                        } else {
+	                            layer.msg('修改失败: ' + res.msg, {icon: 2});
+	                        }
+	                    },
+	                    error: function(xhr, status, error){
+	                        layer.msg('请求失败: ' + error, {icon: 2});
+	                    }
+	                });
+	                
+	                // 返回 false 阻止表单默认提交（页面刷新）
+	                return false;
+	            });
+	        },
+	        end: function(){
+	            // 弹窗销毁时的回调
+	            layer.msg('批量修改中，请稍后查看', {icon: 6});
+	        }
+	    });
+	};
+	var confirmReread = function(productKey){
+		layer.confirm('重新解析会删除所有消息并且重新生成，确认继续吗？', {
+		        btn: ['确定', '关闭'] //按钮
+		      }, function(){
+				$.ajax({
+	                type: 'POST',
+	                url: ctx + 'dataBzjDevice/reRead',
+	                dataType: "JSON",
+	                data: JSON.stringify({productKey: productKey}),
+	                contentType: "application/json",
+	                success: function (res) {
+	  				console.dir(res)
+	                    if (res.code == 0) {
+							layer.msg('任务执行中，请稍后查看界面', {icon: 1});
+	                    } else {
+	                        layer.msg(res.msg);
+	                        $("#img").click();
+	                    }
+	                }
+	            })
+		      }, function(){
+		        layer.msg('重新解析已经取消', {icon: 1});
+		      });
+	}
+	
     //删除
     var tipDialog=function (ids) {
       layer.open({

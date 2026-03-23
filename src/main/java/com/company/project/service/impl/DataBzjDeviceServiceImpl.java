@@ -1,6 +1,5 @@
 package com.company.project.service.impl;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -24,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody.DeviceInfo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.company.project.aliyun.AliYunService;
 import com.company.project.common.exception.BusinessException;
@@ -31,6 +32,7 @@ import com.company.project.common.exception.code.BaseResponseCode;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.mapper.DataBzjDeviceMapper;
 import com.company.project.service.DataBzjDeviceService;
+import com.company.project.service.DataElectricSeederMessageService;
 import com.company.project.util.BaiduCoordConverterHttp;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,8 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
 	@Autowired
 	private AliYunService aliYunService;
 	
+	@Autowired
+	private DataElectricSeederMessageService messageService;
 	
 	 /**
      * 同步播种机设备
@@ -53,20 +57,20 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
     @Scheduled(cron = "0 0/5 * * * ?")
     public boolean sync() {
     	
-    		long timeMillis = System.currentTimeMillis();
-            
-            List<DeviceInfo> queryIotBzjDevice = aliYunService.getBzjDevice();
+		long timeMillis = System.currentTimeMillis();
+        
+        List<DeviceInfo> queryIotBzjDevice = aliYunService.getBzjDevice();
 
-            List<DataBzjDeviceEntity> bzjDeviceList = queryIotBzjDevice.stream()
-	                .map(device -> {
-	                    DataBzjDeviceEntity entity = convertToDataBzjDeviceEntity(device);
-	                    return entity;
-	                })
-	                .collect(Collectors.toList());
-            boolean batchResult = saveOrUpdateBatch(bzjDeviceList);
-            timeMillis = System.currentTimeMillis()- timeMillis ;
-            
-            return false;
+        List<DataBzjDeviceEntity> bzjDeviceList = queryIotBzjDevice.stream()
+                .map(device -> {
+                    DataBzjDeviceEntity entity = convertToDataBzjDeviceEntity(device);
+                    return entity;
+                })
+                .collect(Collectors.toList());
+        boolean batchResult = saveOrUpdateBatch(bzjDeviceList);
+        timeMillis = System.currentTimeMillis()- timeMillis ;
+        
+        return false;
     }
 
     
@@ -136,17 +140,6 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
         bzjDevice.setDeviceSecret(device.getDeviceSecret());
         bzjDevice.setDeviceStatus(device.getDeviceStatus());
         
-        //默认0
-        if(StringUtils.isBlank(device.getNickname())) {
-        	bzjDevice.setDeviceType("0");
-        //包含电驱是电驱
-        }else if(device.getNickname().contains("电驱")) {
-        	bzjDevice.setDeviceType("2");
-        }else{//否则是监控器
-        	bzjDevice.setDeviceType("1");
-        }
-        
-        
 
         Optional.ofNullable(device.getUtcModified()).ifPresent(ts -> {
             try {
@@ -174,5 +167,25 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
     	
     	return new JSONObject(pointMap);
     }
+
+
+    @Override
+	public void reRead(String productKey) {
+		
+    	//1、查询全部设备
+    	LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
+    	//查询条件示例
+    	queryWrapper
+    	.eq(StringUtils.isNotBlank(productKey),DataBzjDeviceEntity::getProductKey,productKey)
+    	;
+    	List<DataBzjDeviceEntity> list = list(queryWrapper);
+    	
+    	
+    	list.forEach(li -> {
+    		//3、重新加载消息
+    		messageService.reRead(li);
+    	});
+    	
+	}
     
 }

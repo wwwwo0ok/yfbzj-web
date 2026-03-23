@@ -421,5 +421,51 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 		@TableField("seed_flag")
 	   private int seedFlag;
 
+		/**
+		 * 额外数据
+		 */
+		@TableField("data1")
+		private String data1;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data2")
+		private String data2;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data3")
+		private String data3;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data4")
+		private String data4;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data5")
+		private String data5;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data6")
+		private String data6;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data7")
+		private String data7;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data8")
+		private String data8;
+		/**
+		 * 额外数据
+		 */
+		@TableField("data9")
+		private String data9;
+		
 
 }

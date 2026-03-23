@@ -121,6 +121,7 @@
   </div>
 </script>
 <script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="look">测试</a>
   <a class="layui-btn layui-btn-xs" lay-event="data">数据</a>
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataBzjDevice:update">编辑</a>
 </script>
@@ -132,7 +133,10 @@
     var table = layui.table;
     var form = layui.form;
     var layer = layui.layer;
+    var tabs = layui.tabs;
     var element = layui.element;
+	var router = layui.router();
+
 	
 	var initLotId = $('#lotId').val();
     //加载table
@@ -157,7 +161,7 @@
           {field: 'username', title: '用户名', sort: true},
           {field: 'address', title: '地址', sort: true},
           {field: 'telephone', title: '电话', sort: true},
-          {field: 'nickname', title: '备注名称', sort: true},
+          {field: 'deviceName', title: '设备名称', sort: true},
           {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
           {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', templet : function(item){
 			if (item.deviceStatus == 'ONLINE') {
@@ -244,8 +248,8 @@
           tipDialog(ids);
           break;
         case 'look':
-          backshow(data);
-          toDisabled();
+			test11(data.lotId);
+		
           break;
         case 'data':
           lookData(data);
@@ -258,6 +262,29 @@
       }
     });
 
+	
+	function test11(lotId){
+	    if (parent.active && parent.active.tabAdd) {
+	        // 将参数作为查询字符串附加到URL
+//	        const params = new URLSearchParams({
+//	            param1: 'value1',
+//	            param2: 'value2'
+//	        });
+	        const urlWithParams = "/manager/index/dataElectricSeederMessage?lotId="+lotId;
+	        
+	        parent.active.tabAdd(
+	            urlWithParams, // 带参数的URL
+	            '3333322222',
+	            '<i class="layui-icon layui-icon-user"></i> 新标签'
+	        );
+	        parent.active.tabChange('3333322222');
+	    }
+	}
+
+	
+	
+	
+	
 	
 	initProvince();
 			 // 初始化省数据（AJAX）
