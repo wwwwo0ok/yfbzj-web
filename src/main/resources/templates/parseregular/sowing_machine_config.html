@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>播种机数据配置</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/layui@2.6.8/dist/css/layui.css">
+	<!--公共模块-->
+	<div th:replace="~{layout}"></div>
+</head>
+<body>
+    <div class="layui-container" style="margin-top:20px;">
+        <div class="layui-form">
+            <!-- 富文本区域 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">原始数据</label>
+                <div class="layui-input-block">
+                    <textarea id="rawData" class="layui-textarea" placeholder="请粘贴原始字符串..." rows="5"></textarea>
+                </div>
+            </div>
+    <fieldset class="layui-field-box">
+            <legend>播种机核心数据</legend>
+            <div class="layui-form-item">
+                <table class="layui-table">
+                    <thead>
+                        <tr>
+                            <th>属性名</th>
+                            <th>显示名称</th>
+                            <th>字符位置</th>
+                            <th>字节配置</th>
+                            <th>数据类型</th>
+                            <th>映射配置</th>
+                            <th>原始数据</th>
+                            <th>处理结果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mainTable">
+    
+                        <tr>
+                            <td>sow_line</td>
+                            <td>播种行数</td>
+							<td>
+								<input type="number" data-attr="charStart"/> 
+								-
+								<input type="number" data-attr="charEnd"/> 
+							</td>
+                            <td>
+                                <input type="checkbox" class="byte-toggle" data-attr="sow_line" title="字节配置">
+                                <div class="byte-config" style="display:none;">
+                                    字节范围: <input type="number" class="byte-start" value="0">-
+                                    <input type="number" class="byte-end" value="0">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="data-type" data-attr="sow_line">
+                                    <option value="number">数字</option>
+                                    <option value="property">属性</option>
+                                </select>
+                            </td>
+                            <td>
+    
+                                <span>无映射</span>
+                            
+                            </td>
+                            <td class="raw-value">-</td>
+                            <td class="processed-value">-</td>
+                        </tr>
+            
+                        <tr>
+                            <td>sow_type</td>
+                            <td>播种类型</td>
+                            <td>
+								<input type="number" data-attr="charStart"/> 
+								-
+								<input type="number" data-attr="charEnd"/> 
+							</td>
+                            <td>
+                                <input type="checkbox" class="byte-toggle" data-attr="sowType" title="字节配置">
+                                <div class="byte-config" style="display:none;">
+                                    字节范围: <input type="number" class="byte-start" value="0">-
+                                    <input type="number" class="byte-end" value="0">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="data-type" data-attr="sow_type">
+                                    <option value="number">数字</option>
+                                    <option value="property">属性</option>
+                                </select>
+                            </td>
+                            <td>
+    <button class="layui-btn layui-btn-sm" onclick="showMapping('sow_type')">配置映射</button>
+                            </td>
+                            <td class="raw-value">-</td>
+                            <td class="processed-value">-</td>
+                        </tr>
+            </tbody>
+                </table>
+            </div>
+        </fieldset><fieldset class="layui-field-box">
+            <legend>播种机行数据</legend>
+            <div class="layui-form-item">
+                <table class="layui-table">
+                    <thead>
+                        <tr>
+                            <th>属性名</th>
+                            <th>显示名称</th>
+                            <th>字符位置</th>
+                            <th>字节配置</th>
+                            <th>数据类型</th>
+                            <th>映射配置</th>
+                            <th>原始数据</th>
+                            <th>处理结果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lineTable">
+    
+                        <tr>
+                            <td>seedCount</td>
+                            <td>播种数量</td>
+                            <td>114-118</td>
+                            <td>
+                                <input type="checkbox" class="byte-toggle" data-attr="seedCount" title="字节配置">
+                                <div class="byte-config" style="display:none;">
+                                    字节范围: <input type="number" class="byte-start" value="0">-
+                                    <input type="number" class="byte-end" value="8">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="data-type" data-attr="seedCount">
+                                    <option value="number">数字</option>
+                                    <option value="property">属性</option>
+                                </select>
+                            </td>
+                            <td>
+    
+                                <span>无映射</span>
+                            
+                            </td>
+                            <td class="raw-value">-</td>
+                            <td class="processed-value">-</td>
+                        </tr>
+            
+                        <tr>
+                            <td>seedFlag</td>
+                            <td>播种电机开关</td>
+                            <td>4-6</td>
+                            <td>
+                                <input type="checkbox" class="byte-toggle" data-attr="seedFlag" title="字节配置">
+                                <div class="byte-config" style="display:none;">
+                                    字节范围: <input type="number" class="byte-start" value="0">-
+                                    <input type="number" class="byte-end" value="0">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="data-type" data-attr="seedFlag">
+                                    <option value="number">数字</option>
+                                    <option value="property">属性</option>
+                                </select>
+                            </td>
+                            <td>
+    
+                                <span>无映射</span>
+                            
+                            </td>
+                            <td class="raw-value">-</td>
+                            <td class="processed-value">-</td>
+                        </tr>
+            </tbody>
+                </table>
+            </div>
+        </fieldset><fieldset class="layui-field-box">
+            <legend>播种机自带报警解析</legend>
+            <div class="layui-form-item">
+                <table class="layui-table">
+                    <thead>
+                        <tr>
+                            <th>属性名</th>
+                            <th>显示名称</th>
+                            <th>字符位置</th>
+                            <th>字节配置</th>
+                            <th>数据类型</th>
+                            <th>映射配置</th>
+                            <th>原始数据</th>
+                            <th>处理结果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alarmTable">
+    
+                        <tr>
+                            <td>sow_line</td>
+                            <td>报警所在行</td>
+                            <td>0-4</td>
+                            <td>
+                                <input type="checkbox" class="byte-toggle" data-attr="sow_line" title="字节配置">
+                                <div class="byte-config" style="display:none;">
+                                    字节范围: <input type="number" class="byte-start" value="0">-
+                                    <input type="number" class="byte-end" value="0">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="data-type" data-attr="sow_line">
+                                    <option value="number">数字</option>
+                                    <option value="property">属性</option>
+                                </select>
+                            </td>
+                            <td>
+    
+                                <span>无映射</span>
+                            
+                            </td>
+                            <td class="raw-value">-</td>
+                            <td class="processed-value">-</td>
+                        </tr>
+            
+                        <tr>
+                            <td>alarmType</td>
+                            <td>报警类型</td>
+                            <td>4-6</td>
+                            <td>
+                                <input type="checkbox" class="byte-toggle" data-attr="alarmType" title="字节配置">
+                                <div class="byte-config" style="display:none;">
+                                    字节范围: <input type="number" class="byte-start" value="0">-
+                                    <input type="number" class="byte-end" value="0">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="data-type" data-attr="alarmType">
+                                    <option value="number">数字</option>
+                                    <option value="property">属性</option>
+                                </select>
+                            </td>
+                            <td>
+    
+                                <span>无映射</span>
+                            
+                            </td>
+                            <td class="raw-value">-</td>
+                            <td class="processed-value">-</td>
+                        </tr>
+            </tbody>
+                </table>
+            </div>
+        </fieldset>
+            <div class="layui-form-item" style="margin-top:20px;">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="saveData">保存配置</button>
+                    <button class="layui-btn layui-btn-primary" id="generateJson">生成JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    // 初始化Layui
+    layui.use(['form', 'layer'], function(){
+        var form = layui.form;
+        var layer = layui.layer;
+        var regularObj = {};
+		
+	// 方法1：URLSearchParams（推荐）
+	  function getQueryParam(name) {
+	    const urlParams = new URLSearchParams(window.location.search);
+	    return urlParams.get(name);
+	  }
+	  const dataId = getQueryParam('dataId'); // 获取dataId
+		
+		
+		var getRegularObj = function(){
+					$.ajax({
+			            type: 'POST',
+			            url: ctx + 'parseRegular/getOne',
+			            dataType: "JSON",
+			            data: JSON.stringify({id: dataId}),
+			            contentType: "application/json",
+			            success: function (res) {
+			                if (res.code == 0) {
+								regularObj = res.data;
+								
+			                } else {
+			                    layer.msg(res.msg);
+			                    $("#img").click();
+			                }
+			            }
+			        })
+					
+				}
+		getRegularObj();
+		
+		
+        // 字节配置切换
+        $('.byte-toggle').change(function() {
+            var attr = $(this).data('attr');
+            $(this).closest('td').find('.byte-config').toggle();
+        });
+        
+        // 显示映射配置
+        window.showMapping = function(attr) {
+            layer.alert('配置映射: ' + attr);
+            // 这里可以扩展为弹出层配置映射
+        };
+        
+        // 保存数据
+        form.on('submit(saveData)', function(data){
+            // 这里处理保存逻辑
+            layer.msg('保存成功！');
+            return false;
+        });
+        
+        // 生成JSON
+        $('#generateJson').click(function() {
+            var jsonData = generateJson();
+            console.log(jsonData);
+            layer.alert(JSON.stringify(jsonData, null, 2));
+        });
+        
+        // 生成JSON数据
+        function generateJson() {
+            var result = {};
+            ['main', 'line', 'alarm'].forEach(function(section) {
+                result[section] = [];
+                $('#' + section + 'Table tr').each(function() {
+                    var row = $(this);
+                    var item = {
+                        attr: row.find('td:eq(0)').text(),
+                        name: row.find('td:eq(1)').text(),
+                        charStart: parseInt(row.find('td:eq(2)').text().split('-')[0]),
+                        charEnd: parseInt(row.find('td:eq(2)').text().split('-')[1]),
+                        byteStart: parseInt(row.find('.byte-start').val()),
+                        byteEnd: parseInt(row.find('.byte-end').val()),
+                        dataType: row.find('.data-type').val()
+                    };
+                    
+                    // 处理映射
+                    var mapping = {};
+                    if (row.find('.mapping-config')) {
+                        // 这里需要实际的映射配置数据
+                    }
+                    
+                    result[section].push(item);
+                });
+            });
+            return result;
+        }
+    });
+    </script>
+</body>
+</html>

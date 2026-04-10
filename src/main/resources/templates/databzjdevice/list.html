@@ -86,8 +86,32 @@
     <form class="layui-form ">
       <div class="layui-form-item">
         <div class="layui-input-inline">
-          <input type="hidden" name="lotId" id="lotId" class="layui-input"  autocomplete="off" placeholder="请输入" th:value="${param.lotId}">
+          <input type="text" name="buyer" id="buyer" class="layui-input"  autocomplete="off" placeholder="用户名称">
         </div>
+        <div class="layui-input-inline">
+          <input type="text" name="phone" id="phone" class="layui-input"  autocomplete="off" placeholder="手机号">
+        </div>
+		<div class="layui-form-inline">
+			                            <div class="layui-input-inline">
+			                                <select id="provinceId" name="provinceId" lay-filter="provinceFilter">
+			                                    <option value=""></option>
+			                                </select>
+			                            </div>
+			                        </div>
+			<div class="layui-form-inline">
+			                            <div class="layui-input-inline">
+			                                <select id="cityId" name="cityId"  lay-filter="cityFilter">
+			                                    <option value="">市</option>
+			                                </select>
+			                            </div>
+			                        </div>
+			<div class="layui-form-inline">
+			                            <div class="layui-input-inline">
+			                                <select id="countryId" name="countryId"  lay-filter="countryFilter">
+			                                    <option value="">区</option>
+			                                </select>
+			                            </div>
+			                        </div>
         <div class="layui-input-inline">
           <input type="text" name="device_name" id="device_name" class="layui-input"  autocomplete="off" placeholder="设备名称">
         </div>
@@ -118,11 +142,13 @@
 </div>
 <script type="text/html" id="toolbar">
   <div class="layui-btn-container oper">
+
+	<button class="layui-btn layui-btn-sm" lay-event="updateDevice">更新</button>
   </div>
 </script>
 <script type="text/html" id="tool">
-  <a class="layui-btn layui-btn-xs" lay-event="look">测试</a>
-  <a class="layui-btn layui-btn-xs" lay-event="data">数据</a>
+  <a class="layui-btn layui-btn-xs" lay-event="look">全量数据</a>
+  <a class="layui-btn layui-btn-xs" lay-event="reRead">校正</a>
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataBzjDevice:update">编辑</a>
 </script>
 
@@ -158,11 +184,11 @@
       , cols: [
         [
           {type: 'checkbox', fixed: 'left'},
-          {field: 'username', title: '用户名', sort: true},
-          {field: 'address', title: '地址', sort: true},
-          {field: 'telephone', title: '电话', sort: true},
-          {field: 'deviceName', title: '设备名称', sort: true},
-          {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
+		  {field: 'username', title: '用户名', sort: true},
+            {field: 'address', title: '地址', sort: true},
+            {field: 'telephone', title: '电话', sort: true},
+            {field: 'deviceName', title: '设备名称', sort: true},
+            {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
           {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', templet : function(item){
 			if (item.deviceStatus == 'ONLINE') {
 					              return '  <a class="layui-btn layui-btn-xs" >在线</a>';
@@ -236,6 +262,9 @@
             });
           }, 200);
           break;
+        case 'updateDevice':
+			updateDevice();
+          break;
       };
     });
     //列操作
@@ -248,11 +277,13 @@
           tipDialog(ids);
           break;
         case 'look':
-			test11(data.lotId);
-		
+			lookData(data);
           break;
-        case 'data':
-          lookData(data);
+        case 'userData':
+          userData(data);
+          break;
+        case 'reRead':
+          reRead(data);
           break;
         case 'edit':
           backshow(data);
@@ -263,21 +294,64 @@
     });
 
 	
-	function test11(lotId){
+	var reRead = function(data){
+			layer.confirm('重新解析会删除所有消息并且重新生成，确认继续吗？', {
+			        btn: ['确定', '关闭'] //按钮
+			      }, function(){
+					$.ajax({
+		                type: 'POST',
+		                url: ctx + 'dataBzjDevice/reReadDevice',
+		                dataType: "JSON",
+		                data: JSON.stringify(data),
+		                contentType: "application/json",
+		                success: function (res) {
+		  				console.dir(res)
+		                    if (res.code == 0) {
+								layer.msg('任务执行中，请稍后查看界面', {icon: 1});
+		                    } else {
+		                        layer.msg(res.msg);
+		                        $("#img").click();
+		                    }
+		                }
+		            })
+			      }, function(){
+			        layer.msg('重新解析已经取消', {icon: 1});
+			      });
+		}
+	var updateDevice = function(){
+			$.ajax({
+                type: 'POST',
+                url: ctx + 'dataBzjDevice/updateDevice',
+                dataType: "JSON",
+                data: JSON.stringify({}),
+                contentType: "application/json",
+                success: function (res) {
+  				console.dir(res)
+                    if (res.code == 0) {
+						layer.msg('任务执行中，请稍后查看界面', {icon: 1});
+                    } else {
+                        layer.msg(res.msg);
+                        $("#img").click();
+                    }
+                }
+            })
+		}
+	
+	function lookData(data){
 	    if (parent.active && parent.active.tabAdd) {
 	        // 将参数作为查询字符串附加到URL
 //	        const params = new URLSearchParams({
 //	            param1: 'value1',
 //	            param2: 'value2'
 //	        });
-	        const urlWithParams = "/manager/index/dataElectricSeederMessage?lotId="+lotId;
-	        
+	        const urlWithParams = "/manager/index/dataElectricSeederMessage?lotId="+data.lotId;
+			parent.active.tabDelete(data.lotId);
 	        parent.active.tabAdd(
 	            urlWithParams, // 带参数的URL
-	            '3333322222',
-	            '<i class="layui-icon layui-icon-user"></i> 新标签'
+	            data.lotId,
+	            '<i class="layui-icon layui-icon-user"></i> '+data.deviceName
 	        );
-	        parent.active.tabChange('3333322222');
+	        parent.active.tabChange(data.lotId);
 	    }
 	}
 
@@ -351,6 +425,121 @@
       return false;
     });
 
+	
+	function initAreaForm(){
+			resetSelect('city', '请先选择省');
+			resetSelect('county', '请先选择市');
+		}
+		
+		// 2. 监听省变化 → 加载市
+		 form.on('select(provinceFilter)', function(data) {
+		   var provinceId = data.value;
+		   if (!provinceId) {
+		     resetSelect('city', '请先选择省');
+		     resetSelect('county', '请先选择市');
+		     form.render('select');
+		     return;
+		   }
+		   getCityList(provinceId);
+		 });
+		
+		 // 3. 监听市变化 → 加载区/县
+		 form.on('select(cityFilter)', function(data) {
+		   var cityId = data.value;
+		   if (!cityId) {
+		     resetSelect('county', '请先选择市');
+		     form.render('select');
+		     return;
+		   }
+		   getCountyList(cityId);
+		 });
+		
+		
+			 initProvince();
+			 // 初始化省数据（AJAX）
+			   function initProvince() {
+			     $.ajax({
+			       url: ctx + 'sysArea/getArea', 				
+				   contentType: 'application/json', // 明确指定 Content-Type
+				   data: JSON.stringify({ parentId: '0' }), // 转换为 JSON 字符串
+			       type: 'POST',
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择省</option>';
+			           $.each(res.data, function(index, item) {
+			             html += '<option value="' + item.id + '">' + item.name + '</option>';
+			           });
+			           $('#provinceId').html(html);
+			           form.render('select'); // 重新渲染下拉框
+			         } else {
+			           layer.msg('加载省数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+
+			   // 根据省ID加载市数据
+			   function getCityList(provinceId) {
+			     $.ajax({
+			       url: ctx + 'sysArea/getArea', 
+			       type: 'POST',
+				   contentType: 'application/json', // 明确指定 Content-Type
+				   data: JSON.stringify({ parentId: provinceId }), // 转换为 JSON 字符串
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择市</option>';
+			           $.each(res.data, function(index, item) {
+			             html += '<option value="' + item.id + '">' + item.name + '</option>';
+			           });
+			           $('#cityId').html(html).prop('disabled', false); // 启用市下拉框
+			           resetSelect('county', '请先选择市'); // 重置区/县
+			           form.render('select');
+			         } else {
+			           layer.msg('加载市数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+
+			   // 根据市ID加载区/县数据
+			   function getCountyList(cityId) {
+			     $.ajax({
+			       url: ctx + 'sysArea/getArea', 
+			       type: 'POST',
+				   contentType: 'application/json', // 明确指定 Content-Type
+				   data: JSON.stringify({ parentId: cityId }), // 转换为 JSON 字符串
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择区/县</option>';
+			           $.each(res.data, function(index, item) {
+			             html += '<option value="' + item.id + '">' + item.name + '</option>';
+			           });
+			           $('#countryId').html(html).prop('disabled', false); // 启用区/县下拉框
+			           form.render('select');
+			         } else {
+			           layer.msg('加载区/县数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+
+			   // 重置下拉框
+			   function resetSelect(selectId, placeholder) {
+			     $('#' + selectId).html('<option value="">' + placeholder + '</option>').prop('disabled', true);
+			   }
+		
+		
+		
+	
     // 监听搜索操作
     form.on('submit(data-search-btn)', function (data) {
       //执行搜索重载
@@ -386,50 +575,8 @@
       }, 200);
     }
 	
-	var lookData = function(param)	{
-		if(param.deviceType == 2){
-	  		const targetUrl = ctx + "index/dataElectricSeederMessage?lotId="+param.lotId;
-		    window.location.href = targetUrl;
-		}
-		if(param.deviceType == 1){
-	  		const targetUrl = ctx + "index/dataElectricSeederMessage?lotId="+param.lotId;
-		    window.location.href = targetUrl;
-		}
-		if(param.deviceType == 0){
-			alert("不确定播种机类型，无法查看数据")
-		}
-	}
 	
-	//触发事件
-	    var active = {
-	        tabAdd: function (url, id, title) {
-	            if (url != "" && url != null && url != undefined) {
-	                window.parent.layui.element.tabAdd('tab', {
-	                    title: title
-	                    ,
-	                    content: '<iframe data-frameid="' + id + '" frameborder="0" name="content" width="100%" src="' + url + '"></iframe>'
-	                    ,
-	                    id: id
-	                })
-	            }
-
-				FrameWH();//计算框架高度
-	        },
-	        tabChange: function (id) {
-	            //切换到指定Tab项
-	            window.parent.layui.element.tabChange('tab', id); //切换到：用户管理
-	            $("iframe[data-frameid='" + id + "']").attr("src", $("iframe[data-frameid='" + id + "']").attr("src"))//切换后刷新框架
-	        },
-	        tabDelete: function (id) {
-	            window.parent.layui.element.tabDelete("tab", id);//删除
-	        }
-	    };
 	
-
-	function FrameWH() {
-	        var h = $(window).height() - 41 - 10 - 35 - 10 - 44 - 10;
-	        $("iframe").css("height", h + "px");
-	    };
     //禁用输入
     var toDisabled = function () {
       $(".oper").hide();

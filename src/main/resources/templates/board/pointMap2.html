@@ -445,6 +445,11 @@ layui.use(function () {
         var upload = layui.upload;
         var laydate = layui.laydate;
 		var screenData = {};
+		var chartSelectionState = {
+			deviceTypeList:[1,2],
+			deviceStatusList:['ONLINE','OFFLINE']
+		};
+		
 		
 		var map = new BMapGL.Map("echartDemo",{
 		    enableRotate: false,//禁用旋转
@@ -490,7 +495,7 @@ layui.use(function () {
               type: 'POST',
               url: ctx + 'dataBzjDevice/pointMap',
               dataType: "JSON",
-              data: JSON.stringify({deviceStatus:'ONLINE'}),
+              data: JSON.stringify(chartSelectionState),
               contentType: "application/json",
               success: function (res) {
 				if (res.code == 0) {
@@ -500,63 +505,193 @@ layui.use(function () {
 			  }
           })
 		}
-
+		fetchData();
 		// 每 1 秒刷新一次
-		        setInterval(fetchData, 1000);
-				
+        setInterval(fetchData, 1000 * 10);
+		// 每 10分钟刷新一次定位
+        setInterval(getDeviceList, 1000 * 5 * 60);
 			
-				
+		
+		// 在CSS中添加以下样式
+		var customInfoWindowStyle = `
+		    <style>
+		        .custom-info-window {
+		            font-family: "Microsoft YaHei", sans-serif;
+		            border-radius: 8px;
+		            overflow: hidden;
+		            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		        }
+		        .custom-info-window .info-header {
+		            background: linear-gradient(135deg, #1E9FFF, #00BFFF);
+		            color: white;
+		            padding: 12px 15px;
+		            font-weight: bold;
+		        }
+		        .custom-info-window .info-content {
+		            padding: 15px;
+		            background: white;
+		        }
+		        .custom-info-window .info-row {
+		            display: flex;
+		            margin-bottom: 8px;
+		            padding-bottom: 8px;
+		            border-bottom: 1px solid #eee;
+		        }
+		        .custom-info-window .info-label {
+		            width: 80px;
+		            color: #666;
+		            font-size: 12px;
+		        }
+		        .custom-info-window .info-value {
+		            flex: 1;
+		            font-weight: bold;
+		        }
+		        .custom-info-window .info-btn {
+		            display: block;
+		            text-align: center;
+		            margin-top: 10px;
+		            background: #1E9FFF;
+		            color: white;
+		            padding: 8px;
+		            border-radius: 4px;
+		            text-decoration: none;
+		        }
+		        .custom-info-window .info-btn:hover {
+		            background: #00BFFF;
+		            color: white;
+		        }
+		    </style>
+		`;
+		
+		// 在创建InfoWindow前添加样式到页面
+		if (!document.getElementById('custom-info-window-style')) {
+		    var styleElement = document.createElement('div');
+		    styleElement.id = 'custom-info-window-style';
+		    styleElement.innerHTML = customInfoWindowStyle;
+		    document.head.appendChild(styleElement);
+		}
+		
+			
+		function getDeviceList(){
+			
+			fetchData();
+			
+			$.ajax({
+			    type: 'POST',
+			    url: ctx + 'dataBzjDevice/selectForMap',
+			    dataType: "JSON",
+			    data: JSON.stringify(chartSelectionState),
+			    contentType: "application/json",
+			    success: function(res) {
+			        console.dir(res);
+			        if (res.code == 0) {
+			            // 确保地图已加载
+			            if (!map) {
+			                console.error("地图未初始化");
+			                return;
+			            }
+
+			            // 清空现有标记（可选）
+			            map.clearOverlays();
+
+			            res.data.forEach(function(device) {
+			                var markerPoint = new BMapGL.Point(device.baiduX, device.baiduY);
+			                // 统一处理图标
+			                var deviceStatus = device.deviceStatus;
+			                var deviceType = device.deviceType;
+			                var iconUrl = "/manager/static/img/location_green.png"; // 默认图标路径
+							
+							if(chartSelectionState.deviceStatusList.length == 2||
+								chartSelectionState.deviceTypeList.length != 2){
+								if (deviceStatus == 'ONLINE') {
+				                    iconUrl = "/manager/static/img/location_green.png";
+				                } 
+				                if (deviceStatus == 'OFFLINE') {
+				                    iconUrl = "/manager/static/img/location_ont.png";
+				                } 
+								
+							}else{
+								if(deviceType == 2){
+					                    iconUrl = "/manager/static/img/location_blue.png";
+								}
+								if(deviceType == 1){
+					                    iconUrl = "/manager/static/img/location_black_green.png";
+								}
+								
+							}
+							
+							
+			                
+
+			                try {
+			                    var myIcon = new BMapGL.Icon(iconUrl, new BMapGL.Size(25, 32), {
+			                        anchor: new BMapGL.Size(13, 13) // 图标中心点
+			                    });
+			                    var marker = new BMapGL.Marker(markerPoint, { icon: myIcon });
+			                    map.addOverlay(marker);
+
+			                    // 信息窗口
+								var content = `
+								    <div class="custom-info-window">
+								        <div class="info-header">${device.username}的播种机</div>
+								        <div class="info-content">
+								            <div class="info-row">
+								                <div class="info-label">设备ID:</div>
+								                <div class="info-value">${device.lotId}</div>
+								            </div>
+								            <div class="info-row">
+								                <div class="info-label">机器名称:</div>
+								                <div class="info-value">${device.deviceName}</div>
+								            </div>
+								            <div class="info-row">
+								                <div class="info-label">类型:</div>
+								                <div class="info-value">${device.deviceType==2?'电驱':'机械'}</div>
+								            </div>
+								            <div class="info-row">
+								                <div class="info-label">状态:</div>
+								                <div class="info-value">${device.deviceStatus=='ONLINE'?'在线':'离线'}</div>
+								            </div>
+								            <div class="info-row">
+								                <div class="info-label">姓名:</div>
+								                <div class="info-value">${device.username}</div>
+								            </div>
+								            <div class="info-row">
+								                <div class="info-label">电话:</div>
+								                <div class="info-value">${device.telephone}</div>
+								            </div>
+								            <a href="http://localhost:8080/manager/index/dataElectricSeederMessage?lotId=${device.lotId}" 
+								               target="_blank" class="info-btn">查看详情</a>
+								        </div>
+								    </div>
+								`;
+			                    
+			                    var infoWindow = new BMapGL.InfoWindow(content, {
+			                        width: 250,
+			                        height: 450,
+			                        title: '详情'
+			                    });
+			                    
+			                    marker.addEventListener('click', function() {
+			                        map.openInfoWindow(infoWindow, markerPoint);
+			                    });
+			                } catch (e) {
+			                    console.error("创建标记点失败:", e, device);
+			                }
+			            });
+			        } else {
+			            layer.msg(res.msg);
+			            $("#img").click();
+			        }
+			    },
+			    error: function(xhr, status, error) {
+			        console.error("AJAX请求失败:", status, error);
+			    }
+			});
+			
+		}		
 		  
-		  $.ajax({
-              type: 'POST',
-              url: ctx + 'dataBzjDevice/selectForMap',
-              dataType: "JSON",
-              data: JSON.stringify({deviceStatus:'ONLINE'}),
-              contentType: "application/json",
-			  success: function (res) {
-  	  				console.dir(res)
-  	                    if (res.code == 0) {
-  //	  					dq_data = res.data.records;
-  	  					// 遍历数据创建标记点
-  	  							  res.data.forEach(function(device) {
-  	  							    // 创建标记点坐标
-  	  							    var markerPoint = new BMapGL.Point(device.baiduX, device.baiduY);
-  	  							    
-  	  							    // 创建标记点
-  	  							    var marker = new BMapGL.Marker(markerPoint);
-  	  							    map.addOverlay(marker);
-  	  							    
-  	  							    // 创建信息窗口内容
-  	  							    var content = `
-  	  							      <div class="custom-info-window">
-  	  							        <p>姓名：${device.username}</p>
-  	  							        <p>电话：${device.telephone}</p>
-  	  							        <p>
-  	  							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
-  	  							            [详情]
-  	  							          </a>
-  	  							        </p>
-  	  							      </div>
-  	  							    `;
-  	  							    
-  	  							    // 创建信息窗口
-  	  							    var infoWindow = new BMapGL.InfoWindow(content, {
-  	  							      width: 250,
-  	  							      height: 150,
-  	  							      title: device.username + '的播种机'
-  	  							    });
-  	  							    
-  	  							    // 为标记点添加点击事件
-  	  							    marker.addEventListener('click', function() {
-  	  							      map.openInfoWindow(infoWindow, markerPoint);
-  	  							    });
-  	  							  });
-  	                    } else {
-  	                        layer.msg(res.msg);
-  	                        $("#img").click();
-  	                    }
-  	                }
-          })
+				
+
 		  
 		  
 		  
@@ -579,17 +714,21 @@ layui.use(function () {
 		  
 			var leftChartDom = document.getElementById('deviceOnline');
 						var leftChart = echarts.init(leftChartDom);
-						var leftOption  = {
+						// 2. 准备图表配置项 (您的原始代码)
+						var leftOption = {
 						  tooltip: {
 						    trigger: 'item'
 						  },
 						  legend: {
 						    top: '5%',
 						    left: 'center',
-							textStyle: {
-							  color: '#00AAD7'  ,// 统一设置图例文字颜色为黄色
-							  fontSize:20,
-							},
+						    textStyle: {
+						      color: '#00AAD7',
+						      fontSize: 20,
+						    },
+						    // 为了让图例可以点击切换，确保 legend.data 与 series.data 的 name 对应
+						    // ECharts 会自动关联，但显式声明是好习惯,在线和离线
+						    data: ['在线', '离线'] 
 						  },
 						  series: [
 						    {
@@ -597,17 +736,17 @@ layui.use(function () {
 						      type: 'pie',
 						      radius: ['40%', '70%'],
 						      avoidLabelOverlap: false,
-							  color:['#1FBBFF','#004BFF'],
+						      color: ['#33FF33', '#1FBBFF',],
 						      padAngle: 5,
 						      itemStyle: {
 						        borderRadius: 10
 						      },
 						      label: {
-								  show: true,
-								  position: 'inside', // 标签显示在饼图外侧
-								  formatter: '{c}', // 显示名称和数值
-								  color: 'white'  ,  // 标签文字颜色
-								  fontSize:30,
+						        show: true,
+						        position: 'inside',
+						        formatter: '{c}',
+						        color: 'white',
+						        fontSize: 30,
 						      },
 						      emphasis: {
 						        label: {
@@ -620,8 +759,8 @@ layui.use(function () {
 						        show: false
 						      },
 						      data: [
+						        { value: 735, name: '离线' },
 						        { value: 1048, name: '在线' },
-						        { value: 735, name: '离线' }
 						      ]
 						    }
 						  ]
@@ -629,37 +768,44 @@ layui.use(function () {
 
 						leftOption && leftChart.setOption(leftOption);
 			
+						
+						
 			var rightChartDom = document.getElementById('deviceFb');
 			var rightChart = echarts.init(rightChartDom);
 			var rightOption;
 
-			rightOption = {
+			// 2. 准备图表配置项
+			var rightOption = {
 			  tooltip: {
 			    trigger: 'item'
 			  },
 			  legend: {
 			    top: '5%',
 			    left: 'center',
-				textStyle: {
-				  color: '#00AAD7'  // 统一设置图例文字颜色为黄色
-				},
+			    textStyle: {
+			      color: '#00AAD7',
+			      fontSize: 20  // 建议加上字体大小，与左边保持一致
+			    },
+			    // 显式声明图例数据，确保可以点击切换
+			    data: ['电驱', '机械']
 			  },
 			  series: [
 			    {
-			      name: '在线率',
+			      name: '设备类型',  // 改为更准确的名称
 			      type: 'pie',
 			      radius: ['40%', '70%'],
 			      avoidLabelOverlap: false,
 			      padAngle: 5,
-				  color:['#1FBBFF','#004BFF'],
+			      color: ['#004BFF','#4D9900'],
 			      itemStyle: {
 			        borderRadius: 10
 			      },
 			      label: {
-					  show: true,
-					  position: 'inside', // 标签显示在饼图外侧
-					  formatter: '{c}', // 显示名称和数值
-					  color: 'white'    // 标签文字颜色
+			        show: true,
+			        position: 'inside',
+			        formatter: '{c}',
+			        color: 'white',
+			        fontSize: 30  // 建议加上字体大小
 			      },
 			      emphasis: {
 			        label: {
@@ -672,8 +818,8 @@ layui.use(function () {
 			        show: false
 			      },
 			      data: [
-			        { value: 1476, name: '监控器' },
-			        { value: 307, name: '播种机' }
+			        { value: 307, name: '电驱' },
+			        { value: 1476, name: '机械' },
 			      ]
 			    }
 			  ]
@@ -682,42 +828,100 @@ layui.use(function () {
 			rightOption && rightChart.setOption(rightOption);
 
 
+			// 监听左边图表的图例变化
+			leftChart.on('legendselectchanged', function (params) {
+			    console.log('左边图例选择变化:', params);
+			    
+			    // params.name 是被点击的图例名称 ('在线' 或 '离线')
+			    // params.selected 是一个对象，如 { '在线': true, '离线': false }
+			    
+			    // 更新我们的状态对象
+		//	    chartSelectionState.leftChart[params.name] = params.selected[params.name];
+				var onlinestatus = [];
+				if(params.selected['在线']){
+					onlinestatus.push('ONLINE');
+				}
+				if(params.selected['离线']){
+					onlinestatus.push('OFFLINE');
+				}
+				chartSelectionState.deviceStatusList = onlinestatus;
+			    
+			    // 打印当前完整的状态
+			    console.log('当前左边图表选择状态:', chartSelectionState);
+			    
+			    // 调用处理函数
+			    getDeviceList();
+			});
+
+			// 监听右边图表的图例变化
+			rightChart.on('legendselectchanged', function (params) {
+			    console.log('右边图例选择变化:', params);
+			    
+			    // params.name 是被点击的图例名称 ('监控器' 或 '播种机')
+			    // params.selected 是一个对象，如 { '监控器': true, '播种机': false }
+			    
+			    // 更新我们的状态对象
+		//	    chartSelectionState.rightChart[params.name] = params.selected[params.name];
+				var deviceTypes = [];
+				if(params.selected['电驱']){
+					deviceTypes.push(2);
+				}
+				if(params.selected['机械']){
+					deviceTypes.push(1);
+				}
+				chartSelectionState.deviceTypeList = deviceTypes;
+					    
+			    // 打印当前完整的状态
+			    console.log('当前右边图表选择状态:', chartSelectionState);
+			    
+			    // 调用处理函数
+				getDeviceList();
+			});
+		
+
+
+			
+			
+			
+			
 			//刷新页面
 			var refreshPage = function(){
 
-			$("#deviceNum").text(parseInt(screenData.online)+parseInt(screenData.offline));
-			$("#onlineNum").text(screenData.online);
-			$("#offlineNum").text(screenData.offline);
-			$("#alarmNum").text(0);
-			$("#seedingDeviceNum").text(screenData.seedDeviceCount);
-			$("#seedingLineNum").text(screenData.seedLineCount);
-			if(screenData.seedDeviceCount && screenData.seedDeviceCount!=0){
-				var avg = parseInt(screenData.seedLineCount)/parseInt(screenData.seedDeviceCount);
-				$("#avgLineNum").text(avg);
+				$("#deviceNum").text(parseInt(screenData.online)+parseInt(screenData.offline));
+				$("#onlineNum").text(screenData.online);
+				$("#offlineNum").text(screenData.offline);
+				$("#alarmNum").text(0);
+				$("#seedingDeviceNum").text(screenData.seedDeviceCount);
+				$("#seedingLineNum").text(screenData.seedLineCount);
+				if(screenData.seedDeviceCount && screenData.seedDeviceCount!=0){
+					var avg = Math.round(parseInt(screenData.seedLineCount)/parseInt(screenData.seedDeviceCount));
+					$("#avgLineNum").text(avg);
+				}
+	
+				const leftData = [
+								
+								{value:screenData.online,name:"在线"},
+								{value:screenData.offline,name:"离线"},
+								
+							];
+	
+				leftChart.setOption	({
+					series: [{ data: leftData }]
+				});
+				const rightData = [
+								
+								{value:screenData.dq,name:"电驱"},
+								{value:screenData.jkq,name:"机械"},
+								
+							];
+	
+				rightChart.setOption	({
+					series: [{ data: rightData }]
+				});
+
 			}
 
-			const leftData = [
-							
-							{value:screenData.online,name:"在线"},
-							{value:screenData.offline,name:"离线"},
-							
-						];
-
-			leftChart.setOption	({
-				series: [{ data: leftData }]
-			});
-			const rightData = [
-							
-							{value:screenData.dq,name:"电驱"},
-							{value:screenData.jkq,name:"监控器"},
-							
-						];
-
-			rightChart.setOption	({
-				series: [{ data: rightData }]
-			});
-
-			}
+			getDeviceList();
 		//
 	});
 

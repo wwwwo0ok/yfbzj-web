@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.project.mapper.BusinessAlarmCommonMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.company.project.entity.BusinessAlarmCommonEntity" id="businessAlarmCommonMap">
+        <result property="id" column="id"/>
+        <result property="alarmType" column="alarm_type"/>
+        <result property="lotId" column="lot_id"/>
+        <result property="messageId" column="message_id"/>
+        <result property="lineNo" column="line_no"/>
+        <result property="code" column="code"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+</mapper>

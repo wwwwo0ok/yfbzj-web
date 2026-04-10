@@ -61,7 +61,6 @@ public class AliYunService {
 	 */
 	public List<DeviceInfo> getBzjDevice(){
 		
-		List<DataProductEntity> deviceLevel = productService.getDeviceLevel();
 		
 		List<DeviceInfo> result = new ArrayList<>();
 		
@@ -75,6 +74,26 @@ public class AliYunService {
 			}
 		});
 		
+		
+		return result;
+	}
+	/**
+	 * 获取所有设备
+	 * @return
+	 */
+	public List<DeviceInfo> getBzjDevice(String productKey){
+		
+		List<DeviceInfo> result = new ArrayList<>();
+		if(strategyMap.containsKey(productKey)){
+			
+			CodeReadStrategy v = strategyMap.get(productKey);
+			if(productService.isActive(v.getCode())) {
+				
+				List<DeviceInfo> queryIotBzjDevice = queryIotBzjDevice(v.getCode());
+				
+				result.addAll(queryIotBzjDevice);
+			}
+		}
 		
 		return result;
 	}
@@ -188,6 +207,65 @@ public class AliYunService {
 		}
         
         return iotLit;
+    	
+    }
+    /**
+     * 获取满足条件的设备消息
+     */
+    public List<Map<String, Object>> getMessageBody(String deviceName,String rawData,String productKey,long beginTimeTimestamp,long endTimeTimestamp) {
+    	
+    	List<Map<String, Object>> resultList = new ArrayList<>();
+    	
+    	int currentPage = 1;
+    	final int pageSize = 100;
+    	try {
+    		ListAnalyticsDataRequest.Condition condition0 = ListAnalyticsDataRequest.Condition.builder()
+    				.operate("BETWEEN")
+    				.fieldName("timestamp")
+    				.betweenStart(String.valueOf(beginTimeTimestamp))
+    				.betweenEnd(String.valueOf(endTimeTimestamp))
+    				.build();
+    		ListAnalyticsDataRequest.Condition condition1 = ListAnalyticsDataRequest.Condition.builder()
+    				.operate("=")
+    				.value(deviceName)
+    				.fieldName("device_name")
+    				.build();
+    		
+    		while (true) {
+    			
+    			ListAnalyticsDataRequest listAnalyticsDataRequest = ListAnalyticsDataRequest.builder()
+    					.iotInstanceId(AliyunIotConstants.IOT_INSTANCE_ID)
+    					.apiPath(rawData)
+    					.condition(java.util.Arrays.asList(
+    							condition0,
+    							condition1
+    							))
+    					.pageSize(pageSize)
+    					.pageNum(currentPage)
+    					.build();
+    			
+    			CompletableFuture<ListAnalyticsDataResponse> response = client.listAnalyticsData(listAnalyticsDataRequest);
+    			ListAnalyticsDataResponse resp = response.get();
+    			ListAnalyticsDataResponseBody.Data bzjData = resp.getBody().getData(); 
+    			
+    			List<Map<String, Object>> list = JSON.parseObject(bzjData.getResultJson(), new TypeReference<List<Map<String, Object>>>() {
+    			});
+    			if(list != null) {
+    				resultList.addAll(list);
+    			}
+    			
+    			
+    			// 关键：正确判断是否还有下一页
+    			if (!resp.getBody().getData().getHasNext()) {
+    				break;
+    			}
+    			currentPage++;
+    		}
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	return resultList;
     	
     }
     

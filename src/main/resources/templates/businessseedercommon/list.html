@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--公共模块-->
+  <div th:replace="~{layout}"></div>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info">
+  <input name="id" hidden/>
+    <div class="layui-form-item">
+      <label class="layui-form-label">设备ID</label>
+      <div class="layui-input-block">
+        <input type="lotId" name="lotId" placeholder="请输入设备ID" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备名称</label>
+      <div class="layui-input-block">
+        <input type="deviceName" name="deviceName" placeholder="请输入设备名称" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">数据发生时刻（硬件时刻）</label>
+      <div class="layui-input-block">
+        <input type="dataTime" name="dataTime" placeholder="请输入数据发生时刻（硬件时刻）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">物联上传数据类型（0:蓝牙上传,1:运行停止上传,2:物联控制后上传,3:设置改变上传）</label>
+      <div class="layui-input-block">
+        <input type="uploadType" name="uploadType" placeholder="请输入物联上传数据类型（0:蓝牙上传,1:运行停止上传,2:物联控制后上传,3:设置改变上传）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">播种类型（0:平行播种）</label>
+      <div class="layui-input-block">
+        <input type="sowType" name="sowType" placeholder="请输入播种类型（0:平行播种）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">播种行数</label>
+      <div class="layui-input-block">
+        <input type="sowLine" name="sowLine" placeholder="请输入播种行数" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">主肥监控标志</label>
+      <div class="layui-input-block">
+        <input type="mainFertilizerMonitoringFlag" name="mainFertilizerMonitoringFlag" placeholder="请输入主肥监控标志" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">主肥电机标志</label>
+      <div class="layui-input-block">
+        <input type="mainFertilizerMotorFlag" name="mainFertilizerMotorFlag" placeholder="请输入主肥电机标志" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">口肥电机标志</label>
+      <div class="layui-input-block">
+        <input type="deputyFertilizerMotorFlag" name="deputyFertilizerMotorFlag" placeholder="请输入口肥电机标志" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">种物位标志</label>
+      <div class="layui-input-block">
+        <input type="seedLocationFlag" name="seedLocationFlag" placeholder="请输入种物位标志" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">主肥物位标志</label>
+      <div class="layui-input-block">
+        <input type="mainFertilizerLocationFlag" name="mainFertilizerLocationFlag" placeholder="请输入主肥物位标志" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">口肥物位标志</label>
+      <div class="layui-input-block">
+        <input type="deputyFertilizerLocationFlag" name="deputyFertilizerLocationFlag" placeholder="请输入口肥物位标志" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">株距（单位mm）</label>
+      <div class="layui-input-block">
+        <input type="sowInterval" name="sowInterval" placeholder="请输入株距（单位mm）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">总播种宽度（单位mm）</label>
+      <div class="layui-input-block">
+        <input type="sowingWidth" name="sowingWidth" placeholder="请输入总播种宽度（单位mm）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设定主肥量（单位kg）</label>
+      <div class="layui-input-block">
+        <input type="setMainFertilizerValue" name="setMainFertilizerValue" placeholder="请输入设定主肥量（单位kg）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">实测主肥量（单位g）</label>
+      <div class="layui-input-block">
+        <input type="realMainFertilizerValue" name="realMainFertilizerValue" placeholder="请输入实测主肥量（单位g）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设定口肥量（单位kg）</label>
+      <div class="layui-input-block">
+        <input type="setDeputyFertilizerValue" name="setDeputyFertilizerValue" placeholder="请输入设定口肥量（单位kg）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">实测口肥量（单位g）</label>
+      <div class="layui-input-block">
+        <input type="realDeputyFertilizerValue" name="realDeputyFertilizerValue" placeholder="请输入实测口肥量（单位g）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">主肥系数</label>
+      <div class="layui-input-block">
+        <input type="mainFertilizerRate" name="mainFertilizerRate" placeholder="请输入主肥系数" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">口肥系数</label>
+      <div class="layui-input-block">
+        <input type="deputyFertilizerRate" name="deputyFertilizerRate" placeholder="请输入口肥系数" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">主肥监控缺肥灵敏度</label>
+      <div class="layui-input-block">
+        <input type="lackFertilizerRate" name="lackFertilizerRate" placeholder="请输入主肥监控缺肥灵敏度" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">单次播种运行时间（单位秒）</label>
+      <div class="layui-input-block">
+        <input type="runningTime" name="runningTime" placeholder="请输入单次播种运行时间（单位秒）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">单次播种距离（单位m）</label>
+      <div class="layui-input-block">
+        <input type="sowDistance" name="sowDistance" placeholder="请输入单次播种距离（单位m）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">种子使能（是否开启播种）</label>
+      <div class="layui-input-block">
+        <input type="seedFlag" name="seedFlag" placeholder="请输入种子使能（是否开启播种）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">数据状态（1:正常,0:忽略）</label>
+      <div class="layui-input-block">
+        <input type="status" name="status" placeholder="请输入数据状态（1:正常,0:忽略）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  sa:hasPermission="businessSeederCommon:list">
+    <form class="layui-form ">
+      <div class="layui-form-item">
+        <div class="layui-input-inline">
+          <input type="text" name="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+        </div>
+        <div class="layui-input-inline ">
+          <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container oper">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="businessSeederCommon:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="businessSeederCommon:delete">删除</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="businessSeederCommon:update">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="businessSeederCommon:delete">删除</a>
+</script>
+
+</body>
+</html>
+<script>
+  layui.use(function () {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+    //加载table
+    var tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , page: true //开启分页
+      , url: ctx + 'businessSeederCommon/listByPage' //数据接口
+      , method: 'POST'
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'id', title: '主键ID', sort: true},
+          {field: 'lotId', title: '设备ID', sort: true},
+          {field: 'deviceName', title: '设备名称', sort: true},
+          {field: 'dataTime', title: '数据发生时刻（硬件时刻）', sort: true},
+          {field: 'uploadType', title: '物联上传数据类型（0:蓝牙上传,1:运行停止上传,2:物联控制后上传,3:设置改变上传）', sort: true},
+          {field: 'sowType', title: '播种类型（0:平行播种）', sort: true},
+          {field: 'sowLine', title: '播种行数', sort: true},
+          {field: 'mainFertilizerMonitoringFlag', title: '主肥监控标志', sort: true},
+          {field: 'mainFertilizerMotorFlag', title: '主肥电机标志', sort: true},
+          {field: 'deputyFertilizerMotorFlag', title: '口肥电机标志', sort: true},
+          {field: 'seedLocationFlag', title: '种物位标志', sort: true},
+          {field: 'mainFertilizerLocationFlag', title: '主肥物位标志', sort: true},
+          {field: 'deputyFertilizerLocationFlag', title: '口肥物位标志', sort: true},
+          {field: 'sowInterval', title: '株距（单位mm）', sort: true},
+          {field: 'sowingWidth', title: '总播种宽度（单位mm）', sort: true},
+          {field: 'setMainFertilizerValue', title: '设定主肥量（单位kg）', sort: true},
+          {field: 'realMainFertilizerValue', title: '实测主肥量（单位g）', sort: true},
+          {field: 'setDeputyFertilizerValue', title: '设定口肥量（单位kg）', sort: true},
+          {field: 'realDeputyFertilizerValue', title: '实测口肥量（单位g）', sort: true},
+          {field: 'mainFertilizerRate', title: '主肥系数', sort: true},
+          {field: 'deputyFertilizerRate', title: '口肥系数', sort: true},
+          {field: 'lackFertilizerRate', title: '主肥监控缺肥灵敏度', sort: true},
+          {field: 'runningTime', title: '单次播种运行时间（单位秒）', sort: true},
+          {field: 'sowDistance', title: '单次播种距离（单位m）', sort: true},
+          {field: 'seedFlag', title: '种子使能（是否开启播种）', sort: true},
+          {field: 'status', title: '数据状态（1:正常,0:忽略）', sort: true},
+          {width: 120, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          toUnDisabled();
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          setTimeout(function () {
+            form.val('info', {
+              "test": "test"
+              , "id": ""
+              , "lotId": ""
+              , "deviceName": ""
+              , "dataTime": ""
+              , "uploadType": ""
+              , "sowType": ""
+              , "sowLine": ""
+              , "mainFertilizerMonitoringFlag": ""
+              , "mainFertilizerMotorFlag": ""
+              , "deputyFertilizerMotorFlag": ""
+              , "seedLocationFlag": ""
+              , "mainFertilizerLocationFlag": ""
+              , "deputyFertilizerLocationFlag": ""
+              , "sowInterval": ""
+              , "sowingWidth": ""
+              , "setMainFertilizerValue": ""
+              , "realMainFertilizerValue": ""
+              , "setDeputyFertilizerValue": ""
+              , "realDeputyFertilizerValue": ""
+              , "mainFertilizerRate": ""
+              , "deputyFertilizerRate": ""
+              , "lackFertilizerRate": ""
+              , "runningTime": ""
+              , "sowDistance": ""
+              , "seedFlag": ""
+              , "status": ""
+            });
+          }, 200);
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'look':
+          backshow(data);
+          toDisabled();
+          break;
+        case 'edit':
+          backshow(data);
+          $(".title").html("编辑");
+          toUnDisabled();
+          break;
+      }
+    });
+
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete(ctx + "businessSeederCommon/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              tableIns1.reload();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.id===undefined || data.field.id===null || data.field.id===""){
+        CoreUtil.sendPost(ctx + "businessSeederCommon/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }else {
+        CoreUtil.sendPut(ctx + "businessSeederCommon/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }
+
+      return false;
+    });
+
+    // 监听搜索操作
+    form.on('submit(data-search-btn)', function (data) {
+      //执行搜索重载
+      tableIns1.reload({
+        page: {
+          curr: 1
+        }
+        , where: data.field
+      });
+      return false;
+    });
+
+    //回显
+    var backshow = function (data) {
+      $(".table_div").hide();
+      $(".operation").show();
+      $(".title").html("查看");
+      setTimeout(function () {
+        form.val('info', {
+          "test": "test"
+                      , "id": data.id
+                      , "lotId": data.lotId
+                      , "deviceName": data.deviceName
+                      , "dataTime": data.dataTime
+                      , "uploadType": data.uploadType
+                      , "sowType": data.sowType
+                      , "sowLine": data.sowLine
+                      , "mainFertilizerMonitoringFlag": data.mainFertilizerMonitoringFlag
+                      , "mainFertilizerMotorFlag": data.mainFertilizerMotorFlag
+                      , "deputyFertilizerMotorFlag": data.deputyFertilizerMotorFlag
+                      , "seedLocationFlag": data.seedLocationFlag
+                      , "mainFertilizerLocationFlag": data.mainFertilizerLocationFlag
+                      , "deputyFertilizerLocationFlag": data.deputyFertilizerLocationFlag
+                      , "sowInterval": data.sowInterval
+                      , "sowingWidth": data.sowingWidth
+                      , "setMainFertilizerValue": data.setMainFertilizerValue
+                      , "realMainFertilizerValue": data.realMainFertilizerValue
+                      , "setDeputyFertilizerValue": data.setDeputyFertilizerValue
+                      , "realDeputyFertilizerValue": data.realDeputyFertilizerValue
+                      , "mainFertilizerRate": data.mainFertilizerRate
+                      , "deputyFertilizerRate": data.deputyFertilizerRate
+                      , "lackFertilizerRate": data.lackFertilizerRate
+                      , "runningTime": data.runningTime
+                      , "sowDistance": data.sowDistance
+                      , "seedFlag": data.seedFlag
+                      , "status": data.status
+                  });
+      }, 200);
+    }
+
+    //禁用输入
+    var toDisabled = function () {
+      $(".oper").hide();
+      $(".disabled").each(function (index, elem) {
+        $(elem).attr("disabled", "")
+      })
+    }
+
+    //放开输入
+    var toUnDisabled = function () {
+      $(".oper").show();
+      $(".disabled").each(function (index, elem) {
+        $(elem).removeAttr("disabled", "")
+      })
+    }
+  });
+</script>

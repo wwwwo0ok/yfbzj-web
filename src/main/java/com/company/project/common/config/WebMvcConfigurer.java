@@ -59,8 +59,10 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport {
     //web是从管理后台来的接口，不走app那一套校验逻辑
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SaInterceptor(handler ->
-                SaRouter.match("/**", r -> StpUtil.checkLogin()))
+        registry.addInterceptor(new SaInterceptor(handler ->{
+		        	// 关键修改：从Redis读取Session状态
+		            StpUtil.checkLogin();
+        		})
                 .isAnnotation(true))
                 .excludePathPatterns("/doc.html")
                 .excludePathPatterns("/swagger-resources/**")

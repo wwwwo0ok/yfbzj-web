@@ -55,6 +55,19 @@ public class DataProductController {
         IPage<DataProductEntity> iPage = dataProductService.page(dataProduct.getQueryPage(), queryWrapper);
         return DataResult.success(iPage);
     }
+    @ApiOperation(value = "提供菜单查询")
+    @PostMapping("dataProduct/getSelectList")
+    @ResponseBody
+    public DataResult getSelectList(@RequestBody DataProductEntity dataProduct){
+    	LambdaQueryWrapper<DataProductEntity> queryWrapper = Wrappers.lambdaQuery();
+    	//查询条件示例
+    	queryWrapper.eq(dataProduct.getCode() != null, DataProductEntity::getCode, dataProduct.getCode());
+    	queryWrapper.orderByDesc(DataProductEntity::getLevel)
+    	.orderByDesc(DataProductEntity::getCreateTime)
+    	;
+    	List<DataProductEntity> list = dataProductService.list( queryWrapper);
+    	return DataResult.success(list);
+    }
 
 
     @ApiOperation(value = "新增")

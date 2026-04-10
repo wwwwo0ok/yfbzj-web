@@ -60,337 +60,337 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 * 电子齿轮比
 	 */
 		@TableField("electronic_gear_ratio")
-		private Integer electronicGearRatio;
+		private int electronicGearRatio;
 
 	/**
 	 * B组孔盘数。
 	 */
 		@TableField("b_holes_num")
-		private Integer bHolesNum;
+		private int bHolesNum;
 
 	/**
 	 * B组株距
 	 */
 		@TableField("b_sow_interval")
-		private Integer bSowInterval;
+		private int bSowInterval;
 
 	/**
 	 * B组电机与主轴的减速比,单位0.1
 	 */
 		@TableField("b_reduction_ratio")
-		private Integer bReductionRatio;
+		private int bReductionRatio;
 
 	/**
 	 * B组电机一圈需要的脉冲数
 	 */
 		@TableField("b_send_pulse")
-		private Integer bSendPulse;
+		private int bSendPulse;
 
 	/**
 	 * B组电机电机一圈需要的脉冲数
 	 */
 		@TableField("b_recieve_pulse")
-		private Integer bRecievePulse;
+		private int bRecievePulse;
 
 	/**
 	 * A组孔盘数。
 	 */
 		@TableField("a_holes_num")
-		private Integer aHolesNum;
+		private int aHolesNum;
 
 	/**
 	 * A组株距
 	 */
 		@TableField("a_sow_interval")
-		private Integer aSowInterval;
+		private int aSowInterval;
 
 	/**
 	 * A组电机与主轴的减速比,单位0.1
 	 */
 		@TableField("a_reduction_ratio")
-		private Integer aReductionRatio;
+		private int aReductionRatio;
 
 	/**
 	 * A组电机一圈需要的脉冲数
 	 */
 		@TableField("a_send_pulse")
-		private Integer aSendPulse;
+		private int aSendPulse;
 
 	/**
 	 * A组电机电机一圈需要的脉冲数，单位个
 	 */
 		@TableField("a_recieve_pulse")
-		private Integer aRecievePulse;
+		private int aRecievePulse;
 
 	/**
 	 * 新头重复
 	 */
 		@TableField("new_head_repeat_flag")
-		private Integer newHeadRepeatFlag;
+		private int newHeadRepeatFlag;
 
 	/**
 	 * 限制距离到强制停机
 	 */
 		@TableField("shut_down_distance_flag")
-		private Integer shutDownDistanceFlag;
+		private int shutDownDistanceFlag;
 
 	/**
 	 * 种电机报警
 	 */
 		@TableField("seed_motor_alarm_flag")
-		private Integer seedMotorAlarmFlag;
+		private int seedMotorAlarmFlag;
 
 	/**
 	 * 编码器取反
 	 */
 		@TableField("encoder_mode_flag")
-		private Integer encoderModeFlag;
+		private int encoderModeFlag;
 
 	/**
 	 * 行程开关方向取反控制
 	 */
 		@TableField("driving_direction_flag")
-		private Integer drivingDirectionFlag;
+		private int drivingDirectionFlag;
 
 	/**
 	 * 有无编码器
 	 */
 		@TableField("has_encoder_flag")
-		private Integer hasEncoderFlag;
+		private int hasEncoderFlag;
 
 	/**
 	 * 测试主肥量
 	 */
 		@TableField("real_main_fertilizer_value")
-		private Integer realMainFertilizerValue;
+		private int realMainFertilizerValue;
 
 	/**
 	 * 设定主肥量
 	 */
 		@TableField("set_main_fertilizer_value")
-		private Integer setMainFertilizerValue;
+		private int setMainFertilizerValue;
 
 	/**
 	 * 主肥系数
 	 */
 		@TableField("main_fertilizer_rate")
-		private Integer mainFertilizerRate;
+		private int mainFertilizerRate;
 
 	/**
 	 * 测试口肥量
 	 */
 		@TableField("real_deputy_fertilizer_value")
-		private Integer realDeputyFertilizerValue;
+		private int realDeputyFertilizerValue;
 
 	/**
 	 * 设定口肥量
 	 */
 		@TableField("set_deputy_fertilizer_value")
-		private Integer setDeputyFertilizerValue;
+		private int setDeputyFertilizerValue;
 
 	/**
 	 * 口肥系数
 	 */
 		@TableField("deputy_fertilizer_rate")
-		private Integer deputyFertilizerRate;
+		private int deputyFertilizerRate;
 
 	/**
 	 * 主肥监控的缺肥灵敏度
 	 */
 		@TableField("lack_fertilizer_rate")
-		private Integer lackFertilizerRate;
+		private int lackFertilizerRate;
 
 	/**
 	 * 主肥监控标志
 	 */
 		@TableField("main_fertilizer_monitoring_flag")
-		private Integer mainFertilizerMonitoringFlag;
+		private int mainFertilizerMonitoringFlag;
 
 	/**
 	 * 主肥电机标志
 	 */
 		@TableField("main_fertilizer_motor_flag")
-		private Integer mainFertilizerMotorFlag;
+		private int mainFertilizerMotorFlag;
 
 	/**
 	 * 口肥电机标志
 	 */
 		@TableField("deputy_fertilizer_motor_flag")
-		private Integer deputyFertilizerMotorFlag;
+		private int deputyFertilizerMotorFlag;
 
 	/**
 	 * 种物位标志
 	 */
 		@TableField("seed_location_flag")
-		private Integer seedLocationFlag;
+		private int seedLocationFlag;
 
 	/**
 	 * 主肥物位标志
 	 */
 		@TableField("main_fertilizer_location_flag")
-		private Integer mainFertilizerLocationFlag;
+		private int mainFertilizerLocationFlag;
 
 	/**
 	 * 口肥物位标志
 	 */
 		@TableField("deputy_fertilizer_location_flag")
-		private Integer deputyFertilizerLocationFlag;
+		private int deputyFertilizerLocationFlag;
 
 	/**
 	 * 报声音
 	 */
 		@TableField("sound_flag")
-		private Integer soundFlag;
+		private int soundFlag;
 
 	/**
 	 * 平行播种
 	 */
 		@TableField("sow_type")
-		private Integer sowType;
+		private int sowType;
 
 	/**
 	 * 播种苗带选择；=0是单苗带，=1是双苗带，=2是三苗带；
 	 */
 		@TableField("sow_mode")
-		private Integer sowMode;
+		private int sowMode;
 
 	/**
 	 * 播种行数
 	 */
 		@TableField("sow_line")
-		private Integer sowLine;
+		private int sowLine;
 
 	/**
 	 * 总播种宽度
 	 */
 		@TableField("sowing_width")
-		private Integer sowingWidth;
+		private int sowingWidth;
 
 	/**
 	 * 种预判时间
 	 */
 		@TableField("predicted_time")
-		private Integer predictedTime;
+		private int predictedTime;
 
 	/**
 	 * 急停阈值
 	 */
 		@TableField("deceleration_value")
-		private Integer decelerationValue;
+		private int decelerationValue;
 
 	/**
 	 * 无电机主肥监控的缺肥底线
 	 */
 		@TableField("lack_fertilizer_line")
-		private Integer lackFertilizerLine;
+		private int lackFertilizerLine;
 
 	/**
 	 * 单次播种运行时记录的运行时间
 	 */
 		@TableField("running_time")
-		private Integer runningTime;
+		private int runningTime;
 
 	/**
 	 * 单次播种的距离显示
 	 */
 		@TableField("sow_distance")
-		private Integer sowDistance;
+		private int sowDistance;
 
 	/**
 	 * 雷达频率
 	 */
 		@TableField("radar_frequency")
-		private Integer radarFrequency;
+		private int radarFrequency;
 
 	/**
 	 * 运行8秒时系统电压
 	 */
 		@TableField("system_voltage")
-		private Integer systemVoltage;
+		private int systemVoltage;
 
 	/**
 	 * 有新头标志
 	 */
 		@TableField("system_new_head_flag")
-		private Integer systemNewHeadFlag;
+		private int systemNewHeadFlag;
 
 	/**
 	 * 压行程（运输中）标志
 	 */
 		@TableField("system_compression_stroke_flag")
-		private Integer systemCompressionStrokeFlag;
+		private int systemCompressionStrokeFlag;
 
 	/**
 	 * 种手动中标志
 	 */
 		@TableField("system_seed_manually_flag")
-		private Integer systemSeedManuallyFlag;
+		private int systemSeedManuallyFlag;
 
 	/**
 	 * 主肥测试手动中标志
 	 */
 		@TableField("system_main_fertilizer_testing_flag")
-		private Integer systemMainFertilizerTestingFlag;
+		private int systemMainFertilizerTestingFlag;
 
 	/**
 	 * 有编码器时编码器报警标志
 	 */
 		@TableField("encoder_alarm_flag")
-		private Integer encoderAlarmFlag;
+		private int encoderAlarmFlag;
 
 	/**
 	 * 播种中标志
 	 */
 		@TableField("sowing_flag")
-		private Integer sowingFlag;
+		private int sowingFlag;
 
 	/**
 	 * 屏连接标志
 	 */
 		@TableField("pad_connect_flag")
-		private Integer padConnectFlag;
+		private int padConnectFlag;
 
 	/**
 	 * 雷达报警标志
 	 */
 		@TableField("system_radar_warn_flag")
-		private Integer systemRadarWarnFlag;
+		private int systemRadarWarnFlag;
 
 	/**
 	 * 单次播种，种子报警次数
 	 */
 		@TableField("seed_alarm_count")
-		private Integer seedAlarmCount;
+		private int seedAlarmCount;
 
 	/**
 	 * 单次播种肥报警次数
 	 */
 		@TableField("fertilizer_alarm_count")
-		private Integer fertilizerAlarmCount;
+		private int fertilizerAlarmCount;
 
 	/**
 	 * 运行8秒时风机压力
 	 */
 		@TableField("fan_pressure")
-		private Integer fanPressure;
+		private int fanPressure;
 
 	/**
 	 * 运行8秒时风机转速
 	 */
 		@TableField("fan_speed")
-		private Integer fanSpeed;
+		private int fanSpeed;
 
 	/**
 	 * 物联上传数据类型
 	 */
 		@TableField("upload_type")
-		private Integer uploadType;
+		private int uploadType;
 
 	/**
 	 * 当前到限里程停止时的剩余路程，4095是无限里程，单位是512米
 	 */
 		@TableField("remaining_mileage")
-		private Integer remainingMileage;
+		private int remainingMileage;
 
 	/**
 	 * 创建时间
@@ -408,7 +408,7 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 * 数据状态(1.正常 0.忽略 )
 	 */
 		@TableField("status")
-		private Integer status;
+		private int status;
 
 	/**
 	 * 阿里云原数据
@@ -462,10 +462,38 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 		@TableField("data8")
 		private String data8;
 		/**
-		 * 额外数据
+		 * 作物
 		 */
 		@TableField("data9")
 		private String data9;
+		
+		/**
+		 * 
+		 *   计算结果区
+		 * 
+		 * 
+		 */
+	/**
+	 * 种子数量
+	 */
+	@TableField("seed_count")
+	private int seedCount;
+	/**
+	 * 每公顷种子数
+	 */
+	@TableField("seed_count_hectare")
+	private int seedCountHectare;
+	/**
+	 * 作业面积（亩）
+	 */
+	@TableField("worked_area")
+	private String workedArea;
+	/**
+	 * 株距
+	 */
+	@TableField("sow_interval")
+	private String sowInterval;
+		
 		
 
 }

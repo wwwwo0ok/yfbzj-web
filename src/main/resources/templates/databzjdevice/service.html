@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--公共模块-->
+  <div th:replace="~{layout}"></div>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info">
+  <input name="lotId" hidden/>
+      <div class="layui-form-item">
+      <label class="layui-form-label">用户名</label>
+      <div class="layui-input-block">
+        <input type="username" name="username" placeholder="请输入用户名" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">地址</label>
+      <div class="layui-input-block">
+        <input type="address" name="address" placeholder="请输入地址" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">电话</label>
+      <div class="layui-input-block">
+        <input type="telephone" name="telephone" placeholder="请输入电话" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">备注名称</label>
+      <div class="layui-input-block">
+        <input type="nickname" name="nickname" placeholder="请输入备注名称" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备信息最后一次更新时的时间</label>
+      <div class="layui-input-block">
+        <input type="text" name="deviceModified" placeholder="请输入设备信息最后一次更新时的时间" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+	
+	<div class="layui-form-item">
+		                            <label class="layui-form-label" >农场/合作社</label>
+		                            <div class="layui-input-inline" style="width:30%;">
+		                                <select id="farmId" name="farmId" lay-filter="farmFilter">
+		                                    <option value=""></option>
+		                                    <option value="0">写作</option>
+		                                    <option value="1">阅读</option>
+		                                    <option value="2">游戏</option>
+		                                    <option value="3">音乐</option>
+		                                    <option value="4">旅行</option>
+		                                </select>
+		                            </div>
+		                        </div>
+	
+      <div class="layui-form-item">
+      <label class="layui-form-label">设备类型（1机械；2电驱）</label>
+	  <div class="layui-input-block">
+	         <input type="radio" name="device_type" value="0" title="未知" checked="" lay-filter="radio-type">
+	         <input type="radio" name="device_type" value="1" title="机械" lay-filter="radio-type">
+	         <input type="radio" name="device_type" value="2" title="电驱" lay-filter="radio-type">
+	     </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-block">
+        <input type="remark" name="remark" placeholder="请输入备注" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  sa:hasPermission="dataBzjDevice:list">
+    <form class="layui-form ">
+      <div class="layui-form-item">
+        <div class="layui-input-inline">
+          <input type="text" name="buyer" id="buyer" class="layui-input"  autocomplete="off" placeholder="用户名称">
+        </div>
+        <div class="layui-input-inline">
+          <input type="text" name="phone" id="phone" class="layui-input"  autocomplete="off" placeholder="手机号">
+        </div>
+		<div class="layui-form-inline">
+			                            <div class="layui-input-inline">
+			                                <select id="provinceId" name="provinceId" lay-filter="provinceFilter">
+			                                    <option value=""></option>
+			                                </select>
+			                            </div>
+			                        </div>
+			<div class="layui-form-inline">
+			                            <div class="layui-input-inline">
+			                                <select id="cityId" name="cityId"  lay-filter="cityFilter">
+			                                    <option value="">市</option>
+			                                </select>
+			                            </div>
+			                        </div>
+			<div class="layui-form-inline">
+			                            <div class="layui-input-inline">
+			                                <select id="countryId" name="countryId"  lay-filter="countryFilter">
+			                                    <option value="">区</option>
+			                                </select>
+			                            </div>
+			                        </div>
+        <div class="layui-input-inline">
+          <input type="text" name="device_name" id="device_name" class="layui-input"  autocomplete="off" placeholder="设备名称">
+        </div>
+		<div class="layui-input-inline layui-form">
+		                  <select name="deviceStatus">
+		                      <option value="ONLINE">在线</option>
+		                      <option value="OFFLINE">离线</option>
+		                      <option value="UNACTIVE">未激活</option>
+		                      <option value="DISABLE">禁用</option>
+		                      <option value="">全部</option>
+		                  </select>
+		              </div>
+		<div class="layui-input-inline layui-form">
+		                  <select name="deviceType">
+		                      <option value="">全部</option>
+		                      <option value="1">监控器</option>
+		                      <option value="2">电驱</option>
+		                      <option value="0">未知</option>
+		                  </select>
+		              </div>
+        <div class="layui-input-inline ">
+          <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+      	</div>
+	  </div>
+    </form>
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container oper">
+
+	<button class="layui-btn layui-btn-sm" lay-event="updateDevice">更新</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="look">数据</a>
+  <a class="layui-btn layui-btn-xs" lay-event="reRead">校正</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataBzjDevice:update">编辑</a>
+</script>
+
+</body>
+</html>
+<script>
+  layui.use(function () {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+    var tabs = layui.tabs;
+    var element = layui.element;
+	var router = layui.router();
+
+	
+	var initLotId = $('#lotId').val();
+    //加载table
+    var tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , page: true //开启分页
+      , url: ctx + 'dataBzjDevice/listByPage' //数据接口
+      , method: 'POST'
+	  , where: {deviceStatus:'ONLINE',lotId:initLotId}
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+		  {field: 'username', title: '用户名', sort: true},
+            {field: 'address', title: '地址', sort: true},
+            {field: 'telephone', title: '电话', sort: true},
+            {field: 'deviceName', title: '设备名称', sort: true},
+            {field: 'deviceModified', title: '设备信息最后一次更新时的时间', sort: true},
+          {field: 'deviceStatus', title: '设备状态：ONLINE-设备在线，OFFLINE-设备离线，UNACTIVE-设备未激活，DISABLE-设备已禁用', templet : function(item){
+			if (item.deviceStatus == 'ONLINE') {
+					              return '  <a class="layui-btn layui-btn-xs" >在线</a>';
+					          }
+					          if (item.deviceStatus == 'OFFLINE') {
+					              return '<a class="layui-btn layui-btn-xs layui-btn-normal" >离线</a>';
+					          }
+					          if (item.deviceStatus == 'UNACTIVE') {
+					              return '<a class="layui-btn layui-btn-xs layui-btn-warm " >未激活</a>';
+					          }
+					          if (item.deviceStatus == 'DISABLE') {
+					              return '<a class="layui-btn layui-btn-xs layui-btn-warm " >禁用</a>';
+					          }
+			
+		  }},
+		  {
+		      field: 'deviceType', width: 70, title: '类型', templet: function (item) {
+		          if (item.deviceType == 0) {
+		              return '  <a class="layui-btn layui-btn-xs" >未知</a>';
+		          }
+		          if (item.deviceType == 1) {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-normal" >机械</a>';
+		          }
+		          if (item.deviceType == 2) {
+		              return '<a class="layui-btn layui-btn-xs layui-btn-warm " >电驱</a>';
+		          }
+		      }
+		  },
+          {field: 'remark', title: '备注', sort: true},
+          {width: 220, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          toUnDisabled();
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          setTimeout(function () {
+            form.val('info', {
+              "test": "test"
+              , "deptId": ""
+              , "username": ""
+              , "address": ""
+              , "telephone": ""
+              , "deviceName": ""
+              , "nickname": ""
+              , "deviceModified": ""
+              , "deviceStatus": ""
+              , "deviceType": ""
+              , "remark": ""
+            });
+          }, 200);
+          break;
+        case 'updateDevice':
+			updateDevice();
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'look':
+			lookData(data);
+          break;
+        case 'reRead':
+          reRead(data);
+          break;
+        case 'edit':
+          backshow(data);
+          $(".title").html("编辑");
+          toUnDisabled();
+          break;
+      }
+    });
+
+	
+	var reRead = function(data){
+			layer.confirm('重新解析会删除所有消息并且重新生成，确认继续吗？', {
+			        btn: ['确定', '关闭'] //按钮
+			      }, function(){
+					$.ajax({
+		                type: 'POST',
+		                url: ctx + 'dataBzjDevice/reReadDevice',
+		                dataType: "JSON",
+		                data: JSON.stringify(data),
+		                contentType: "application/json",
+		                success: function (res) {
+		  				console.dir(res)
+		                    if (res.code == 0) {
+								layer.msg('任务执行中，请稍后查看界面', {icon: 1});
+		                    } else {
+		                        layer.msg(res.msg);
+		                        $("#img").click();
+		                    }
+		                }
+		            })
+			      }, function(){
+			        layer.msg('重新解析已经取消', {icon: 1});
+			      });
+		}
+	var updateDevice = function(){
+			$.ajax({
+                type: 'POST',
+                url: ctx + 'dataBzjDevice/updateDevice',
+                dataType: "JSON",
+                data: JSON.stringify({}),
+                contentType: "application/json",
+                success: function (res) {
+  				console.dir(res)
+                    if (res.code == 0) {
+						layer.msg('任务执行中，请稍后查看界面', {icon: 1});
+                    } else {
+                        layer.msg(res.msg);
+                        $("#img").click();
+                    }
+                }
+            })
+		}
+	
+	function lookData(data){
+	    if (parent.active && parent.active.tabAdd) {
+	        // 将参数作为查询字符串附加到URL
+//	        const params = new URLSearchParams({
+//	            param1: 'value1',
+//	            param2: 'value2'
+//	        });
+	        const urlWithParams = "/manager/index/dataElectricSeederMessage?lotId="+data.lotId;
+	        
+	        parent.active.tabAdd(
+	            urlWithParams, // 带参数的URL
+	            data.lotId,
+	            '<i class="layui-icon layui-icon-user"></i> '+data.deviceName
+	        );
+	        parent.active.tabChange(data.lotId);
+	    }
+	}
+
+	
+	
+	
+	
+	
+	initProvince();
+			 // 初始化省数据（AJAX）
+			   function initProvince() {
+			     $.ajax({
+			       url: ctx + 'sysFarm/select', 				
+			       type: 'POST',
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择省</option>';
+			           $.each(res.data, function(key, value) {
+			             html += '<option value="' + key + '">' + value + '</option>';
+			           });
+			           $('#farmId').html(html);
+			           form.render('select'); // 重新渲染下拉框
+			         } else {
+			           layer.msg('加载省数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+	
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete(ctx + "dataBzjDevice/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              tableIns1.reload();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.lotId===undefined || data.field.lotId===null || data.field.lotId===""){
+        CoreUtil.sendPost(ctx + "dataBzjDevice/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }else {
+        CoreUtil.sendPut(ctx + "dataBzjDevice/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }
+
+      return false;
+    });
+
+	
+	function initAreaForm(){
+			resetSelect('city', '请先选择省');
+			resetSelect('county', '请先选择市');
+		}
+		
+		// 2. 监听省变化 → 加载市
+		 form.on('select(provinceFilter)', function(data) {
+		   var provinceId = data.value;
+		   if (!provinceId) {
+		     resetSelect('city', '请先选择省');
+		     resetSelect('county', '请先选择市');
+		     form.render('select');
+		     return;
+		   }
+		   getCityList(provinceId);
+		 });
+		
+		 // 3. 监听市变化 → 加载区/县
+		 form.on('select(cityFilter)', function(data) {
+		   var cityId = data.value;
+		   if (!cityId) {
+		     resetSelect('county', '请先选择市');
+		     form.render('select');
+		     return;
+		   }
+		   getCountyList(cityId);
+		 });
+		
+		
+			 initProvince();
+			 // 初始化省数据（AJAX）
+			   function initProvince() {
+			     $.ajax({
+			       url: ctx + 'sysArea/getArea', 				
+				   contentType: 'application/json', // 明确指定 Content-Type
+				   data: JSON.stringify({ parentId: '0' }), // 转换为 JSON 字符串
+			       type: 'POST',
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择省</option>';
+			           $.each(res.data, function(index, item) {
+			             html += '<option value="' + item.id + '">' + item.name + '</option>';
+			           });
+			           $('#provinceId').html(html);
+			           form.render('select'); // 重新渲染下拉框
+			         } else {
+			           layer.msg('加载省数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+
+			   // 根据省ID加载市数据
+			   function getCityList(provinceId) {
+			     $.ajax({
+			       url: ctx + 'sysArea/getArea', 
+			       type: 'POST',
+				   contentType: 'application/json', // 明确指定 Content-Type
+				   data: JSON.stringify({ parentId: provinceId }), // 转换为 JSON 字符串
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择市</option>';
+			           $.each(res.data, function(index, item) {
+			             html += '<option value="' + item.id + '">' + item.name + '</option>';
+			           });
+			           $('#cityId').html(html).prop('disabled', false); // 启用市下拉框
+			           resetSelect('county', '请先选择市'); // 重置区/县
+			           form.render('select');
+			         } else {
+			           layer.msg('加载市数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+
+			   // 根据市ID加载区/县数据
+			   function getCountyList(cityId) {
+			     $.ajax({
+			       url: ctx + 'sysArea/getArea', 
+			       type: 'POST',
+				   contentType: 'application/json', // 明确指定 Content-Type
+				   data: JSON.stringify({ parentId: cityId }), // 转换为 JSON 字符串
+			       success: function(res) {
+			         if (res.code === 0) {
+			           var html = '<option value="">请选择区/县</option>';
+			           $.each(res.data, function(index, item) {
+			             html += '<option value="' + item.id + '">' + item.name + '</option>';
+			           });
+			           $('#countryId').html(html).prop('disabled', false); // 启用区/县下拉框
+			           form.render('select');
+			         } else {
+			           layer.msg('加载区/县数据失败');
+			         }
+			       },
+			       error: function() {
+			         layer.msg('请求异常');
+			       }
+			     });
+			   }
+
+			   // 重置下拉框
+			   function resetSelect(selectId, placeholder) {
+			     $('#' + selectId).html('<option value="">' + placeholder + '</option>').prop('disabled', true);
+			   }
+		
+		
+		
+	
+    // 监听搜索操作
+    form.on('submit(data-search-btn)', function (data) {
+      //执行搜索重载
+      tableIns1.reload({
+        page: {
+          curr: 1
+        }
+        , where: data.field
+      });
+      return false;
+    });
+
+    //回显
+    var backshow = function (data) {
+      $(".table_div").hide();
+      $(".operation").show();
+      $(".title").html("查看");
+      setTimeout(function () {
+        form.val('info', {
+          "test": "test"
+                      , "lotId": data.lotId
+                      , "deptId": data.deptId
+                      , "username": data.username
+                      , "address": data.address
+                      , "telephone": data.telephone
+                      , "deviceName": data.deviceName
+                      , "nickname": data.nickname
+                      , "deviceModified": data.deviceModified
+                      , "deviceStatus": data.deviceStatus
+                      , "deviceType": data.deviceType
+                      , "remark": data.remark
+                  });
+      }, 200);
+    }
+	
+	
+	
+    //禁用输入
+    var toDisabled = function () {
+      $(".oper").hide();
+      $(".disabled").each(function (index, elem) {
+        $(elem).attr("disabled", "")
+      })
+    }
+
+    //放开输入
+    var toUnDisabled = function () {
+      $(".oper").show();
+      $(".disabled").each(function (index, elem) {
+        $(elem).removeAttr("disabled", "")
+      })
+    }
+  });
+</script>

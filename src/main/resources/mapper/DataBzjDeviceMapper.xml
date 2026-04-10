@@ -31,29 +31,129 @@
 
 
 
-	<select id="pointMap" resultType="java.util.Map">
-			select 
--- 在线数量
-    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_status='ONLINE') as online ,
-    	
-    	-- 离线数量
-    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_status='OFFLINE') as offline ,
-    	-- 监控器数量
-    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_type='1') as jkq ,
-    	-- 播种机数量
-    	
-    	(select count(*) from data_bzj_device dbd where dbd.del_flag  = 0  and device_type='2') as dq ,
-    	-- 报警总数
-    	
-    	-- 种报警
-    	
-    	-- 播种设备
-    	(select count(distinct lot_Id) from data_electric_seeder_message desm where data_time >= CURDATE()          
-  AND DATE_ADD(CURDATE(), INTERVAL 1 DAY)> data_time)  as seedDeviceCount ,
-    	-- 播种行数
-    	(select sum(sow_line) from data_electric_seeder_message desm where data_time >= CURDATE()          
-  AND  DATE_ADD(CURDATE(), INTERVAL 1 DAY) >data_time)  as seedLineCount 
-	
+	<select id="getSelect" 
+        parameterType="com.company.project.dto.DeviceAndSaleQueryDTO" 
+        resultMap="dataBzjDeviceMap">
+	    SELECT
+	        sale.buyer AS username,
+	        sale.address_info AS address,
+	        sale.phone AS telephone,
+	        device.*
+	    FROM
+	        data_bzj_device device
+	    LEFT JOIN
+	        data_sale sale ON device.device_name = sale.product_code
+    	<where>
+	        <!-- 买家（非空判断） -->
+	        <if test="query.buyer != null and query.buyer != ''">
+	            AND sale.buyer LIKE CONCAT('%', #{query.buyer}, '%')
+	        </if>
+	        
+	        <!-- 联系电话（非空判断） -->
+	        <if test="query.phone != null and query.phone != ''">
+	            AND sale.phone = #{query.phone}
+	        </if>
+	        
+	        <!-- 省（非空判断） -->
+	        <if test="query.provinceId != null and query.provinceId != ''">
+	            AND sale.province_id = #{query.provinceId}
+	        </if>
+	        
+	        <!-- 市（非空判断） -->
+	        <if test="query.cityId != null and query.cityId != ''">
+	            AND sale.city_id = #{query.cityId}
+	        </if>
+	        
+	        <!-- 区（非空判断） -->
+	        <if test="query.countryId != null and query.countryId != ''">
+	            AND sale.country_id = #{query.countryId}
+	        </if>
+	        
+	        <!-- 设备名称（非空判断，支持模糊查询） -->
+	        <if test="query.deviceName != null and query.deviceName != ''">
+	            AND device.device_name LIKE CONCAT('%', #{query.deviceName}, '%')
+	        </if>
+	        
+	        <!-- 设备状态（非空判断） -->
+	        <if test="query.deviceStatus != null and query.deviceStatus != ''">
+	            AND device.device_status = #{query.deviceStatus}
+	        </if>
+	        
+	        <!-- 设备类型（非空判断） -->
+	        <if test="query.deviceType != null and query.deviceType != ''">
+	            AND device.device_type = #{query.deviceType}
+	        </if>
+    	</where>
 	</select>
+
+	<select id="pointMap" parameterType="com.company.project.entity.DataBzjDeviceEntity" resultType="java.util.Map">
+    SELECT 
+        -- 在线数量（根据 deviceTypeList 过滤 device_type）
+        (SELECT COUNT(*) 
+         FROM data_bzj_device dbd 
+         WHERE dbd.del_flag = 0 
+         AND device_status = 'ONLINE'
+         <if test="query.deviceTypeList != null and query.deviceTypeList.size() > 0">
+             AND dbd.device_type IN 
+             <foreach collection="query.deviceTypeList" item="type" open="(" separator="," close=")">
+                 #{type}
+             </foreach>
+         </if>
+        ) AS online,
+
+        -- 离线数量（根据 deviceTypeList 过滤 device_type）
+        (SELECT COUNT(*) 
+         FROM data_bzj_device dbd 
+         WHERE dbd.del_flag = 0 
+         AND device_status = 'OFFLINE'
+         <if test="query.deviceTypeList != null and query.deviceTypeList.size() > 0">
+             AND dbd.device_type IN 
+             <foreach collection="query.deviceTypeList" item="type" open="(" separator="," close=")">
+                 #{type}
+             </foreach>
+         </if>
+        ) AS offline,
+
+        -- 监控器数量（根据 deviceStatusList 过滤 device_status）
+        (SELECT COUNT(*) 
+         FROM data_bzj_device dbd 
+         WHERE dbd.del_flag = 0 
+         AND dbd.device_type = '1' 
+         <if test="query.deviceStatusList != null and query.deviceStatusList.size() > 0">
+             AND dbd.device_status IN 
+             <foreach collection="query.deviceStatusList" item="status" open="(" separator="," close=")">
+                 #{status}
+             </foreach>
+         </if>
+        ) AS jkq,
+
+        -- 播种机数量（根据 deviceStatusList 过滤 device_status）
+        (SELECT COUNT(*) 
+         FROM data_bzj_device dbd 
+         WHERE dbd.del_flag = 0 
+         AND dbd.device_type = '2' 
+         <if test="query.deviceStatusList != null and query.deviceStatusList.size() > 0">
+             AND dbd.device_status IN 
+             <foreach collection="query.deviceStatusList" item="status" open="(" separator="," close=")">
+                 #{status}
+             </foreach>
+         </if>
+        ) AS dq,
+
+        -- 播种设备数量（今日）
+        (SELECT COUNT(DISTINCT lot_Id) 
+         FROM data_electric_seeder_message desm 
+         WHERE desm.data_time >= CURDATE()          
+         AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > desm.data_time
+        ) AS seedDeviceCount,
+
+        -- 播种行数（今日）
+        (SELECT SUM(sow_line) 
+         FROM data_electric_seeder_message desm 
+         WHERE desm.data_time >= CURDATE()          
+         AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > desm.data_time
+        ) AS seedLineCount
+</select>
+
 
 </mapper>

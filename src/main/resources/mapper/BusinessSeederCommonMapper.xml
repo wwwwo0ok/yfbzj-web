@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.project.mapper.BusinessSeederCommonMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.company.project.entity.BusinessSeederCommonEntity" id="businessSeederCommonMap">
+        <result property="id" column="id"/>
+        <result property="lotId" column="lot_id"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="dataTime" column="data_time"/>
+        <result property="uploadType" column="upload_type"/>
+        <result property="sowType" column="sow_type"/>
+        <result property="sowLine" column="sow_line"/>
+        <result property="mainFertilizerMonitoringFlag" column="main_fertilizer_monitoring_flag"/>
+        <result property="mainFertilizerMotorFlag" column="main_fertilizer_motor_flag"/>
+        <result property="deputyFertilizerMotorFlag" column="deputy_fertilizer_motor_flag"/>
+        <result property="seedLocationFlag" column="seed_location_flag"/>
+        <result property="mainFertilizerLocationFlag" column="main_fertilizer_location_flag"/>
+        <result property="deputyFertilizerLocationFlag" column="deputy_fertilizer_location_flag"/>
+        <result property="sowInterval" column="sow_interval"/>
+        <result property="sowingWidth" column="sowing_width"/>
+        <result property="setMainFertilizerValue" column="set_main_fertilizer_value"/>
+        <result property="realMainFertilizerValue" column="real_main_fertilizer_value"/>
+        <result property="setDeputyFertilizerValue" column="set_deputy_fertilizer_value"/>
+        <result property="realDeputyFertilizerValue" column="real_deputy_fertilizer_value"/>
+        <result property="mainFertilizerRate" column="main_fertilizer_rate"/>
+        <result property="deputyFertilizerRate" column="deputy_fertilizer_rate"/>
+        <result property="lackFertilizerRate" column="lack_fertilizer_rate"/>
+        <result property="runningTime" column="running_time"/>
+        <result property="sowDistance" column="sow_distance"/>
+        <result property="seedFlag" column="seed_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+
+</mapper>

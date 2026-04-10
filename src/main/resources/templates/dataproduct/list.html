@@ -91,6 +91,7 @@
 </script>
 <script type="text/html" id="tool">
   <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataProduct:update">编辑</a>
+  <a class="layui-btn layui-btn-xs" lay-event="sync" sa:hasPermission="dataProduct:update">同步设备</a>
   <a class="layui-btn layui-btn-xs" lay-event="reRead" sa:hasPermission="dataProduct:update">重新解析</a>
   <a class="layui-btn layui-btn-xs" lay-event="updateBatch" sa:hasPermission="dataProduct:update">批量设置</a>
 </script>
@@ -196,6 +197,13 @@
 				layer.msg("非维护状态禁止本操作！");
 			}
           break;
+        case 'sync':
+			if(data.level != 0){
+				syncDevice(data.code);
+			}else{
+				layer.msg("非维护状态禁止本操作！");
+			}
+          break;
         case 'updateBatch':
 			if(data.level != 0){
 				updateBatch(data.code);
@@ -275,6 +283,30 @@
 				$.ajax({
 	                type: 'POST',
 	                url: ctx + 'dataBzjDevice/reRead',
+	                dataType: "JSON",
+	                data: JSON.stringify({productKey: productKey}),
+	                contentType: "application/json",
+	                success: function (res) {
+	  				console.dir(res)
+	                    if (res.code == 0) {
+							layer.msg('任务执行中，请稍后查看界面', {icon: 1});
+	                    } else {
+	                        layer.msg(res.msg);
+	                        $("#img").click();
+	                    }
+	                }
+	            })
+		      }, function(){
+		        layer.msg('重新解析已经取消', {icon: 1});
+		      });
+	}
+	var syncDevice = function(productKey){
+		layer.confirm('重新解析会删除所有消息并且重新生成，确认继续吗？', {
+		        btn: ['确定', '关闭'] //按钮
+		      }, function(){
+				$.ajax({
+	                type: 'POST',
+	                url: ctx + 'dataBzjDevice/syncDevice',
 	                dataType: "JSON",
 	                data: JSON.stringify({productKey: productKey}),
 	                contentType: "application/json",
@@ -376,7 +408,6 @@
 				        page: {
 				          curr: 1
 				        }
-				        , where: data.field
 				      });
                 } else {
                 }

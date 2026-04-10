@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--公共模块-->
+  <div th:replace="~{layout}"></div>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info">
+  <input name="id" hidden/>
+    <div class="layui-form-item">
+      <label class="layui-form-label">产品</label>
+	  <div class="layui-input-inline">
+         <select name="productKey" id="productKey" lay-verify="required" lay-search>
+           <option value="">直接选择或搜索选择</option>
+           <option value="1">layer</option>
+           <option value="2">form</option>
+           <option value="3">layim</option>
+           <option value="4">element</option>
+           <option value="5">laytpl</option>
+           <option value="6">upload</option>
+           <option value="7">laydate</option>
+           <option value="8">laypage</option>
+           <option value="9">flow</option>
+           <option value="10">util</option>
+           <option value="11">code</option>
+           <option value="12">tree</option>
+           <option value="13">layedit</option>
+           <option value="14">nav</option>
+           <option value="15">tab</option>
+           <option value="16">table</option>
+           <option value="17">select</option>
+           <option value="18">checkbox</option>
+           <option value="19">switch</option>
+           <option value="20">radio</option>
+         </select>
+       </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">消息编码</label>
+      <div class="layui-input-block">
+        <input type="code" name="code" placeholder="请输入消息编码" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">消息名称</label>
+      <div class="layui-input-block">
+        <input type="name" name="name" placeholder="请输入消息名称" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">描述</label>
+      <div class="layui-input-block">
+        <input type="description" name="description" placeholder="请输入描述" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">消息状态（1开启、0关闭）</label>
+      <div class="layui-input-block">
+        <input type="messageStatus" name="messageStatus" placeholder="请输入消息状态（1开启、0关闭）" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">上次同步时间</label>
+      <div class="layui-input-block">
+        <input type="lastUpdateTime" name="lastUpdateTime" placeholder="请输入上次同步时间" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  sa:hasPermission="dataMessageType:list">
+    <form class="layui-form ">
+      <div class="layui-form-item">
+        <div class="layui-input-inline">
+          <input type="text" name="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+        </div>
+        <div class="layui-input-inline ">
+          <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container oper">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataMessageType:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataMessageType:delete">删除</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit" sa:hasPermission="dataMessageType:update">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" sa:hasPermission="dataMessageType:delete">删除</a>
+</script>
+
+</body>
+</html>
+<script>
+  layui.use(function () {
+    var table = layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
+	
+	var productList = [];
+	
+    //加载table
+    var tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , page: true //开启分页
+      , url: ctx + 'dataMessageType/listByPage' //数据接口
+      , method: 'POST'
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'id', title: '', sort: true},
+          {field: 'productKey', title: '产品key', sort: true},
+          {field: 'code', title: '消息编码', sort: true},
+          {field: 'name', title: '消息名称', sort: true},
+          {field: 'description', title: '描述', sort: true},
+          {field: 'messageStatus', title: '消息状态（1开启、0关闭）', sort: true},
+          {field: 'lastUpdateTime', title: '上次同步时间', sort: true},
+          {width: 120, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+	
+	var getProuctList = function(){
+			$.ajax({
+	            type: 'POST',
+	            url: ctx + 'dataProduct/getSelectList',
+	            dataType: "JSON",
+	            data: JSON.stringify({}),
+	            contentType: "application/json",
+	            success: function (res) {
+	                if (res.code == 0) {
+						productList = res.data;
+						
+						var html = '<option value="">请选择产品</option>';
+								           $.each(res.data, function(index, item) {
+								             html += '<option value="' + item.code + '">' + item.name + '</option>';
+								           });
+								           $('#productKey').html(html);
+								           form.render('select'); // 重新渲染下拉框
+	                } else {
+	                    layer.msg(res.msg);
+	                    $("#img").click();
+	                }
+	            }
+	        })
+			
+		}
+	getProuctList();
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          toUnDisabled();
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          setTimeout(function () {
+            form.val('info', {
+              "test": "test"
+              , "id": ""
+              , "productKey": ""
+              , "code": ""
+              , "name": ""
+              , "description": ""
+              , "messageStatus": ""
+              , "lastUpdateTime": ""
+            });
+          }, 200);
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'look':
+          backshow(data);
+          toDisabled();
+          break;
+        case 'edit':
+          backshow(data);
+          $(".title").html("编辑");
+          toUnDisabled();
+          break;
+      }
+    });
+
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete(ctx + "dataMessageType/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              tableIns1.reload();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.id===undefined || data.field.id===null || data.field.id===""){
+        CoreUtil.sendPost(ctx + "dataMessageType/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }else {
+        CoreUtil.sendPut(ctx + "dataMessageType/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          tableIns1.reload();
+        });
+      }
+
+      return false;
+    });
+
+    // 监听搜索操作
+    form.on('submit(data-search-btn)', function (data) {
+      //执行搜索重载
+      tableIns1.reload({
+        page: {
+          curr: 1
+        }
+        , where: data.field
+      });
+      return false;
+    });
+
+    //回显
+    var backshow = function (data) {
+      $(".table_div").hide();
+      $(".operation").show();
+      $(".title").html("查看");
+      setTimeout(function () {
+        form.val('info', {
+          "test": "test"
+                      , "id": data.id
+                      , "productKey": data.productKey
+                      , "code": data.code
+                      , "name": data.name
+                      , "description": data.description
+                      , "messageStatus": data.messageStatus
+                      , "lastUpdateTime": data.lastUpdateTime
+                  });
+      }, 200);
+    }
+
+    //禁用输入
+    var toDisabled = function () {
+      $(".oper").hide();
+      $(".disabled").each(function (index, elem) {
+        $(elem).attr("disabled", "")
+      })
+    }
+
+    //放开输入
+    var toUnDisabled = function () {
+      $(".oper").show();
+      $(".disabled").each(function (index, elem) {
+        $(elem).removeAttr("disabled", "")
+      })
+    }
+  });
+</script>

@@ -12,9 +12,15 @@
         <result property="machineName" column="machine_name"/>
         <result property="machineModel" column="machine_model"/>
         <result property="brandNumber" column="brand_number"/>
-        <result property="lines" column="lines"/>
+        <result property="machineLines" column="machine_lines"/>
         <result property="productCode" column="product_code"/>
-        <result property="createTime" column="create_time"/>
+        <result property="addressInfo" column="address_info"/>
+        <result property="agentId" column="agent_id"/>
+        <result property="provinceId" column="province_id"/>
+        <result property="cityId" column="city_id"/>
+        <result property="countryId" column="country_id"/>
+        <result property="machineModelId" column="machine_model_id"/>
+        <result property="saleStatus" column="sale_status"/>
     </resultMap>
 
 

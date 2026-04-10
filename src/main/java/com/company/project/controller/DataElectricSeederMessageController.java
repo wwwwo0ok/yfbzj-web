@@ -56,7 +56,6 @@ public class DataElectricSeederMessageController {
     @PostMapping("dataElectricSeederMessage/listByPage")
     @ResponseBody
     public DataResult findListByPage(@RequestBody DataElectricSeederMessageEntity dataElectricSeederMessage){
-        LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
         
         //空不查询
         if(StringUtils.isBlank(dataElectricSeederMessage.getLotId())) {

@@ -1,14 +1,15 @@
 package com.company.project.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,19 +21,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.company.project.common.utils.DataResult;
+import com.company.project.dto.DeviceAndSaleQueryDTO;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
-import com.company.project.entity.SysFarmEntity;
+import com.company.project.entity.DataSaleEntity;
 import com.company.project.entity.SysUser;
 import com.company.project.service.DataBzjDeviceService;
 import com.company.project.service.DataElectricSeederMessageService;
+import com.company.project.service.DataSaleService;
 import com.company.project.service.SysFarmService;
 import com.company.project.service.UserService;
 import com.company.project.service.impl.DataBzjDeviceServiceImpl;
+import com.google.common.collect.Lists;
+
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.annotations.ApiOperation;
@@ -54,40 +58,44 @@ public class DataBzjDeviceController {
     private DataBzjDeviceService dataBzjDeviceService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
-    private SysFarmService sysFarmService;
-
-    @Resource
-    private UserService userService;
     
     @Autowired
-    private DataElectricSeederMessageService messageService;
+    private DataSaleService saleService;
+    
+    @Autowired
+    private UserService userService;
 
     DataBzjDeviceController(DataBzjDeviceServiceImpl dataBzjDeviceService) {
         this.dataBzjDeviceService = dataBzjDeviceService;
     }
     
     /**
-    * 跳转到页面
+    * 跳转到管理员页面
     */
     @GetMapping("/index/dataBzjDevice")
     public String dataBzjDevice() {
         return "databzjdevice/list";
     }
     /**
-     * 跳转到监控器页面
+     * 跳转到售后服务界面
      */
-    @GetMapping("/index/dataBzjDevice1")
-    public String dataBzjDevice1() {
-    	return "databzjdevice/list1";
+    @GetMapping("/index/dataBzjDeviceForService")
+    public String dataBzjDeviceForService() {
+    	return "databzjdevice/service";
     }
     /**
-     * 跳转到播种机页面
+     * 跳转到买家界面
      */
-    @GetMapping("/index/dataBzjDevice2")
-    public String dataBzjDevice2() {
-    	return "databzjdevice/list2";
+    @GetMapping("/index/dataBzjDeviceForBuyer")
+    public String dataBzjDeviceForBuyer() {
+    	return "databzjdevice/buyer";
+    }
+    /**
+     * 跳转到卖家界面
+     */
+    @GetMapping("/index/dataBzjDeviceForSeller")
+    public String dataBzjDeviceForSeller() {
+    	return "databzjdevice/seller";
     }
 
 
@@ -98,39 +106,33 @@ public class DataBzjDeviceController {
     @PostMapping("dataBzjDevice/listByPage")
     @SaCheckPermission("dataBzjDevice:list")
     @ResponseBody
-    public DataResult findListByPage(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    public DataResult findListByPage(@RequestBody DeviceAndSaleQueryDTO dataDto
+    		){
     	
-//    	DataAnalysisUtil.test();
-    	
-        LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
-        //查询条件示例
-        queryWrapper
-        .eq(StringUtils.isNotBlank(dataBzjDevice.getLotId()), DataBzjDeviceEntity::getLotId, dataBzjDevice.getLotId())
-        .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceName()),DataBzjDeviceEntity::getDeviceName,dataBzjDevice.getDeviceName())
-        .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceType()),DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceType())
-        .eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceStatus()),DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatus())
-        .orderByDesc(DataBzjDeviceEntity::getLotId);
+        IPage<DataBzjDeviceEntity> iPage = dataBzjDeviceService.selectPage(dataDto);
         
-        Object loginId = StpUtil.getLoginId();
-    	if(loginId!=null) {
-    		
-    		SysUser byId = userService.getById(loginId.toString());
-    		
-    		
-    		LambdaQueryWrapper<SysFarmEntity> lambdaQuery = Wrappers.lambdaQuery();
-    		
-    		lambdaQuery.eq(SysFarmEntity::getPhone, byId.getUsername());
-    		
-    		SysFarmEntity one = sysFarmService.getOne(lambdaQuery);
-    		
-    		if(one!=null) {
-    			queryWrapper.eq
-    			(StringUtils.isNotBlank(one.getId()),DataBzjDeviceEntity::getFarmId,one.getId());
-    		}
-    	}
-        
-        IPage<DataBzjDeviceEntity> iPage = dataBzjDeviceService.page(dataBzjDevice.getQueryPage(), queryWrapper);
         return DataResult.success(iPage);
+    }
+    
+    @ApiOperation(value = "买家查询分页数据")
+    @PostMapping("dataBzjDevice/listByPageForUser")
+    @SaCheckPermission("dataBzjDevice:list")
+    @ResponseBody
+    public DataResult listByPageForUser(@RequestBody DeviceAndSaleQueryDTO dataDto
+    		){
+    	
+        Object loginId = StpUtil.getLoginId();
+        if(loginId!=null) {
+            
+            SysUser byId = userService.getById(loginId.toString());
+            
+            dataDto.setPhone(byId.getPhone());
+            
+        }
+    	
+    	IPage<DataBzjDeviceEntity> iPage = dataBzjDeviceService.selectPage(dataDto);
+    	
+    	return DataResult.success(iPage);
     }
     
     
@@ -138,11 +140,38 @@ public class DataBzjDeviceController {
     @PostMapping("dataBzjDevice/reRead")
     @ResponseBody
     public DataResult reRead(@RequestBody DataBzjDeviceEntity dataBzjDevice){
-    	
     	dataBzjDeviceService.reRead(dataBzjDevice.getProductKey());
-    	
     	return DataResult.success();
-    	
+    }
+    @ApiOperation(value = "重新加载该产品")
+    @PostMapping("dataBzjDevice/reReadDevice")
+    @ResponseBody
+    public DataResult reReadDevice(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    	boolean reRead = dataBzjDeviceService.reRead(dataBzjDevice);
+    	return reRead?DataResult.success():DataResult.fail("此任务已经在进行中或者系统繁忙请稍后再试");
+    }
+    @ApiOperation(value = "主动更新全设备信息")
+    @PostMapping("dataBzjDevice/updateDevice")
+    @ResponseBody
+    public DataResult updateDevice(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    	boolean sync = dataBzjDeviceService.sync();
+    	return sync?DataResult.success():DataResult.fail("此任务已经在进行中或者系统繁忙请稍后再试");
+    }
+    @ApiOperation(value = "主动更新单条信息")
+    @PostMapping("dataBzjDevice/reReadMessage")
+    @ResponseBody
+    public DataResult reReadMessage(@RequestBody DataElectricSeederMessageEntity dataBzjDevice
+    		){
+    	boolean reRead = dataBzjDeviceService.reRead(dataBzjDevice);
+    	return reRead?DataResult.success():DataResult.fail("此任务已经在进行中或者系统繁忙请稍后再试");
+    }
+
+    @ApiOperation(value = "主动更新设备信息")
+    @PostMapping("dataBzjDevice/syncDevice")
+    @ResponseBody
+    public DataResult syncDevice(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    	boolean sync = dataBzjDeviceService.sync(dataBzjDevice.getProductKey());
+    	return sync?DataResult.success():DataResult.fail("有其他用户已经在同步中");
     }
     @ApiOperation(value = "批量修改")
     @PostMapping("dataBzjDevice/updateBatch")
@@ -178,43 +207,24 @@ public class DataBzjDeviceController {
 	@ResponseBody
 	public DataResult selectForMap(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
-    	
+		if(CollectionUtils.isEmpty(dataBzjDevice.getDeviceStatusList())||CollectionUtils.isEmpty(dataBzjDevice.getDeviceTypeList())) {
+			return DataResult.success();
+		}
+		
     	LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
     	//查询条件示例
     	queryWrapper
-    	.eq(StringUtils.isNotBlank(dataBzjDevice.getLotId()), DataBzjDeviceEntity::getLotId, dataBzjDevice.getLotId())
-    	.eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceName()),DataBzjDeviceEntity::getDeviceName,dataBzjDevice.getDeviceName())
-    	.eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceType()),DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceType())
-    	.eq(StringUtils.isNotBlank(dataBzjDevice.getDeviceStatus()),DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatus())
-    	.eq(StringUtils.isNotBlank(dataBzjDevice.getProductKey()),DataBzjDeviceEntity::getProductKey,dataBzjDevice.getProductKey())
+    	.in(DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceTypeList())
+    	.in(DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatusList())
     	.isNotNull(DataBzjDeviceEntity::getBaiduX)
     	.isNotNull(DataBzjDeviceEntity::getBaiduY)
     	.orderByDesc(DataBzjDeviceEntity::getLotId);
     	
-    	Object loginId = StpUtil.getLoginId();
-    	if(loginId!=null) {
-    		
-    		SysUser byId = userService.getById(loginId.toString());
-    		
-    		
-    		LambdaQueryWrapper<SysFarmEntity> lambdaQuery = Wrappers.lambdaQuery();
-    		
-    		lambdaQuery.eq(SysFarmEntity::getPhone, byId.getUsername());
-    		
-    		SysFarmEntity one = sysFarmService.getOne(lambdaQuery);
-    		
-    		if(one!=null) {
-    			queryWrapper.eq
-    			(StringUtils.isNotBlank(one.getId()),DataBzjDeviceEntity::getFarmId,one.getId());
-    		}
-    	}
     	
     	List<DataBzjDeviceEntity> list = dataBzjDeviceService.list(queryWrapper);
     	
-    	List<DataBzjDeviceEntity> collect = list.stream().filter(li -> li.getLatestX()!=null&&li.getLatestY()!=null&&li.getLatestX()!=0&&li.getLatestY()!=0).collect(Collectors.toList());
-    	
-    	
-    	return DataResult.success(collect);
+        
+        return DataResult.success(list);
     }
     
 
@@ -222,13 +232,13 @@ public class DataBzjDeviceController {
     @PostMapping("dataBzjDevice/pointMap")
     @SaCheckPermission("dataBzjDevice:list")
     @ResponseBody
-    public DataResult pointMap(){
+    public DataResult pointMap(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
 //    	DataAnalysisUtil.test();
     	
     	
         
-        JSONObject json = dataBzjDeviceService.pointMap();
+        JSONObject json = dataBzjDeviceService.pointMap(dataBzjDevice);
         
         
         return DataResult.success(json);

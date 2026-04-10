@@ -1,21 +1,430 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:sa="http://www.thymeleaf.org/extras/sa-token"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" style="height: 100%;">
 <head>
     <meta charset="UTF-8">
     <title>大屏显示</title>
 	<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <!-- 如果有特殊样式可以保留，否则删除 -->
     <div th:replace="~{layout}"></div>
+	<link rel="stylesheet" th:href="@{/static/css/pointMap.css}">
 </head>
-<body>
+
+<body style="height:100%;background-color: #060931;">
 <!-- 表格部分（保留） -->
-<div class="table_div">
-	
 
+<div class="layuimini-main layui-top-box" style="height:100%">
+    <!-- 新增顶部标题栏 -->
+    <div class="layui-row" style="height: 10%; margin-bottom: 10px;">
+        <div class="layui-col-md12" 		style="background: url('/manager/static/img/title.png') no-repeat center center;
+		                        background-size: 100%;
+		                        width: 100%;
+		                        height: 100%;
+		                        display: flex;
+		                        align-items: center;
+		                        justify-content: center;
+		                        font-size: 24px;
+		                        font-weight: bold;
+		                        color: #fff;
+		                        border-radius: 4px;">
+            <div >
+                煜丰农业大屏展示
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主要内容区域 -->
+    <div class="layui-row layui-col-space10" style="height: 90%;">
+        <!-- 左侧列 (调整为60%高度) -->
+        <div class="layui-col-md3" style="height: 100%; display: flex; flex-direction: column;">
+            <div style="flex: 6; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+                        background-size: cover;
+                        padding: 20px;
+                        box-sizing: border-box;
+                        margin-bottom: 10px;">
+                <div id="deviceOnline" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div style="flex: 4; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+                        background-size: cover;
+                        padding: 20px;
+                        box-sizing: border-box;">
+                <!-- 新增的左侧下方内容 -->
+                <div style="width: 100%; height: 100%;">
+					<div style="
+					width: 30%;
+									height: 20%;
+									background: url('/manager/static/img/textTitle.png') no-repeat center center;
+									background-size: 100%;
+									text-align: center;
+									display: flex;          /* 启用flex布局 */
+									justify-content: center; /* 水平居中 */
+									align-items: center;     /* 垂直居中 - 关键修正 */
+									padding-bottom: 15px;
+									">
+					                		设备显示
+										</div>
+										<div style="flex:1;height:80%">
+											<div style="flex:1;height:50%">
+												<div class="layui-col-md6" style="height: 100%;">
+													
+													<div class="layui-col-md6" style="height: 100%;
+														background:url('/manager/static/img/bar1.png') no-repeat center center;
+														background-size:100%;
+														text-align: center;
+														display: flex;          /* 启用flex布局 */
+														justify-content: center; /* 水平居中 */
+														align-items: center;     /* 垂直居中 - 关键修正 */
+													">
 
-	<div id="echartDemo" style="width: 1920px; height: 1080px;"></div>
+														</div>
+														<div class="layui-col-md6" style="height:100%">
+															<div style="flex:1;height:50%;text-align: center;
+																		display: flex;          /* 启用flex布局 */
+																		justify-content: center; /* 水平居中 */
+																		align-items: center;     /* 垂直居中 - 关键修正 */">设备总数</div>
+															<div id="deviceNum" style="flex:1;height:50%;text-align: center;
+																		display: flex;          /* 启用flex布局 */
+																		justify-content: center; /* 水平居中 */
+																		align-items: center;     /* 垂直居中 - 关键修正 */
+
+																		line-height:28px;
+																		font-size:28px;
+																		color:#00df84;
+																		text-shadow:0 0 3px rgba(14,255,157,.5);
+																		">1783</div>
+														</div>
+														
+												</div>
+												<div class="layui-col-md6" style="height: 100%;">
+													
+													<div class="layui-col-md6" style="height: 100%;
+														background:url('/manager/static/img/select1.png') no-repeat center center;
+														background-size:100%;
+														text-align: center;
+														display: flex;          /* 启用flex布局 */
+														justify-content: center; /* 水平居中 */
+														align-items: center;     /* 垂直居中 - 关键修正 */
+													">
+
+														</div>
+														<div class="layui-col-md6" style="height:100%">														<div style="flex:1;height:50%;text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */">在线总数</div>
+														<div id="onlineNum" style="flex:1;height:50%;text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */
+
+																	line-height:28px;
+																	font-size:28px;
+																	color:#00df84;
+																	text-shadow:0 0 3px rgba(14,255,157,.5);
+																	">735</div>
+														</div>
+														
+												</div>
+											</div>
+											<div style="flex:1;height:50%">
+												<div class="layui-col-md6" style="height: 100%;">
+																									
+													<div class="layui-col-md6" style="height: 100%;
+														background:url('/manager/static/img/close1.png') no-repeat center center;
+														background-size:100%;
+														text-align: center;
+														display: flex;          /* 启用flex布局 */
+														justify-content: center; /* 水平居中 */
+														align-items: center;     /* 垂直居中 - 关键修正 */
+													">
+					
+														</div>
+														<div class="layui-col-md6" style="height:100%">
+															<div style="flex:1;height:50%;text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */">离线总数</div>
+														<div id="offlineNum" style="flex:1;height:50%;text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */
+
+																	line-height:28px;
+																	font-size:28px;
+																	color:#00df84;
+																	text-shadow:0 0 3px rgba(14,255,157,.5);
+																	">1048</div>
+														</div>
+														
+												</div>
+												<div class="layui-col-md6" style="height: 100%;">
+													
+													<div class="layui-col-md6" style="height: 100%;
+														background:url('/manager/static/img/alarm1.png') no-repeat center center;
+														background-size:100%;
+														text-align: center;
+														display: flex;          /* 启用flex布局 */
+														justify-content: center; /* 水平居中 */
+														align-items: center;     /* 垂直居中 - 关键修正 */
+													">
+					
+														</div>
+														<div class="layui-col-md6" style="height:100%">														<div style="flex:1;height:50%;text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */">报警总数</div>
+														<div id="alarmNum" style="flex:1;height:50%;text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */
+
+																	line-height:28px;
+																	font-size:28px;
+																	color:#00df84;
+																	text-shadow:0 0 3px rgba(14,255,157,.5);
+																	">15</div>
+														</div>
+														
+												</div>
+											</div>
+										</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间列 -->
+        <div class="layui-col-md6" style="height: 100%;">
+            <div style="width: 100%; height: 100%;">
+                <div id="echartDemo" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+        
+        <!-- 右侧列 (拆分为两个相等部分) -->
+        <div class="layui-col-md3" style="height: 100%; display: flex; flex-direction: column;">
+            <div style="flex: 1; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+                        background-size: cover;
+                        padding: 20px;
+                        box-sizing: border-box;
+                        margin-bottom: 10px;">
+                <div id="deviceFb" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div style="flex: 1; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+                        background-size: cover;
+                        padding: 20px;
+                        box-sizing: border-box;
+                        margin-bottom: 10px;">
+                <!-- 新增的右侧第一个下方内容 -->
+                <div style="
+				width: 30%;
+																	height: 20%;
+																	background: url('/manager/static/img/textTitle.png') no-repeat center center;
+																	background-size: 100%;
+																	text-align: center;
+																	display: flex;          /* 启用flex布局 */
+																	justify-content: center; /* 水平居中 */
+																	align-items: center;     /* 垂直居中 - 关键修正 */
+																	padding-bottom: 15px;
+				">
+                		报警显示
+					</div>
+					<div style="flex:1;height:80%">
+						<div class="layui-col-md4" style="height: 100%;">
+							<div style="flex:1;
+									height:60%;
+							background:url('/manager/static/img/number1.png') no-repeat center center;
+											background-size:100%;
+											text-align: center;
+											display: flex;          /* 启用flex布局 */
+											justify-content: center; /* 水平居中 */
+											align-items: center;     /* 垂直居中 - 关键修正 */
+											margin:10%;
+											
+											line-height: 60px;
+											font-size:20px;
+											
+											">0</div>
+							<div style="flex:1;height:20%;
+
+							text-align: center;
+							display: flex;          /* 启用flex布局 */
+							justify-content: center; /* 水平居中 */
+							align-items: center;     /* 垂直居中 - 关键修正 */
+							">异常数量</div>
+						</div>
+						<div class="layui-col-md4" style="height: 100%;">
+							<div style="flex:1;
+																height:60%;
+														background:url('/manager/static/img/number1.png') no-repeat center center;
+																		background-size:100%;
+																		text-align: center;
+																		display: flex;          /* 启用flex布局 */
+																		justify-content: center; /* 水平居中 */
+																		align-items: center;     /* 垂直居中 - 关键修正 */
+																		margin:10%;
+																		line-height: 60px;
+																		font-size:20px;
+																		
+																		">0</div>
+														<div style="flex:1;height:20%;
+
+														text-align: center;
+														display: flex;          /* 启用flex布局 */
+														justify-content: center; /* 水平居中 */
+														align-items: center;     /* 垂直居中 - 关键修正 */
+														">警告数量</div>
+						</div>
+						<div class="layui-col-md4" style="height: 100%;">
+							<div style="flex:1;
+																height:60%;
+														background:url('/manager/static/img/number1.png') no-repeat center center;
+																		background-size:100%;
+																		text-align: center;
+																		display: flex;          /* 启用flex布局 */
+																		justify-content: center; /* 水平居中 */
+																		align-items: center;     /* 垂直居中 - 关键修正 */
+																		margin:10%;
+																		line-height: 60px;
+																		font-size:20px;
+																		
+																		">0</div>
+														<div style="flex:1;height:20%;
+
+														text-align: center;
+														display: flex;          /* 启用flex布局 */
+														justify-content: center; /* 水平居中 */
+														align-items: center;     /* 垂直居中 - 关键修正 */
+														">报修数量</div>
+						</div>
+
+					</div>
+            </div>
+            <div style="flex: 1; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+                        background-size: cover;
+                        padding: 20px;
+                        box-sizing: border-box;
+						">
+                <!-- 新增的右侧第二个下方内容 -->
+                <div style="width: 100%; height: 100%;">
+					<div style="
+					flex: 1;
+													width: 30%;
+													height: 20%;
+													background: url('/manager/static/img/textTitle.png') no-repeat center center;
+													background-size: 100%;
+													text-align: center;
+													display: flex;          /* 启用flex布局 */
+													justify-content: center; /* 水平居中 */
+													align-items: center;     /* 垂直居中 - 关键修正 */
+													padding-bottom: 15px;
+														
+														
+														">
+										                		播种显示
+															</div>
+															
+															<div style="flex:1;height:80%">
+																<div class="layui-col-md4" style="height: 100%;">
+																							<div style="flex:1;
+																									height:60%;
+																							background:url('/manager/static/img/store1.png') no-repeat center center;
+																											background-size:60%;
+																											text-align: center;
+																											display: flex;          /* 启用flex布局 */
+																											justify-content: center; /* 水平居中 */
+																											align-items: center;     /* 垂直居中 - 关键修正 */
+																											"></div>
+																							<div style="flex:1;height:20%;
+
+																							text-align: center;
+																							display: flex;          /* 启用flex布局 */
+																							justify-content: center; /* 水平居中 */
+																							align-items: center;     /* 垂直居中 - 关键修正 */
+																							">播种设备</div>
+																							<div id="seedingDeviceNum" style="flex:1;height:20%;
+
+																							text-align: center;
+																							display: flex;          /* 启用flex布局 */
+																							justify-content: center; /* 水平居中 */
+																							align-items: center;     /* 垂直居中 - 关键修正 */
+
+																							line-height:28px;
+																							font-size:28px;
+																							color:#00df84;
+																							text-shadow:0 0 3px rgba(14,255,157,.5);
+																							">158</div>
+																						</div>
+																<div class="layui-col-md4" style="height: 100%;">
+																							<div style="flex:1;
+																									height:60%;
+																							background:url('/manager/static/img/store2.png') no-repeat center center;
+																											background-size:60%;
+																											text-align: center;
+																											display: flex;          /* 启用flex布局 */
+																											justify-content: center; /* 水平居中 */
+																											align-items: center;     /* 垂直居中 - 关键修正 */
+																											"></div>
+																							<div style="flex:1;height:20%;
+
+																							text-align: center;
+																							display: flex;          /* 启用flex布局 */
+																							justify-content: center; /* 水平居中 */
+																							align-items: center;     /* 垂直居中 - 关键修正 */
+																							">播种行数</div>
+																							<div id="seedingLineNum" style="flex:1;height:20%;
+
+																							text-align: center;
+																							display: flex;          /* 启用flex布局 */
+																							justify-content: center; /* 水平居中 */
+																							align-items: center;     /* 垂直居中 - 关键修正 */
+
+																							line-height:28px;
+																							font-size:28px;
+																							color:#00df84;
+																							text-shadow:0 0 3px rgba(14,255,157,.5);
+																							">478741</div>
+																						</div>
+																<div class="layui-col-md4" style="height: 100%;">
+																							<div style="flex:1;
+																									height:60%;
+																							background:url('/manager/static/img/store3.png') no-repeat center center;
+																											background-size:60%;
+																											text-align: center;
+																											display: flex;          /* 启用flex布局 */
+																											justify-content: center; /* 水平居中 */
+																											align-items: center;     /* 垂直居中 - 关键修正 */
+																											"></div>
+																							<div  style="flex:1;height:20%;
+
+																							text-align: center;
+																							display: flex;          /* 启用flex布局 */
+																							justify-content: center; /* 水平居中 */
+																							align-items: center;     /* 垂直居中 - 关键修正 */
+																							">平均行数</div>
+																							<div id="avgLineNum" style="flex:1;height:20%;
+
+																							text-align: center;
+																							display: flex;          /* 启用flex布局 */
+																							justify-content: center; /* 水平居中 */
+																							align-items: center;     /* 垂直居中 - 关键修正 */
+																							
+																							line-height:28px;
+																							font-size:28px;
+																							color:#00df84;
+																							text-shadow:0 0 3px rgba(14,255,157,.5);
+																							
+																							">3030</div>
+																						</div>
+																
+																
+																
+															</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&&type=webgl&ak=3P8xyD2iYXPnT1uFzUfdzJiMt5x9HQPt">
 </script
@@ -35,7 +444,7 @@ layui.use(function () {
         var form = layui.form;
         var upload = layui.upload;
         var laydate = layui.laydate;
-		
+		var screenData = {};
 		
 		var map = new BMapGL.Map("echartDemo",{
 		    enableRotate: false,//禁用旋转
@@ -43,7 +452,7 @@ layui.use(function () {
 		});
 		
 		var point = new BMapGL.Point(116.404, 39.915); //初始中心点
-		map.centerAndZoom(point, 5);  //初始大小
+		map.centerAndZoom(point, 6);  //初始大小
 		map.enableScrollWheelZoom();    //启用滚动
 		
 		// 创建城市选择控件
@@ -59,74 +468,130 @@ layui.use(function () {
 	   
 	   
 	   //定义一个控件类【重点：自定义控件】
+		  
 		  //电驱列表
 		  var dq_data = [];
-//		  [
-//		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
-//		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
-//		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
-//		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
-//		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
-//		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
-//		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
-//		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
-//		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
-//		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
+		  [
+		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
+		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
+		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
+		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
+		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
+		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
+		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
+		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
+		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
+		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
+		  ]
 		  
-//		  ]
-		  
+// 定时获取数据并更新页面
+        function fetchData() {
 		  $.ajax({
               type: 'POST',
-              url: ctx + 'dataBzjDevice/listByPage',
+              url: ctx + 'dataBzjDevice/pointMap',
               dataType: "JSON",
-              data: JSON.stringify({deviceType:'2',deviceStatus:'ONLINE'}),
+              data: JSON.stringify({deviceStatus:'ONLINE'}),
               contentType: "application/json",
               success: function (res) {
-				console.dir(res)
-                  if (res.code == 0) {
-					dq_data = res.data.records;
-					// 遍历数据创建标记点
-							  dq_data.forEach(function(device) {
-							    // 创建标记点坐标
-							    var markerPoint = new BMapGL.Point(device.latestX, device.latestY);
-							    
-							    // 创建标记点
-							    var marker = new BMapGL.Marker(markerPoint);
-							    map.addOverlay(marker);
-							    
-							    // 创建信息窗口内容
-							    var content = `
-							      <div class="custom-info-window">
-							        <p>姓名：${device.username}</p>
-							        <p>电话：${device.telephone}</p>
-							        <p>
-							          <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
-							            [详情]
-							          </a>
-							        </p>
-							      </div>
-							    `;
-							    
-							    // 创建信息窗口
-							    var infoWindow = new BMapGL.InfoWindow(content, {
-							      width: 250,
-							      height: 150,
-							      title: device.username + '的播种机'
-							    });
-							    
-							    // 为标记点添加点击事件
-							    marker.addEventListener('click', function() {
-							      map.openInfoWindow(infoWindow, markerPoint);
-							    });
-							  });
-                  } else {
-                      layer.msg(res.msg);
-                      $("#img").click();
-                  }
-              }
+				if (res.code == 0) {
+					screenData = res.data;
+					refreshPage();
+					}
+			  }
           })
+		}
+
+		// 每 1 秒刷新一次
+		        setInterval(fetchData, 1000);
+				
+			
+				
+		  
+				$.ajax({
+				    type: 'POST',
+				    url: ctx + 'dataBzjDevice/selectForMap',
+				    dataType: "JSON",
+				    data: JSON.stringify({}),
+				    contentType: "application/json",
+				    success: function(res) {
+				        console.dir(res);
+				        if (res.code == 0) {
+				            // 确保地图已加载
+				            if (!map) {
+				                console.error("地图未初始化");
+				                return;
+				            }
+
+				            // 清空现有标记（可选）
+				            map.clearOverlays();
+
+				            res.data.forEach(function(device) {
+				                var markerPoint = new BMapGL.Point(device.baiduX, device.baiduY);
+				                // 统一处理图标
+				                var deviceType = device.deviceType;
+				                var deviceStatus = device.deviceStatus;
+				                var iconUrl = null; // 默认图标路径
+				                
+				                if (deviceStatus == 'OFFLINE') {
+				                    iconUrl = "/manager/static/img/map_offLine.png";
+				                } 
+
+				                try {
+									if(iconUrl == null){
+					                    var marker = new BMapGL.Marker(markerPoint);
+					                    map.addOverlay(marker);
+									}else{
+					                    var myIcon = new BMapGL.Icon(iconUrl, new BMapGL.Size(22, 28), {
+					                        anchor: new BMapGL.Size(13, 13) // 图标中心点
+					                    });
+					                    var marker = new BMapGL.Marker(markerPoint, { icon: myIcon });
+					                    map.addOverlay(marker);
+									}
+
+				                    // 信息窗口
+				                    var content = `
+				                        <div class="custom-info-window">
+				                            <p>姓名：${device.username}</p>
+				                            <p>电话：${device.telephone}</p>
+				                            <p>
+				                                <a target="_blank" href="http://localhost:8080/manager/index/dataBzjDevice?lotId=${device.lotId}">
+				                                    [详情]
+				                                </a>
+				                            </p>
+				                        </div>
+				                    `;
+				                    
+				                    var infoWindow = new BMapGL.InfoWindow(content, {
+				                        width: 250,
+				                        height: 150,
+				                        title: device.username + '的播种机'
+				                    });
+				                    
+				                    marker.addEventListener('click', function() {
+				                        map.openInfoWindow(infoWindow, markerPoint);
+				                    });
+				                } catch (e) {
+				                    console.error("创建标记点失败:", e, device);
+				                }
+				            });
+				        } else {
+				            layer.msg(res.msg);
+				            $("#img").click();
+				        }
+				    },
+				    error: function(xhr, status, error) {
+				        console.error("AJAX请求失败:", status, error);
+				    }
+				});
+
 		  
 		  
+		  
+		  map.setMapStyleV2({
+		             styleId: "843f82bb7b6cf081859a105b2a9fbfae" // 替换为你的样式ID
+		         });
+		  			  
+		 
 		  
 		  
 		  map.addEventListener('tilesloaded', function () {
@@ -134,11 +599,157 @@ layui.use(function () {
 			  // 在地图上添加点标记
 		  });
 		  
-			  
+		
+		  
+		  
+		  
+		  
+			var leftChartDom = document.getElementById('deviceOnline');
+						var leftChart = echarts.init(leftChartDom);
+						var leftOption  = {
+						  tooltip: {
+						    trigger: 'item'
+						  },
+						  legend: {
+						    top: '5%',
+						    left: 'center',
+							textStyle: {
+							  color: '#00AAD7'  ,// 统一设置图例文字颜色为黄色
+							  fontSize:20,
+							},
+						  },
+						  series: [
+						    {
+						      name: '在线率',
+						      type: 'pie',
+						      radius: ['40%', '70%'],
+						      avoidLabelOverlap: false,
+							  color:['#1FBBFF','#004BFF'],
+						      padAngle: 5,
+						      itemStyle: {
+						        borderRadius: 10
+						      },
+						      label: {
+								  show: true,
+								  position: 'inside', // 标签显示在饼图外侧
+								  formatter: '{c}', // 显示名称和数值
+								  color: 'white'  ,  // 标签文字颜色
+								  fontSize:30,
+						      },
+						      emphasis: {
+						        label: {
+						          show: true,
+						          fontSize: 40,
+						          fontWeight: 'bold'
+						        }
+						      },
+						      labelLine: {
+						        show: false
+						      },
+						      data: [
+						        { value: 1048, name: '在线' },
+						        { value: 735, name: '离线' }
+						      ]
+						    }
+						  ]
+						};
+
+						leftOption && leftChart.setOption(leftOption);
+			
+			var rightChartDom = document.getElementById('deviceFb');
+			var rightChart = echarts.init(rightChartDom);
+			var rightOption;
+
+			rightOption = {
+			  tooltip: {
+			    trigger: 'item'
+			  },
+			  legend: {
+			    top: '5%',
+			    left: 'center',
+				textStyle: {
+				  color: '#00AAD7'  // 统一设置图例文字颜色为黄色
+				},
+			  },
+			  series: [
+			    {
+			      name: '在线率',
+			      type: 'pie',
+			      radius: ['40%', '70%'],
+			      avoidLabelOverlap: false,
+			      padAngle: 5,
+				  color:['#1FBBFF','#004BFF'],
+			      itemStyle: {
+			        borderRadius: 10
+			      },
+			      label: {
+					  show: true,
+					  position: 'inside', // 标签显示在饼图外侧
+					  formatter: '{c}', // 显示名称和数值
+					  color: 'white'    // 标签文字颜色
+			      },
+			      emphasis: {
+			        label: {
+			          show: true,
+			          fontSize: 40,
+			          fontWeight: 'bold'
+			        }
+			      },
+			      labelLine: {
+			        show: false
+			      },
+			      data: [
+			        { value: 1476, name: '监控器' },
+			        { value: 307, name: '播种机' }
+			      ]
+			    }
+			  ]
+			};
+
+			rightOption && rightChart.setOption(rightOption);
+
+
+			//刷新页面
+			var refreshPage = function(){
+
+			$("#deviceNum").text(parseInt(screenData.online)+parseInt(screenData.offline));
+			$("#onlineNum").text(screenData.online);
+			$("#offlineNum").text(screenData.offline);
+			$("#alarmNum").text(0);
+			$("#seedingDeviceNum").text(screenData.seedDeviceCount);
+			$("#seedingLineNum").text(screenData.seedLineCount);
+			if(screenData.seedDeviceCount && screenData.seedDeviceCount!=0){
+				var avg = parseInt(screenData.seedLineCount)/parseInt(screenData.seedDeviceCount);
+				$("#avgLineNum").text(avg);
+			}
+
+			const leftData = [
+							
+							{value:screenData.online,name:"在线"},
+							{value:screenData.offline,name:"离线"},
+							
+						];
+
+			leftChart.setOption	({
+				series: [{ data: leftData }]
+			});
+			const rightData = [
+							
+							{value:screenData.dq,name:"电驱"},
+							{value:screenData.jkq,name:"监控器"},
+							
+						];
+
+			rightChart.setOption	({
+				series: [{ data: rightData }]
+			});
+
+			}
 		//
 	});
 
 
+	
 
 </script>
 </body>

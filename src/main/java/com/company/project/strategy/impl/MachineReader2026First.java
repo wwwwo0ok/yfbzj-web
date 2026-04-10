@@ -18,6 +18,8 @@ public class MachineReader2026First implements CodeReadStrategy{
 	//从物联网和数据库获得
 	private String code = "h25yYLMqP93";
 
+	private static final Integer MAX_LINE_NUMBE_INTEGER = 18;
+	
 	@Override
 	public String getCode() {
 		return code;
@@ -249,7 +251,7 @@ public class MachineReader2026First implements CodeReadStrategy{
         
       //WLF[288]-WLF[327]-（范围0-255）=转换主肥监控报警行号（高5位），原因（低3位）到物联平台，记录最近的20条
         String hexStr288 = hexStr.substring(288-64, 328-64);
-        analysisAlarm(hexStr288,alarmEntities,20,DataAlarmEntity.FERT_MONITORING_TYPE_);
+        analysisAlarm(hexStr288,alarmEntities,20,DataAlarmEntity.FERT_MONITORING_TYPE);
         //WLF[226]-WLF[265]-（范围0-255）=转换种报警行号（高5位），原因（低3位）到物联平台，记录最近的20条
         String hexStr226 = hexStr.substring(226-64, 266-64);
         analysisAlarm(hexStr226,alarmEntities,20,DataAlarmEntity.SEED_ALARM_TYPE);
@@ -279,9 +281,11 @@ public class MachineReader2026First implements CodeReadStrategy{
 		int length = binaryStr.length()/size;
 		
 		for(int i = 0;i<size;i++) {
+
+			int startIndex = i * length;
+			int endIndex = ( i + 1 ) * length;
 			
-			
-			String substring = binaryStr.substring(i,i+length);
+			String substring = binaryStr.substring(startIndex,endIndex);
 			
 			String high5Bits22 = substring.substring(0, 5);//高5位 行号
 	        String low3Bits22 = substring.substring(5);//低3位 编号
@@ -289,12 +293,12 @@ public class MachineReader2026First implements CodeReadStrategy{
 			int lineNo = DigitalTrans.binaryToAlgorism(high5Bits22);
 			int no = DigitalTrans.binaryToAlgorism(low3Bits22);
 			
-			if(lineNo != 0) {
+			if(lineNo != 0 && lineNo<= MAX_LINE_NUMBE_INTEGER) {
 				DataAlarmEntity entity = new DataAlarmEntity();
 				
 				entity.setLineNo(lineNo);
 				entity.setAlarmType(alarmType);
-				entity.setCode(Integer.toString(no));
+				entity.setCode(no);
 				
 				list.add(entity);
 			}
@@ -305,10 +309,12 @@ public class MachineReader2026First implements CodeReadStrategy{
 	private void setLineDataByByte(String hexStr, List<DataElectricSeederMessageLineEntity> lineEntities,
 			BiConsumer<DataElectricSeederMessageLineEntity, Integer> setter) {
 		int size = lineEntities.size();
-		int length = hexStr.length()/size;
+		int length = hexStr.length()/MAX_LINE_NUMBE_INTEGER;
 		
 		for(int i = 0;i<size;i++) {
-			String substring = hexStr.substring(i,i+length);
+			int startIndex = i * length;
+			int endIndex = ( i + 1 ) * length;
+			String substring = hexStr.substring(startIndex,endIndex);
 			int num = DigitalTrans.binaryToAlgorism(substring);
 			setter.accept(lineEntities.get(i), num);
 		}
@@ -318,11 +324,14 @@ public class MachineReader2026First implements CodeReadStrategy{
 			BiConsumer<DataElectricSeederMessageLineEntity, Integer> setter) {
 		
 		int size = lineEntities.size();
-		int length = hexStr.length()/size;
+		int length = hexStr.length()/MAX_LINE_NUMBE_INTEGER;
 		
 		for(int i = 0;i<size;i++) {
 			
-			String substring = hexStr.substring(i,i+length);
+			int startIndex = i * length;
+			int endIndex = ( i + 1 ) * length;
+			
+			String substring = hexStr.substring(startIndex,endIndex);
 			
 			String binaryStr = DigitalTrans.hexStringToBinary(substring);
 			int num = DigitalTrans.binaryToAlgorism(binaryStr);
@@ -375,7 +384,7 @@ public class MachineReader2026First implements CodeReadStrategy{
 	
 	public static void main(String[] args) {
 		
-		String aaString = "0006005FF0C80CB201F42EE0004605DC2B301E2000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001F00000000000000000000000000000000000000000000000100001F00001F0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+		String aaString = "0010008830AA113001F42EE0004605DC00001E20003602140800000021A202FB011A3011B00117D01174011990115E0118E01171000000000000000000000000000000000000000000000000000000FF01310000000000000000000000000000000000000000000F000000000000000000000000000000000000000000000000000000000000000000000000000039E7391249263C1530885B313D862E2E000000000000000000000000000000000000000000000000000037D734C74281397336DC570E3576286D0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 		
 		MachineReader2026First reader = new MachineReader2026First();
 		

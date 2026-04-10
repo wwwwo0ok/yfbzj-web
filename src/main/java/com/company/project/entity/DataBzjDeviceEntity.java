@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -165,5 +166,10 @@ public class DataBzjDeviceEntity extends BaseEntity implements Serializable {
 			return "/" + productKey + "/rawdata/get" ;
 		}
 		
+		
+		@TableField(exist = false)
+	    private List<String> deviceTypeList;    // 对应 "监控器", "播种机"
+		@TableField(exist = false)
+	    private List<String> deviceStatusList; // 对应 "ONLINE", "OFFLINE"
 
 }

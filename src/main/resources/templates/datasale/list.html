@@ -51,13 +51,78 @@
       <div class="layui-form-item">
       <label class="layui-form-label">行数</label>
       <div class="layui-input-block">
-        <input type="lines" name="lines" placeholder="请输入行数" autocomplete="off" class="layui-input disabled">
+        <input type="machineLines" name="machineLines" placeholder="请输入行数" autocomplete="off" class="layui-input disabled">
       </div>
     </div>
       <div class="layui-form-item">
       <label class="layui-form-label">激光喷码</label>
       <div class="layui-input-block">
         <input type="productCode" name="productCode" placeholder="请输入激光喷码" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">经销商id</label>
+      <div class="layui-input-block">
+        <input type="agentId" name="agentId" placeholder="请输入经销商id" autocomplete="off" class="layui-input disabled">
+      </div>
+	  
+	  
+	  <div class="layui-form-item">
+	  	                            <label class="layui-form-label">省</label>
+	  	                            <div class="layui-input-inline">
+	  	                                <select id="provinceId" name="provinceId" lay-filter="provinceFilter">
+	  	                                    <option value=""></option>
+	  	                                    <option value="0">写作</option>
+	  	                                    <option value="1">阅读</option>
+	  	                                    <option value="2">游戏</option>
+	  	                                    <option value="3">音乐</option>
+	  	                                    <option value="4">旅行</option>
+	  	                                </select>
+	  	                            </div>
+	  	                        </div>
+	  	<div class="layui-form-item">
+	  	                            <label class="layui-form-label">市</label>
+	  	                            <div class="layui-input-inline">
+	  	                                <select id="cityId" name="cityId"  lay-filter="cityFilter">
+	  	                                    <option value=""></option>
+	  	                                    <option value="0">写作</option>
+	  	                                    <option value="1">阅读</option>
+	  	                                    <option value="2">游戏</option>
+	  	                                    <option value="3">音乐</option>
+	  	                                    <option value="4">旅行</option>
+	  	                                </select>
+	  	                            </div>
+	  	                        </div>
+	  	<div class="layui-form-item">
+	  	                            <label class="layui-form-label">区</label>
+	  	                            <div class="layui-input-inline">
+	  	                                <select id="countryId" name="countryId"  lay-filter="countryFilter">
+	  	                                    <option value=""></option>
+	  	                                    <option value="0">写作</option>
+	  	                                    <option value="1">阅读</option>
+	  	                                    <option value="2">游戏</option>
+	  	                                    <option value="3">音乐</option>
+	  	                                    <option value="4">旅行</option>
+	  	                                </select>
+	  	                            </div>
+	  	                        </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">地区详情</label>
+      <div class="layui-input-block">
+        <input type="machineModelId" name="addressInfo" placeholder="请输入地区详情" autocomplete="off" class="layui-input disabled">
+      </div>
+	  </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">型号id</label>
+      <div class="layui-input-block">
+        <input type="machineModelId" name="machineModelId" placeholder="请输入型号id" autocomplete="off" class="layui-input disabled">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">商品状态</label>
+      <div class="layui-input-block">
+        <input type="saleStatus" name="saleStatus" placeholder="请输入商品状态" autocomplete="off" class="layui-input disabled">
       </div>
     </div>
   <div class="layui-form-item">
@@ -88,6 +153,7 @@
 <script type="text/html" id="toolbar">
   <div class="layui-btn-container oper">
     <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataSale:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="export"  >导出</button>
     <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataSale:delete">删除</button>
   </div>
 </script>
@@ -104,6 +170,7 @@
     var table = layui.table;
     var form = layui.form;
     var layer = layui.layer;
+	var curData = {};
     //加载table
     var tableIns1 = table.render({
       elem: '#showTable'
@@ -122,21 +189,121 @@
       , cols: [
         [
           {type: 'checkbox', fixed: 'left'},
-          {field: 'id', title: '', sort: true},
           {field: 'agent', title: '经销商', sort: true},
-          {field: 'buyer', title: '买家', sort: true},
-          {field: 'phone', title: '联系电话', sort: true},
-          {field: 'machineName', title: '机器名称', sort: true},
-          {field: 'machineModel', title: '机器型号', sort: true},
-          {field: 'brandNumber', title: '名牌编号', sort: true},
-          {field: 'lines', title: '行数', sort: true},
-          {field: 'productCode', title: '激光喷码', sort: true},
-          {width: 120, toolbar: "#tool", title: '操作'}
+          {field: 'buyer', title: '用户', sort: true},
+          {width: 140,field: 'phone', title: '联系电话', sort: true},
+          {width: 220,field: 'machineName', title: '机器名称', sort: true},
+          {width: 110,field: 'machineModel', title: '机器型号', sort: true},
+          {width: 80,field: 'machineLines', title: '行数', sort: true},
+		  {width: 220,field: 'addressInfo', title: '地区详情', sort: true},
+          {width: 80,field: 'saleStatus', title: '状态', sort: true},
+          {width: 220, toolbar: "#tool", title: '操作'}
         ]
       ]
       , toolbar: '#toolbar'
     });
 
+	function initAreaForm(){
+		resetSelect('city', '请先选择省');
+		resetSelect('county', '请先选择市');
+		if(curData){
+			getCityList(curData.provinceId);
+			getCountyList(curData.cityId);
+		}
+	}
+	// 3. 监听市变化 → 加载区/县
+	 form.on('select(cityFilter)', function(data) {
+	   var cityId = data.value;
+	   if (!cityId) {
+	     resetSelect('county', '请先选择市');
+	     form.render('select');
+	     return;
+	   }
+	   getCountyList(cityId);
+	 });
+	 
+
+	 initProvince();
+	 // 初始化省数据（AJAX）
+	   function initProvince() {
+	     $.ajax({
+	       url: ctx + 'sysArea/getArea', 				
+	    contentType: 'application/json', // 明确指定 Content-Type
+	    data: JSON.stringify({ parentId: '0' }), // 转换为 JSON 字符串
+	       type: 'POST',
+	       success: function(res) {
+	         if (res.code === 0) {
+	           var html = '<option value="">请选择省</option>';
+	           $.each(res.data, function(index, item) {
+	             html += '<option value="' + item.id + '">' + item.name + '</option>';
+	           });
+	           $('#provinceId').html(html);
+	           form.render('select'); // 重新渲染下拉框
+	         } else {
+	           layer.msg('加载省数据失败');
+	         }
+	       },
+	       error: function() {
+	         layer.msg('请求异常');
+	       }
+	     });
+	   }
+
+	   // 根据省ID加载市数据
+	   function getCityList(provinceId) {
+	     $.ajax({
+	       url: ctx + 'sysArea/getArea', 
+	       type: 'POST',
+	    contentType: 'application/json', // 明确指定 Content-Type
+	    data: JSON.stringify({ parentId: provinceId }), // 转换为 JSON 字符串
+	       success: function(res) {
+	         if (res.code === 0) {
+	           var html = '<option value="">请选择市</option>';
+	           $.each(res.data, function(index, item) {
+	             html += '<option value="' + item.id + '">' + item.name + '</option>';
+	           });
+	           $('#cityId').html(html).prop('disabled', false); // 启用市下拉框
+	           resetSelect('county', '请先选择市'); // 重置区/县
+	           form.render('select');
+	         } else {
+	           layer.msg('加载市数据失败');
+	         }
+	       },
+	       error: function() {
+	         layer.msg('请求异常');
+	       }
+	     });
+	   }
+
+	   // 根据市ID加载区/县数据
+	   function getCountyList(cityId) {
+	     $.ajax({
+	       url: ctx + 'sysArea/getArea', 
+	       type: 'POST',
+	    contentType: 'application/json', // 明确指定 Content-Type
+	    data: JSON.stringify({ parentId: cityId }), // 转换为 JSON 字符串
+	       success: function(res) {
+	         if (res.code === 0) {
+	           var html = '<option value="">请选择区/县</option>';
+	           $.each(res.data, function(index, item) {
+	             html += '<option value="' + item.id + '">' + item.name + '</option>';
+	           });
+	           $('#countryId').html(html).prop('disabled', false); // 启用区/县下拉框
+	           form.render('select');
+	         } else {
+	           layer.msg('加载区/县数据失败');
+	         }
+	       },
+	       error: function() {
+	         layer.msg('请求异常');
+	       }
+	     });
+	   }
+
+	   // 重置下拉框
+	   function resetSelect(selectId, placeholder) {
+	     $('#' + selectId).html('<option value="">' + placeholder + '</option>').prop('disabled', true);
+	   }
 
     //表头工具
     table.on('toolbar(showTable)', function(obj){
@@ -169,16 +336,25 @@
               , "machineName": ""
               , "machineModel": ""
               , "brandNumber": ""
-              , "lines": ""
+              , "machineLines": ""
               , "productCode": ""
+              , "agentId": ""
+              , "areaId": ""
+              , "machineModelId": ""
+              , "addressInfo": ""
+              , "saleStatus": ""
             });
           }, 200);
           break;
+		 case 'export':
+		 	exportData();
+		 break;
       };
     });
     //列操作
     table.on('tool(showTable)',function (obj) {
       var data = obj.data;
+	  curData = data;
       switch (obj.event) {
         case 'del':
           var ids=[];
@@ -190,6 +366,7 @@
           toDisabled();
           break;
         case 'edit':
+		  initAreaForm();
           backshow(data);
           $(".title").html("编辑");
           toUnDisabled();
@@ -265,8 +442,13 @@
                       , "machineName": data.machineName
                       , "machineModel": data.machineModel
                       , "brandNumber": data.brandNumber
-                      , "lines": data.lines
+                      , "machineLines": data.machineLines
                       , "productCode": data.productCode
+                      , "agentId": data.agentId
+                      , "areaId": data.areaId
+                      , "machineModelId": data.machineModelId
+                      , "addressInfo": data.addressInfo
+                      , "saleStatus": data.saleStatus
                   });
       }, 200);
     }
@@ -286,5 +468,24 @@
         $(elem).removeAttr("disabled", "")
       })
     }
-  });
+	// 导出方法
+	function exportData() {
+	    // 动态创建一个隐藏的 form 表单
+	    var form = $('<form></form>');
+	    form.attr('method', 'post');
+	    form.attr('action', ctx + 'dataSale/export'); // 根据实际后端路径调整
+	    form.attr('style', 'display:none');
+
+	    // 如果需要传递额外参数（如查询条件），可以添加隐藏字段
+	    // 示例：form.append('<input type="hidden" name="startTime" value="2024-01-01">');
+
+	    // 将表单附加到 body 并提交
+	    $('body').append(form);
+	    form.submit();
+	    form.remove(); // 提交后移除
+	}
+	
+	
+	// 暴露到全局的 export 方法
+	});
 </script>

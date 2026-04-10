@@ -8,8 +8,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
@@ -27,10 +31,11 @@ import lombok.extern.slf4j.Slf4j;
  * @author wenbin
  */
 @SpringBootApplication(exclude = DruidDataSourceAutoConfigure.class)
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 1800) // 覆盖超时时间
 @MapperScan("com.company.project.mapper")
 @Slf4j
 @ServletComponentScan(basePackages = {"com.company.project.common.filter"}) //这一句完成了配置，Springboot的”懒理念“真的厉害。
-@EnableScheduling  // 关键注解
+@EnableScheduling  // 开启定时任务
 public class CompanyProjectApplication {
 
     public static void main(String[] args) throws Exception {
@@ -73,5 +78,14 @@ public class CompanyProjectApplication {
                 )
                 .build();
     }
+    
+    @Configuration
+    public class RedisSessionConfig {
+        @Bean
+        public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+            return new GenericJackson2JsonRedisSerializer(); // JSON序列化
+        }
+    }
+
 
 }

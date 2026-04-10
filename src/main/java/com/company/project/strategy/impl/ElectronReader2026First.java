@@ -17,6 +17,11 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	//从物联网和数据库获得
 	private String code = "h25yejp0P5j";
 
+	private static final Integer MAX_LINE_NUMBE_INTEGER = 24;
+	
+	
+	
+
 	@Override
 	public String getCode() {
 		return code;
@@ -242,11 +247,11 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	        }
 
 	        // 只有行号不为0时才添加报警
-	        if (lineNo != 0) {
+	        if (lineNo != 0 && lineNo<= MAX_LINE_NUMBE_INTEGER) {
 	            DataAlarmEntity entity = new DataAlarmEntity();
 	            entity.setLineNo(lineNo);
 	            entity.setAlarmType(alarmType);
-	            entity.setCode(Integer.toString(no));
+	            entity.setCode(no);
 	            list.add(entity);
 	        }
 	    }
@@ -276,7 +281,7 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	        
 	        dataAlarmEntity.setLineNo(lineNo);
 	        dataAlarmEntity.setAlarmType(DataAlarmEntity.SEED_ALARM_TYPE);
-	        dataAlarmEntity.setCode(Integer.toString(reasonCode));
+	        dataAlarmEntity.setCode(reasonCode);
 	        
 	    }
 		
@@ -305,7 +310,7 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	        
 	        dataAlarmEntity.setLineNo(lineNo);
 //	        dataAlarmEntity.setAlarmType(DataAlarmEntity.FERT_ALARM_TYPE);
-	        dataAlarmEntity.setCode(Integer.toString(reasonCode));
+	        dataAlarmEntity.setCode(reasonCode);
 	    }
 	    
 	    return list;

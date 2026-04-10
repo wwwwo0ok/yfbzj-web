@@ -83,7 +83,7 @@
 	    </where>
 	</select>
 	
-	<select id="selectAll" resultMap="dataElectricSeederMessageMap">
+	<select id="selectAll" resultMap="dataElectricSeederMessageMap" parameterType="com.company.project.entity.DataElectricSeederMessageEntity">
 	    select * from data_electric_seeder_message
 	    <where>
 	        <if test="query.lotId != null and query.lotId != ''">
@@ -100,9 +100,6 @@
 	        </if>
 	        <if test="query.createTimeEnd != null">
 	            AND data_time &lt;= #{query.createTimeEnd}
-	        </if>
-	        <if test="query.status != null and status != ''">
-	            AND status = #{query.status}
 	        </if>
 	        <!-- 可以添加更多字段的查询条件 -->
 	    </where>

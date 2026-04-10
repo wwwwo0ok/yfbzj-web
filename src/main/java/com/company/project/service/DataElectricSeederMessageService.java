@@ -44,9 +44,15 @@ public interface DataElectricSeederMessageService extends IService<DataElectricS
 	IPage<DataElectricSeederMessageEntity> getMessageList(DataElectricSeederMessageEntity queryEntity);
 
 	/**
-	 * 重新加载消息
+	 * 重新加载消息,根据设备
 	 * @param li
 	 */
-	void reRead(DataBzjDeviceEntity li);
+	boolean reRead(DataBzjDeviceEntity li);
+
+	void reSave(DataElectricSeederMessageEntity li, DataBzjDeviceEntity paramEntit);
+
+	boolean reRead(DataBzjDeviceEntity entity, String messageId);
+
+	boolean reRead(List<DataBzjDeviceEntity> list);
 }
 

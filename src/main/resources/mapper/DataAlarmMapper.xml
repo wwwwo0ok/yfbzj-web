@@ -7,6 +7,8 @@
     <resultMap type="com.company.project.entity.DataAlarmEntity" id="dataAlarmMap">
         <result property="id" column="id"/>
         <result property="alarmType" column="alarm_type"/>
+        <result property="alarmStatus" column="alarm_status"/>
+        <result property="alarmName" column="alarm_name"/>
         <result property="lotId" column="lot_id"/>
         <result property="messageId" column="message_id"/>
         <result property="lineNo" column="line_no"/>

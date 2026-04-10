@@ -1,5 +1,7 @@
 package com.company.project.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,6 +41,7 @@ import com.company.project.strategy.CodeReadStrategy;
 
 @Service("dataElectricSeederMessageService")
 public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectricSeederMessageMapper, DataElectricSeederMessageEntity> implements DataElectricSeederMessageService {
+
 
 	@Autowired
     private AliYunService aliYunService;
@@ -59,16 +65,19 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	@Autowired
 	DataAlarmService dataAlarmService;
 	
-	 @Autowired
-	    private DataElectricSeederMessageMapper dataElectricSeederMessageMapper;
+	@Autowired
+    private DataElectricSeederMessageMapper dataElectricSeederMessageMapper;
+ 
+	@Autowired
+	private RedissonClient redissonClient;
 
-	
  // Service层示例
     @Override
     public IPage<DataElectricSeederMessageEntity> getMessageList(DataElectricSeederMessageEntity queryEntity) {
     	 Page<DataElectricSeederMessageEntity> page = new Page<>(queryEntity.getPage(), queryEntity.getLimit());
 
         IPage<DataElectricSeederMessageEntity> list = dataElectricSeederMessageMapper.selectAll(page,queryEntity);
+        
         return list;
     }
     
@@ -80,31 +89,45 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     @Scheduled(cron = "0 0/30 * * * ?")
     public boolean sync() {
     	
-		long timeMillis = System.currentTimeMillis();
+    	// 定义锁的key，可以根据业务需求调整
+        String lockKey = "sync:bzj:message:add:lock";
+        // 锁等待时间(毫秒)，防止线程长时间等待
+        long waitTime = 5000;
+        // 锁持有时间(毫秒)，防止死锁
+        long leaseTime = 10000;
+        
+        RLock lock = redissonClient.getLock(lockKey);
+        
+        // 尝试获取锁，最多等待waitTime毫秒
+        boolean isLocked;
+		try {
+			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			if (!isLocked) {
+	            // 获取锁失败
+	            return false;
+	        }
+			
+
+			long timeMillis = System.currentTimeMillis();
+	    	
+			//获取所有的设备  
+			List<DataBzjDeviceEntity> dqlist = dataBzjDeviceService.list();
+			
+			dqlist.forEach(this::insertNewData);
+			
+			//循环调用增量保存
+	        timeMillis = System.currentTimeMillis()- timeMillis ;
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+            // 确保锁被释放
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     	
-		//获取所有的设备  
-		List<DataBzjDeviceEntity> dqlist = dataBzjDeviceService.list();
-		
-		dqlist.forEach(this::insertNewData);
-		
-		
-//		
-//		//获取所有的设备
-//		List<DataBzjDeviceEntity> jxlist = dataBzjDeviceService.list(new QueryWrapper<DataBzjDeviceEntity>().eq("device_type",1));
-//		
-//		jxlist.forEach(this::insertNewData);
-		
-		
-		
-		
-//		DataBzjDeviceEntity dq = new DataBzjDeviceEntity();
-//		dq.setDeviceName("gkBdNUruoMBVbCHbbzLr");//播种机
-//		DataBzjDeviceEntity jx = new DataBzjDeviceEntity();
-//		dq.setDeviceName("iiAriJtCvsFLPW5zfn1E");//监控器
-//		List<DataBzjDeviceEntity> list = new ArrayList<>(Arrays.asList(dq,jx));
-		
-		//循环调用增量保存
-        timeMillis = System.currentTimeMillis()- timeMillis ;
+    	
         
         
         return true;
@@ -160,13 +183,17 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	        
             List<DataElectricSeederMessageEntity> iotLit = aliYunService.getMessage(device.getDeviceName(),device.getRawdata(),device.getProductKey(),beginTimeTimestamp, endTimeTimestamp);
 	        
+            iotLit.forEach(this::calculateData);
             
 	        saveBatch(iotLit);
             
             iotLit.forEach(li -> {
             	String id = li.getId();
             	List<DataElectricSeederMessageLineEntity> lines = li.getLines();
-            	lines.forEach(line -> line.setMessageId(id));
+            	lines.forEach(line -> {
+            		line.setMessageId(id);
+            		line.setLotId(li.getLotId());
+            	});
             	dataElectricSeederMessageLineService.saveBatch(lines);
             	
             	List<DataAlarmEntity> alarms = li.getAlarms();
@@ -226,10 +253,46 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	    
 	    return update(entity, updateWrapper);
 	}
+	@Override
+	public boolean reRead(List<DataBzjDeviceEntity> paramEntity) {
+		
+		// 定义锁的key，可以根据业务需求调整
+        String lockKey = "sync:bzj:device:productKey:lock";
+        // 锁等待时间(毫秒)，防止线程长时间等待
+        long waitTime = 5000;
+        // 锁持有时间(毫秒)，防止死锁
+        long leaseTime = 10000;
+        
+        
+        RLock lock = redissonClient.getLock(lockKey);
+        
+        // 尝试获取锁，最多等待waitTime毫秒
+        boolean isLocked;
+		try {
+			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			if (!isLocked) {
+	            // 获取锁失败
+	            return false;
+	        }
+			paramEntity.forEach(this::reRead);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+            // 确保锁被释放
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+		
+		return true;
+	}
+	
 	
 	@Transactional(rollbackFor = Exception.class) // 1. 将事务注解移到这里
     @Override
-    public void reRead(DataBzjDeviceEntity paramEntit) {
+    public boolean reRead(DataBzjDeviceEntity paramEntit) {
+		
         LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(paramEntit.getLotId() != null, DataElectricSeederMessageEntity::getLotId, paramEntit.getLotId());
         
@@ -239,12 +302,31 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         List<DataElectricSeederMessageEntity> list = list(queryWrapper);
 
         if (list == null || list.isEmpty()) {
-            return; // 没有数据需要处理，直接返回
+            return false; // 没有数据需要处理，直接返回
         }
 
         // 2. 循环处理，reSave 不再需要独立事务
         list.forEach(li -> reSave(li, paramEntit));
+        
+        return true;
     }
+	@Transactional(rollbackFor = Exception.class) // 1. 将事务注解移到这里
+	@Override
+	public boolean reRead(DataBzjDeviceEntity paramEntit,String messageId) {
+		
+     
+
+		DataElectricSeederMessageEntity byId = getById(messageId);
+		
+		if (byId == null ) {
+			return false; // 没有数据需要处理，直接返回
+		}
+		
+		// 2. 循环处理，reSave 不再需要独立事务
+		reSave(byId, paramEntit);
+		
+		return true;
+	}
 
     /**
      * 重新保存单条消息及其关联数据。
@@ -253,6 +335,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
      * @param paramEntit 参数实体
      */
     // 3. 移除了 @Transactional 注解
+	@Override
     public void reSave(DataElectricSeederMessageEntity li, DataBzjDeviceEntity paramEntit) {
         // 4. 增加空指针检查
         CodeReadStrategy strategy = strategyMap.get(paramEntit.getProductKey());
@@ -272,11 +355,11 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         entity.setDeviceName(li.getDeviceName());
         entity.setDataTime(li.getDataTime());
         entity.setAliyun(li.getAliyun());
+        
+        calculateData(entity);
 
-        // 保存主实体，此时 entity 会获得新的ID（如果是新增的话）
-        // 注意：如果你的逻辑是更新，这里应该是 updateById(entity)
-        // 从你的代码看，似乎是想用新数据替换旧数据，所以是 save (insert)
-        // 如果是更新，需要先查询出旧实体，再更新它的字段
+
+        // 更新，需要先查询出旧实体，再更新它的字段
         updateById(entity);
         String newId = entity.getId(); // 获取新保存实体的ID
 
@@ -285,11 +368,13 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         alarmParaMap.put("message_id", li.getId());
         alarmParaMap.put("lot_id", li.getLotId()); // 加上 lotId，更安全
         alarmService.removeByMap(alarmParaMap);
+        
 
         Map<String, Object> lineParaMap = new HashMap<>();
         lineParaMap.put("message_id", li.getId());
         lineParaMap.put("lot_id", li.getLotId()); // 加上 lotId，更安全
         messageLineService.removeByMap(lineParaMap);
+        
 
         // 7. 批量保存新的关联数据
         List<DataElectricSeederMessageLineEntity> lines = entity.getLines();
@@ -312,5 +397,78 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     }
 
 	
+	/**
+	 * 为页面提供查询功能
+	 * @param entity
+	 */
+	public void calculateData(DataElectricSeederMessageEntity entity) {
+		
+		Integer sowLine = entity.getSowLine();
+		/**
+		 * 种子数量
+		 */
+		List<DataElectricSeederMessageLineEntity> lines = entity.getLines();
+		  // 初始化总和为 BigDecimal.ZERO
+		int totalSeedCount = 0;
+
+	    // 确保 lines 不为 null，然后进行求和计算
+	    if (lines != null && !lines.isEmpty()) {
+	        totalSeedCount = lines.stream() // 1. 将列表转换为流
+	                .filter(line -> line != null && line.getSeedNum() != null) // 2. 过滤掉null的行和seedCount为null的行，防止空指针异常
+	                .mapToInt(DataElectricSeederMessageLineEntity::getSeedNum) // 3. 提取每个对象的 seedCount 属性，并转换为 IntStream
+	                .sum(); // 4. 对流中的所有整数求和
+	    }
+	    entity.setSeedCount(totalSeedCount);
+	    /**
+	     * 每公顷种子数
+	     */
+	    // 提取参数并处理 null 值，提供默认值 0
+	    Integer sowDistance = entity.getSowDistance();
+	    Integer sowingWidth = entity.getSowingWidth();
+
+	    // 使用 BigDecimal 进行精确计算，避免整数除法精度丢失
+	    BigDecimal areaInHectares = BigDecimal.ZERO;
+	    if (sowDistance > 0 && sowingWidth > 0) {
+	        // 面积（公顷） = (距离(米) * 宽度(毫米)) / 10,000,000
+	        // 解释：米 * 毫米 = 0.001 平方米，所以除以 10,000,000 得到公顷（因为 1 公顷 = 10,000 平方米）
+	        BigDecimal distance = new BigDecimal(sowDistance);
+	        BigDecimal width = new BigDecimal(sowingWidth);
+	        BigDecimal divisor = new BigDecimal(10000000); // 10,000,000
+	        areaInHectares = distance.multiply(width).divide(divisor, 4, RoundingMode.HALF_UP); // 保留4位小数
+	    }
+
+	    // 计算每公顷种子数（播种密度）
+	    if (areaInHectares.compareTo(BigDecimal.ZERO) > 0) { // 确保面积大于0
+	        BigDecimal totalSeeds = new BigDecimal(totalSeedCount);
+	        BigDecimal seedCountPerHectare = totalSeeds.divide(areaInHectares, 0, RoundingMode.HALF_UP); // 保留0位小数，四舍五入
+	        entity.setSeedCountHectare(seedCountPerHectare.intValue());
+	    } else {
+	        entity.setSeedCountHectare(0); // 面积为零时，设置密度为0
+	    }
+
+	    /**
+	     * 作业面积（亩）
+	     */
+	    // 1 公顷 = 15 亩
+	    BigDecimal workedAreaInMu = areaInHectares.multiply(new BigDecimal(15));
+	    entity.setWorkedArea(workedAreaInMu.toString()); // 转换为 int，注意可能丢失小数部分
+
+		/**
+		 * 株距
+		 */
+		Integer aSowInterval = entity.getASowInterval();
+		Integer bSowInterval = entity.getBSowInterval();
+		String sowIntervalString = "";
+		if(aSowInterval!=0 && bSowInterval!=0) {
+			sowIntervalString = aSowInterval + "/" + bSowInterval ;
+		}else if(aSowInterval==0) {
+			sowIntervalString = Integer.toString(bSowInterval) ;
+		}else if(bSowInterval==0) {
+			sowIntervalString = Integer.toString(aSowInterval) ;
+		}else {
+			sowIntervalString = "0";
+		}
+		entity.setSowInterval(sowIntervalString);
+	}
 	
 }
