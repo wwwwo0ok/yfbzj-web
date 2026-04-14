@@ -273,15 +273,15 @@
 		                data: JSON.stringify(data),
 		                contentType: "application/json",
 		                success: function (res) {
-		  				console.dir(res)
 		                    if (res.code == 0) {
-								layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		                    } else {
 		                        layer.msg(res.msg);
 		                        $("#img").click();
 		                    }
 		                }
 		            })
+
+					layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 			      }, function(){
 			        layer.msg('重新解析已经取消', {icon: 1});
 			      });
@@ -294,15 +294,15 @@
                 data: JSON.stringify({}),
                 contentType: "application/json",
                 success: function (res) {
-  				console.dir(res)
                     if (res.code == 0) {
-						layer.msg('任务执行中，请稍后查看界面', {icon: 1});
                     } else {
                         layer.msg(res.msg);
                         $("#img").click();
                     }
                 }
             })
+
+			layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		}
 	
 	function lookData(data){

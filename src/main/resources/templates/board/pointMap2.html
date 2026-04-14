@@ -66,128 +66,7 @@
 					                		设备显示
 										</div>
 										<div style="flex:1;height:80%">
-											<div style="flex:1;height:50%">
-												<div class="layui-col-md6" style="height: 100%;">
-													
-													<div class="layui-col-md6" style="height: 100%;
-														background:url('/manager/static/img/bar1.png') no-repeat center center;
-														background-size:100%;
-														text-align: center;
-														display: flex;          /* 启用flex布局 */
-														justify-content: center; /* 水平居中 */
-														align-items: center;     /* 垂直居中 - 关键修正 */
-													">
-
-														</div>
-														<div class="layui-col-md6" style="height:100%">
-															<div style="flex:1;height:50%;text-align: center;
-																		display: flex;          /* 启用flex布局 */
-																		justify-content: center; /* 水平居中 */
-																		align-items: center;     /* 垂直居中 - 关键修正 */">设备总数</div>
-															<div id="deviceNum" style="flex:1;height:50%;text-align: center;
-																		display: flex;          /* 启用flex布局 */
-																		justify-content: center; /* 水平居中 */
-																		align-items: center;     /* 垂直居中 - 关键修正 */
-
-																		line-height:28px;
-																		font-size:28px;
-																		color:#00df84;
-																		text-shadow:0 0 3px rgba(14,255,157,.5);
-																		">1783</div>
-														</div>
-														
-												</div>
-												<div class="layui-col-md6" style="height: 100%;">
-													
-													<div class="layui-col-md6" style="height: 100%;
-														background:url('/manager/static/img/select1.png') no-repeat center center;
-														background-size:100%;
-														text-align: center;
-														display: flex;          /* 启用flex布局 */
-														justify-content: center; /* 水平居中 */
-														align-items: center;     /* 垂直居中 - 关键修正 */
-													">
-
-														</div>
-														<div class="layui-col-md6" style="height:100%">														<div style="flex:1;height:50%;text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */">在线总数</div>
-														<div id="onlineNum" style="flex:1;height:50%;text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */
-
-																	line-height:28px;
-																	font-size:28px;
-																	color:#00df84;
-																	text-shadow:0 0 3px rgba(14,255,157,.5);
-																	">735</div>
-														</div>
-														
-												</div>
-											</div>
-											<div style="flex:1;height:50%">
-												<div class="layui-col-md6" style="height: 100%;">
-																									
-													<div class="layui-col-md6" style="height: 100%;
-														background:url('/manager/static/img/close1.png') no-repeat center center;
-														background-size:100%;
-														text-align: center;
-														display: flex;          /* 启用flex布局 */
-														justify-content: center; /* 水平居中 */
-														align-items: center;     /* 垂直居中 - 关键修正 */
-													">
-					
-														</div>
-														<div class="layui-col-md6" style="height:100%">
-															<div style="flex:1;height:50%;text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */">离线总数</div>
-														<div id="offlineNum" style="flex:1;height:50%;text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */
-
-																	line-height:28px;
-																	font-size:28px;
-																	color:#00df84;
-																	text-shadow:0 0 3px rgba(14,255,157,.5);
-																	">1048</div>
-														</div>
-														
-												</div>
-												<div class="layui-col-md6" style="height: 100%;">
-													
-													<div class="layui-col-md6" style="height: 100%;
-														background:url('/manager/static/img/alarm1.png') no-repeat center center;
-														background-size:100%;
-														text-align: center;
-														display: flex;          /* 启用flex布局 */
-														justify-content: center; /* 水平居中 */
-														align-items: center;     /* 垂直居中 - 关键修正 */
-													">
-					
-														</div>
-														<div class="layui-col-md6" style="height:100%">														<div style="flex:1;height:50%;text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */">报警总数</div>
-														<div id="alarmNum" style="flex:1;height:50%;text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */
-
-																	line-height:28px;
-																	font-size:28px;
-																	color:#00df84;
-																	text-shadow:0 0 3px rgba(14,255,157,.5);
-																	">15</div>
-														</div>
-														
-												</div>
-											</div>
+											<div id="onlineChart" style="width: 100%; height: 100%;"></div>
 										</div>
                 </div>
             </div>
@@ -352,7 +231,7 @@
 																							font-size:28px;
 																							color:#00df84;
 																							text-shadow:0 0 3px rgba(14,255,157,.5);
-																							">158</div>
+																							">0</div>
 																						</div>
 																<div class="layui-col-md4" style="height: 100%;">
 																							<div style="flex:1;
@@ -382,7 +261,7 @@
 																							font-size:28px;
 																							color:#00df84;
 																							text-shadow:0 0 3px rgba(14,255,157,.5);
-																							">478741</div>
+																							">0</div>
 																						</div>
 																<div class="layui-col-md4" style="height: 100%;">
 																							<div style="flex:1;
@@ -413,7 +292,7 @@
 																							color:#00df84;
 																							text-shadow:0 0 3px rgba(14,255,157,.5);
 																							
-																							">3030</div>
+																							">0</div>
 																						</div>
 																
 																
@@ -583,11 +462,9 @@ layui.use(function () {
 			    data: JSON.stringify(chartSelectionState),
 			    contentType: "application/json",
 			    success: function(res) {
-			        console.dir(res);
 			        if (res.code == 0) {
 			            // 确保地图已加载
 			            if (!map) {
-			                console.error("地图未初始化");
 			                return;
 			            }
 
@@ -675,7 +552,6 @@ layui.use(function () {
 			                        map.openInfoWindow(infoWindow, markerPoint);
 			                    });
 			                } catch (e) {
-			                    console.error("创建标记点失败:", e, device);
 			                }
 			            });
 			        } else {
@@ -684,7 +560,6 @@ layui.use(function () {
 			        }
 			    },
 			    error: function(xhr, status, error) {
-			        console.error("AJAX请求失败:", status, error);
 			    }
 			});
 			
@@ -707,7 +582,80 @@ layui.use(function () {
 			  // 在地图上添加点标记
 		  });
 		  
-		
+
+		   let onlineChart = null;
+		   
+		   // 初始化图表（只需执行一次）
+		   function initChart() {
+		       const dom = document.getElementById('onlineChart');
+		       onlineChart = echarts.init(dom);
+		       // 深空黑背景色
+		       onlineChart.setOption({
+		           //backgroundColor: '#0a0f1a',   // 深空黑
+		           tooltip: { 
+		               trigger: 'axis',
+		               axisPointer: { type: 'shadow' } // 可选，增强视觉效果
+		           },
+		           xAxis: { 
+		               type: 'category', 
+		               data: [],
+		               axisLine: { lineStyle: { color: '#3399ff', width: 2 } },      // 坐标轴线蓝色
+		               axisLabel: { fontSize: 14, color: '#66ccff' },                // 标签文字蓝色，字号14
+		               axisTick: { lineStyle: { color: '#3399ff' } }                  // 刻度线蓝色
+		           },
+		           yAxis: { 
+		               type: 'value', 
+		               name: '台',
+		               nameTextStyle: { fontSize: 14, color: '#66ccff' },             // 轴名称蓝色
+		               axisLine: { lineStyle: { color: '#3399ff' } },                 // Y轴线蓝色
+		               axisLabel: { fontSize: 14, color: '#66ccff' },                 // 标签蓝色
+		               axisTick: { lineStyle: { color: '#3399ff' } },                 // 刻度线蓝色
+		               splitLine: { show: false }                                    // 去掉横向网格线
+		           },
+		           series: [{ 
+		               type: 'line',
+		               data: [],
+		               smooth: false,
+		               itemStyle: { color: '#33aaff' },               // 数据点颜色
+		               lineStyle: { color: '#33aaff', width: 2 },     // 折线颜色
+		               label: {
+		                   show: true,
+		                   position: 'top',
+		                   fontSize: 13,
+		                   color: '#88ddff'                           // 标签文字浅蓝
+		               }
+		           }]
+		       });
+		   }
+		  initChart();
+		   
+		  function updateChart(data) {
+		              if (!onlineChart) {
+		                  console.warn('请先调用 initChart()');
+		                  return;
+		              }
+		              // 提取 x 轴数据（键）和 y 轴数据（值）
+		              let dates = Object.keys(data);
+		              let values = Object.values(data);
+
+		              // 推荐对日期排序（如果你的日期不是自然顺序，比如 "4-11","4-12","4-13" 本身顺序正确，但为了安全可以排序）
+		              // 这里假设日期格式是 "M-D"，可以转成 Date 排序
+		              const sorted = dates.map((date, idx) => ({ date, value: values[idx] }))
+		                  .sort((a, b) => {
+		                      // 简单将 "4-11" 转成月份和日期数值比较
+		                      const [m1, d1] = a.date.split('-').map(Number);
+		                      const [m2, d2] = b.date.split('-').map(Number);
+		                      return m1 === m2 ? d1 - d2 : m1 - m2;
+		                  });
+		              dates = sorted.map(item => item.date);
+		              values = sorted.map(item => item.value);
+
+		              // 更新图表选项（不会重建实例，只会动态改变数据）
+		              onlineChart.setOption({
+		                  xAxis: { data: dates },
+		                  series: [{ data: values }]
+		              });
+		          }
 		  
 		  
 		  
@@ -830,7 +778,6 @@ layui.use(function () {
 
 			// 监听左边图表的图例变化
 			leftChart.on('legendselectchanged', function (params) {
-			    console.log('左边图例选择变化:', params);
 			    
 			    // params.name 是被点击的图例名称 ('在线' 或 '离线')
 			    // params.selected 是一个对象，如 { '在线': true, '离线': false }
@@ -847,7 +794,6 @@ layui.use(function () {
 				chartSelectionState.deviceStatusList = onlinestatus;
 			    
 			    // 打印当前完整的状态
-			    console.log('当前左边图表选择状态:', chartSelectionState);
 			    
 			    // 调用处理函数
 			    getDeviceList();
@@ -855,7 +801,6 @@ layui.use(function () {
 
 			// 监听右边图表的图例变化
 			rightChart.on('legendselectchanged', function (params) {
-			    console.log('右边图例选择变化:', params);
 			    
 			    // params.name 是被点击的图例名称 ('监控器' 或 '播种机')
 			    // params.selected 是一个对象，如 { '监控器': true, '播种机': false }
@@ -872,7 +817,6 @@ layui.use(function () {
 				chartSelectionState.deviceTypeList = deviceTypes;
 					    
 			    // 打印当前完整的状态
-			    console.log('当前右边图表选择状态:', chartSelectionState);
 			    
 			    // 调用处理函数
 				getDeviceList();
@@ -886,10 +830,13 @@ layui.use(function () {
 			
 			//刷新页面
 			var refreshPage = function(){
-
-				$("#deviceNum").text(parseInt(screenData.online)+parseInt(screenData.offline));
-				$("#onlineNum").text(screenData.online);
-				$("#offlineNum").text(screenData.offline);
+				
+				
+				// 模拟获取新数据（实际开发中替换为你的 Ajax/Fetch）
+					           // 模拟后端返回的数据，每次刷新可能不同
+           // 也可以动态增加/减少键值对
+           // 例如："4-15": 28
+	           updateChart(screenData.onlineMap);
 				$("#alarmNum").text(0);
 				$("#seedingDeviceNum").text(screenData.seedDeviceCount);
 				$("#seedingLineNum").text(screenData.seedLineCount);
@@ -897,7 +844,7 @@ layui.use(function () {
 					var avg = Math.round(parseInt(screenData.seedLineCount)/parseInt(screenData.seedDeviceCount));
 					$("#avgLineNum").text(avg);
 				}
-	
+
 				const leftData = [
 								
 								{value:screenData.online,name:"在线"},
@@ -911,7 +858,7 @@ layui.use(function () {
 				const rightData = [
 								
 								{value:screenData.dq,name:"电驱"},
-								{value:screenData.jkq,name:"机械"},
+								{value:screenData.jkq,name:"监控器"},
 								
 							];
 	
@@ -920,7 +867,7 @@ layui.use(function () {
 				});
 
 			}
-
+		//
 			getDeviceList();
 		//
 	});

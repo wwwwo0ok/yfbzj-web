@@ -142,8 +142,7 @@
 </div>
 <script type="text/html" id="toolbar">
   <div class="layui-btn-container oper">
-
-	<button class="layui-btn layui-btn-sm" lay-event="updateDevice">更新</button>
+	<button class="layui-btn layui-btn-sm" lay-event="updateDevice">更新设备信息</button>
   </div>
 </script>
 <script type="text/html" id="tool">
@@ -161,6 +160,7 @@
     var layer = layui.layer;
     var tabs = layui.tabs;
     var element = layui.element;
+    var laydate = layui.laydate;
 	var router = layui.router();
 
 	
@@ -223,7 +223,6 @@
       ]
       , toolbar: '#toolbar'
     });
-
 
     //表头工具
     table.on('toolbar(showTable)', function(obj){
@@ -305,7 +304,6 @@
 		                data: JSON.stringify(data),
 		                contentType: "application/json",
 		                success: function (res) {
-		  				console.dir(res)
 		                    if (res.code == 0) {
 								layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		                    } else {
@@ -326,15 +324,14 @@
                 data: JSON.stringify({}),
                 contentType: "application/json",
                 success: function (res) {
-  				console.dir(res)
                     if (res.code == 0) {
-						layer.msg('任务执行中，请稍后查看界面', {icon: 1});
                     } else {
                         layer.msg(res.msg);
                         $("#img").click();
                     }
                 }
             })
+			layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		}
 	
 	function lookData(data){

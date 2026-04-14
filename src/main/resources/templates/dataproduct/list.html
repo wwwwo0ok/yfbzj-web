@@ -234,7 +234,6 @@
 	            form.on('submit(submit-btn)', function(data){
 	                // 1. 获取单选框的值
 	                var deviceType = data.field.device_type;
-	                console.log('选中的设备类型:', deviceType);
 					
 	                
 	                // 2. 发送 AJAX 请求到后台
@@ -287,15 +286,15 @@
 	                data: JSON.stringify({productKey: productKey}),
 	                contentType: "application/json",
 	                success: function (res) {
-	  				console.dir(res)
 	                    if (res.code == 0) {
-							layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 	                    } else {
 	                        layer.msg(res.msg);
 	                        $("#img").click();
 	                    }
 	                }
 	            })
+
+				layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		      }, function(){
 		        layer.msg('重新解析已经取消', {icon: 1});
 		      });
@@ -311,15 +310,14 @@
 	                data: JSON.stringify({productKey: productKey}),
 	                contentType: "application/json",
 	                success: function (res) {
-	  				console.dir(res)
 	                    if (res.code == 0) {
-							layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 	                    } else {
 	                        layer.msg(res.msg);
 	                        $("#img").click();
 	                    }
 	                }
 	            })
+				layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		      }, function(){
 		        layer.msg('重新解析已经取消', {icon: 1});
 		      });

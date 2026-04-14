@@ -86,6 +86,7 @@
 	<select id="selectAll" resultMap="dataElectricSeederMessageMap" parameterType="com.company.project.entity.DataElectricSeederMessageEntity">
 	    select * from data_electric_seeder_message
 	    <where>
+	     	AND status != 1   <!-- 新增：过滤逻辑删除的数据 -->
 	        <if test="query.lotId != null and query.lotId != ''">
 	            AND lot_id = #{query.lotId}
 	        </if>

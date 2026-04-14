@@ -3,9 +3,12 @@ package com.company.project.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -23,6 +26,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.company.project.aliyun.RedisDeviceManager;
 import com.company.project.common.utils.DataResult;
 import com.company.project.dto.DeviceAndSaleQueryDTO;
 import com.company.project.entity.DataBzjDeviceEntity;
@@ -35,6 +39,7 @@ import com.company.project.service.DataSaleService;
 import com.company.project.service.SysFarmService;
 import com.company.project.service.UserService;
 import com.company.project.service.impl.DataBzjDeviceServiceImpl;
+import com.company.project.util.DateUtil;
 import com.google.common.collect.Lists;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
@@ -54,6 +59,7 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("/")
 public class DataBzjDeviceController {
 
+
     @Autowired
     private DataBzjDeviceService dataBzjDeviceService;
     @Autowired
@@ -64,10 +70,16 @@ public class DataBzjDeviceController {
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private RedisDeviceManager redisDeviceManager;
+	@Autowired
+	private RedissonClient redissonClient;
+	
+	@Autowired
+	private DataElectricSeederMessageService messageService;
+    
 
-    DataBzjDeviceController(DataBzjDeviceServiceImpl dataBzjDeviceService) {
-        this.dataBzjDeviceService = dataBzjDeviceService;
-    }
     
     /**
     * 跳转到管理员页面
@@ -116,7 +128,6 @@ public class DataBzjDeviceController {
     
     @ApiOperation(value = "买家查询分页数据")
     @PostMapping("dataBzjDevice/listByPageForUser")
-    @SaCheckPermission("dataBzjDevice:list")
     @ResponseBody
     public DataResult listByPageForUser(@RequestBody DeviceAndSaleQueryDTO dataDto
     		){
@@ -135,6 +146,51 @@ public class DataBzjDeviceController {
     	return DataResult.success(iPage);
     }
     
+    @ApiOperation(value = "更新数据(根据产品)")
+    @PostMapping("dataBzjDevice/refreshData")
+    @ResponseBody
+    public DataResult refreshData(@RequestBody DataBzjDeviceEntity dataBzjDevice){
+    	LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
+    	//空不查询
+    	if(StringUtils.isBlank(dataBzjDevice.getLotId())) {
+    		return DataResult.success();
+    	}
+    	
+    	// 定义锁的key，可以根据业务需求调整
+        String updateAllKey = "sync:bzj:message:add:lock";
+        String lockKey = "sync:bzj:message:add:one:"+dataBzjDevice.getLotId()+":lock";
+        // 锁等待时间(毫秒)，防止线程长时间等待
+        
+        
+    	RLock updateAllLock = redissonClient.getLock(updateAllKey);
+    	if(updateAllLock.isLocked()) {
+    		return DataResult.fail("后台已经在同步中，请稍后查看");
+    	}
+        
+        RLock lock = redissonClient.getLock(lockKey);
+        
+        // 尝试获取锁，最多等待waitTime毫秒
+        boolean isLocked;
+		try {
+			isLocked = lock.tryLock();
+			if (!isLocked) {
+	            // 获取锁失败
+	    		return DataResult.fail("后台已经在同步中，请稍后查看");
+	        }
+    	
+			DataBzjDeviceEntity byId = dataBzjDeviceService.getById(dataBzjDevice.getLotId());
+			
+	    	//单数据同步
+	    	messageService.addAndCheck(byId);
+		} finally {
+            // 确保锁被释放
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    	
+    	return DataResult.success();
+    }
     
     @ApiOperation(value = "重新加载批次数据")
     @PostMapping("dataBzjDevice/reRead")
@@ -160,9 +216,8 @@ public class DataBzjDeviceController {
     @ApiOperation(value = "主动更新单条信息")
     @PostMapping("dataBzjDevice/reReadMessage")
     @ResponseBody
-    public DataResult reReadMessage(@RequestBody DataElectricSeederMessageEntity dataBzjDevice
-    		){
-    	boolean reRead = dataBzjDeviceService.reRead(dataBzjDevice);
+    public DataResult reReadMessage(@RequestBody DataElectricSeederMessageEntity messageEntity		){
+    	boolean reRead = dataBzjDeviceService.reRead(messageEntity);
     	return reRead?DataResult.success():DataResult.fail("此任务已经在进行中或者系统繁忙请稍后再试");
     }
 
@@ -234,11 +289,18 @@ public class DataBzjDeviceController {
     @ResponseBody
     public DataResult pointMap(@RequestBody DataBzjDeviceEntity dataBzjDevice){
     	
-//    	DataAnalysisUtil.test();
-    	
-    	
         
         JSONObject json = dataBzjDeviceService.pointMap(dataBzjDevice);
+        
+        String[] lastDaysFromToday = DateUtil.getLastDaysFromToday(5);
+        
+        Map<String, Object> onlineMap = new TreeMap<>();
+        json.put("onlineMap", onlineMap);
+        
+        for(String dayString : lastDaysFromToday) {
+        	long onlineDeviceCount = redisDeviceManager.getOnlineDeviceCount(dayString);
+        	onlineMap.put(dayString.substring(5), onlineDeviceCount);
+        }
         
         
         return DataResult.success(json);

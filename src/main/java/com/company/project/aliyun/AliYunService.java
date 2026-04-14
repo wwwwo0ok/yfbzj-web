@@ -1,7 +1,13 @@
 package com.company.project.aliyun;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,25 +19,23 @@ import org.springframework.stereotype.Component;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.aliyun.auth.credentials.provider.DefaultCredentialProvider;
 import com.aliyun.sdk.service.iot20180120.AsyncClient;
 import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataRequest;
 import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataResponse;
 import com.aliyun.sdk.service.iot20180120.models.ListAnalyticsDataResponseBody;
 import com.aliyun.sdk.service.iot20180120.models.QueryDevicePropertyDataRequest;
 import com.aliyun.sdk.service.iot20180120.models.QueryDevicePropertyDataResponse;
+import com.aliyun.sdk.service.iot20180120.models.QueryDevicePropertyDataResponseBody;
+import com.aliyun.sdk.service.iot20180120.models.QueryDevicePropertyDataResponseBody.Data;
 import com.aliyun.sdk.service.iot20180120.models.QueryDevicePropertyDataResponseBody.PropertyInfo;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceRequest;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponse;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody;
-import com.aliyun.sdk.service.iot20180120.models.ListDistributedDeviceResponseBody.Info;
 import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody.DeviceInfo;
 import com.company.project.entity.DataElectricSeederMessageEntity;
-import com.company.project.entity.DataProductEntity;
 import com.company.project.service.DataProductService;
 import com.company.project.strategy.CodeReadStrategy;
 import com.company.project.util.AliyunIotConstants;
-import com.google.gson.Gson;
 
 /**
  *  阿里云服务封装
@@ -134,7 +138,6 @@ public class AliYunService {
             .build();
     }
 	
-	
     /**
      * 获取满足条件的设备消息
      */
@@ -182,12 +185,24 @@ public class AliYunService {
 	            for (Map<String, Object> data : list) {
 	                String iotId = data.get("iot_id").toString();
 	                String timestamp = data.get("timestamp").toString();
+	                String dataTimeRaw = data.get("date_time").toString();
+	                LocalDateTime dateTime = null;
+	                // 如果毫秒部分不足3位，补零
+	                if (dataTimeRaw.matches("\\d{14}\\.\\d{1,2}")) {
+	                    // 补足到3位毫秒
+	                    String[] parts = dataTimeRaw.split("\\.");
+	                    String millis = parts[1];
+	                    while (millis.length() < 3) millis += "0";
+	                    dataTimeRaw = parts[0] + "." + millis;
+	                }
+	                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS");
+	                dateTime = LocalDateTime.parse(dataTimeRaw, formatter);
 	                if(data.containsKey("BZJ")) {
 	                	String hexData = data.get("BZJ").toString().trim();
-	                	DataElectricSeederMessageEntity entity = strategyMap.get(productKey).readCode(hexData);;
+	                	DataElectricSeederMessageEntity entity = new DataElectricSeederMessageEntity();
 	                	entity.setLotId(iotId);
 	                	entity.setDeviceName(deviceName);
-	                	entity.setDataTime(new Date(Long.parseLong(timestamp)));
+	                	entity.setDataTime(dateTime);
 	                	entity.setAliyun(hexData);
 	                	
 	                	iotLit.add(entity);
@@ -299,9 +314,22 @@ public class AliYunService {
              QueryDevicePropertyDataResponse resp = response.get();
              // Asynchronous processing of return values
              
-             List<PropertyInfo> propertyInfoList = resp.getBody().getData().getList().getPropertyInfo();
-             
-             
+             List<PropertyInfo> propertyInfoList = Collections.emptyList();
+
+             if (resp != null && resp.getBody() != null) {
+                 QueryDevicePropertyDataResponseBody body = resp.getBody();
+                 if (body.getData() != null) {
+                     Data data = body.getData();
+                     if (data.getList() != null) {
+                         propertyInfoList = data.getList().getPropertyInfo();
+                         if (propertyInfoList == null) {
+                             propertyInfoList = Collections.emptyList();
+                         }
+                     }
+                 }
+             }
+
+
              
              for(PropertyInfo info:propertyInfoList ){
             	 
@@ -340,6 +368,7 @@ public class AliYunService {
     	return resultMap;
     	
     }
+	
     
     
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import javax.swing.text.html.parser.Entity;
+
 import org.springframework.stereotype.Component;
 
 import com.company.project.entity.DataAlarmEntity;
@@ -26,14 +28,13 @@ public class MachineReader2026First implements CodeReadStrategy{
 	}
 
 	@Override
-	public DataElectricSeederMessageEntity readCode(String code) {
-    	return analysisMachineHexStr(code);
+	public void readCode(DataElectricSeederMessageEntity entity) {
+    	analysisMachineHexStr(entity);
 	}
 	
-	public DataElectricSeederMessageEntity analysisMachineHexStr(String hexStr) {
+	public void analysisMachineHexStr(DataElectricSeederMessageEntity entity) {
 		
-		DataElectricSeederMessageEntity entity = new DataElectricSeederMessageEntity();
-		
+		String hexStr = entity.getAliyun();
 		
 		
 		
@@ -262,7 +263,6 @@ public class MachineReader2026First implements CodeReadStrategy{
         String hexStr340 = hexStr.substring(340-64, 348-64);
         analysisAlarm(hexStr340,alarmEntities,4,DataAlarmEntity.DEPUTY_FERT_ALARM_TYPE);
         
-        return entity;
 	}
 	
 	
@@ -387,8 +387,8 @@ public class MachineReader2026First implements CodeReadStrategy{
 		String aaString = "0010008830AA113001F42EE0004605DC00001E20003602140800000021A202FB011A3011B00117D01174011990115E0118E01171000000000000000000000000000000000000000000000000000000FF01310000000000000000000000000000000000000000000F000000000000000000000000000000000000000000000000000000000000000000000000000039E7391249263C1530885B313D862E2E000000000000000000000000000000000000000000000000000037D734C74281397336DC570E3576286D0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 		
 		MachineReader2026First reader = new MachineReader2026First();
-		
-		DataElectricSeederMessageEntity analysisMachineHexStr = reader.analysisMachineHexStr(aaString);
+		DataElectricSeederMessageEntity analysisMachineHexStr = new DataElectricSeederMessageEntity();
+		reader.analysisMachineHexStr(analysisMachineHexStr);
 		
 		
 	}

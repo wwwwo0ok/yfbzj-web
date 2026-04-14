@@ -311,7 +311,6 @@
         }).fail(function(jqXHR, textStatus, errorThrown) {
             // 错误处理
             myChart.hideLoading();
-            console.error('地图加载失败:', textStatus, errorThrown);
             myChart.setOption({
                 title: {
                     text: '地图加载失败',

@@ -2,13 +2,16 @@ package com.company.project.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -16,10 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -27,6 +28,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.company.project.aliyun.AliYunService;
+import com.company.project.aliyun.RedisDeviceManager;
 import com.company.project.entity.DataAlarmEntity;
 import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
@@ -37,6 +39,7 @@ import com.company.project.service.DataBzjDeviceService;
 import com.company.project.service.DataElectricSeederMessageLineService;
 import com.company.project.service.DataElectricSeederMessageService;
 import com.company.project.strategy.CodeReadStrategy;
+import com.company.project.util.DateUtil;
 
 
 @Service("dataElectricSeederMessageService")
@@ -70,6 +73,9 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
  
 	@Autowired
 	private RedissonClient redissonClient;
+	
+	@Autowired
+	private RedisDeviceManager redisDeviceManager;
 
  // Service层示例
     @Override
@@ -83,14 +89,14 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     
     
     /**
-     * 增量同步全部电驱消息内容（2025年12月开始）
+     * 同步设备消息（仅限今日在线过的）
      */
     @Override
-    @Scheduled(cron = "0 0/30 * * * ?")
-    public boolean sync() {
+    @Scheduled(cron = "0 2/5 * * * ?")
+    public boolean syncToday() {
     	
     	// 定义锁的key，可以根据业务需求调整
-        String lockKey = "sync:bzj:message:add:lock";
+        String lockKey = "sync:bzj:message:update:today";
         // 锁等待时间(毫秒)，防止线程长时间等待
         long waitTime = 5000;
         // 锁持有时间(毫秒)，防止死锁
@@ -101,7 +107,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         // 尝试获取锁，最多等待waitTime毫秒
         boolean isLocked;
 		try {
-			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			isLocked = lock.tryLock();
 			if (!isLocked) {
 	            // 获取锁失败
 	            return false;
@@ -110,16 +116,13 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 
 			long timeMillis = System.currentTimeMillis();
 	    	
-			//获取所有的设备  
-			List<DataBzjDeviceEntity> dqlist = dataBzjDeviceService.list();
+			//获取今日累计在线的设备  
+			List<DataBzjDeviceEntity> dqlist = redisDeviceManager.getTodayOnlineDeviceList();
 			
-			dqlist.forEach(this::insertNewData);
+			dqlist.forEach(this::addAndCheck);
 			
 			//循环调用增量保存
 	        timeMillis = System.currentTimeMillis()- timeMillis ;
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {
@@ -132,85 +135,169 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         
         return true;
     }
-    
-    
-    @Override
-    public void insertNewData(String lotId) {
-    	DataBzjDeviceEntity byId = dataBzjDeviceService.getById(lotId);
-    	if(byId!=null) {
-    		insertNewData(byId);
-    	}
-    }
-    
     /**
-     * 增量保存
-     * @param device
-     * @return
+     * 同步设备消息
      */
     @Override
-    @Transactional
-    public boolean insertNewData(DataBzjDeviceEntity device) {
+    public boolean syncMessages(String dayString) {
     	
-        
+    	// 定义锁的key，可以根据业务需求调整
+    	String lockKey = "sync:bzj:message:update:"+dayString;
+    	// 锁等待时间(毫秒)，防止线程长时间等待
+    	long waitTime = 5000;
+    	// 锁持有时间(毫秒)，防止死锁
+    	long leaseTime = 10000;
+    	
+    	RLock lock = redissonClient.getLock(lockKey);
+    	
+    	// 尝试获取锁，最多等待waitTime毫秒
+    	boolean isLocked;
     	try {
-	    	//查询最大结束时间位起始时间
-	    	Date beginTimeDate = selectMaxDataTimeByDevice(device);
-	    	
-
-	    	Date endTimeDate = new Date();
-	    	long endTimeTimestamp = endTimeDate.getTime();
-	    	
-	    	
-	    	// 转换为Instant（时间戳）
-	    	Instant endInstant = endTimeDate.toInstant();
-	    	
-	    	// 或者更推荐的方式：
-	    	Instant thirtyDaysBeforeInstant2 = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault())
-	    			.minusDays(30)
-	    			.atZone(ZoneId.systemDefault())
-	    			.toInstant();
-	    	
-	    	// 转换回Date
-	    	Date thirtyDaysBefore = Date.from(thirtyDaysBeforeInstant2);
-	    	long beginTimeTimestamp = thirtyDaysBefore.getTime();
-	    	if(beginTimeDate != null) {
-	    		long time = beginTimeDate.getTime();
-	    		if(time>=beginTimeTimestamp) {
-	    			beginTimeTimestamp = time;
-	    		}
-	    	}
-            
-	        
-            List<DataElectricSeederMessageEntity> iotLit = aliYunService.getMessage(device.getDeviceName(),device.getRawdata(),device.getProductKey(),beginTimeTimestamp, endTimeTimestamp);
-	        
-            iotLit.forEach(this::calculateData);
-            
-	        saveBatch(iotLit);
-            
-            iotLit.forEach(li -> {
-            	String id = li.getId();
-            	List<DataElectricSeederMessageLineEntity> lines = li.getLines();
-            	lines.forEach(line -> {
-            		line.setMessageId(id);
-            		line.setLotId(li.getLotId());
-            	});
-            	dataElectricSeederMessageLineService.saveBatch(lines);
-            	
-            	List<DataAlarmEntity> alarms = li.getAlarms();
-            	alarms.forEach(alarm -> {
-            		alarm.setMessageId(id);
-            		alarm.setLotId(li.getLotId());
-            	});
-            	dataAlarmService.saveBatch(alarms);
-            });
-	    	
-    	}catch(Exception e) {
-    		e.printStackTrace();
+    		isLocked = lock.tryLock();
+    		if (!isLocked) {
+    			// 获取锁失败
+    			return false;
+    		}
+    		
+    		
+    		long timeMillis = System.currentTimeMillis();
+    		
+    		//获取全部的设备
+    		List<DataBzjDeviceEntity> dqlist = redisDeviceManager.getAllCachedDevices();
+    		
+    		dqlist.forEach(li -> this.addAndCheck(li,dayString));
+    		
+    		//循环调用增量保存
+    		timeMillis = System.currentTimeMillis()- timeMillis ;
+    	} finally {
+    		// 确保锁被释放
+    		if (lock.isHeldByCurrentThread()) {
+    			lock.unlock();
+    		}
     	}
+    	
+    	
     	
     	
     	return true;
     }
+    
+
+    @Override
+    public boolean addAndCheck(DataBzjDeviceEntity device) {
+    	return addAndCheck(device,DateUtil.getTodayString());
+    }
+    @Override
+    public boolean addAndCheck(DataBzjDeviceEntity device,String dayString) {
+    	
+    	String startTime = DateUtil.getStartOfDayString(dayString);
+    	String endTime = DateUtil.getEndOfTodayString();
+    	if(DateUtil.isWithinDays(startTime, endTime, 15)) {
+    		return addAndCheck(device,startTime,endTime);
+    	}else {
+    		return false;
+    	}
+    }
+    
+    
+    @Override
+    @Transactional
+    public boolean addAndCheck(DataBzjDeviceEntity device,String startTime,String endTime) {
+        List<DataElectricSeederMessageEntity> addMessageList = new ArrayList<>();
+        List<DataElectricSeederMessageEntity> deleteMessageList = new ArrayList<>();
+
+        
+        // 1. 从阿里云获得数据
+        List<DataElectricSeederMessageEntity> aliyunList = aliYunService.getMessage(device.getDeviceName(), device.getRawdata(), device.getProductKey(),DateUtil.getTimestamp(startTime),DateUtil.getTimestamp(endTime));
+        // 2. 本地数据集合
+        List<DataElectricSeederMessageEntity> databaseList = getListByLotId(device.getLotId(),startTime,endTime);
+
+        // ========== 新增：本地重复数据去重 ==========
+        // 按 key 分组，每组只保留一条（这里按 id 降序取最大）
+        Map<String, DataElectricSeederMessageEntity> keepMap = new HashMap<>();
+        Map<String, List<DataElectricSeederMessageEntity>> groupByKey = databaseList.stream()
+                .collect(Collectors.groupingBy(this::buildUniqueKey));
+        
+        for (Map.Entry<String, List<DataElectricSeederMessageEntity>> entry : groupByKey.entrySet()) {
+            List<DataElectricSeederMessageEntity> records = entry.getValue();
+            // 按 id 降序排序，第一条为要保留的（id 最大）
+            records.sort((a, b) -> b.getId().compareTo(a.getId()));
+            DataElectricSeederMessageEntity keep = records.get(0);
+            keepMap.put(entry.getKey(), keep);
+            // 其余重复记录加入删除集合
+            for (int i = 1; i < records.size(); i++) {
+                deleteMessageList.add(records.get(i));
+            }
+        }
+        // =======================================
+
+        // 3. 构建本地去重后的映射（用于比较）
+        // 注意：这里直接用 keepMap，而不是原始的 databaseList
+
+        // 4. 记录阿里云中存在的所有 key
+        Set<String> aliyunKeySet = new HashSet<>();
+
+        // 5. 遍历阿里云数据，判断本地去重后的映射中是否存在
+        for (DataElectricSeederMessageEntity aliyun : aliyunList) {
+            String key = buildUniqueKey(aliyun);
+            aliyunKeySet.add(key);
+            if (!keepMap.containsKey(key)) {
+                addMessageList.add(aliyun);
+            }
+        }
+
+        // 6. 遍历本地去重后的映射，判断是否在阿里云中不存在（多余）
+        for (Map.Entry<String, DataElectricSeederMessageEntity> entry : keepMap.entrySet()) {
+            String key = entry.getKey();
+            if (!aliyunKeySet.contains(key)) {
+                deleteMessageList.add(entry.getValue());  // 保留的这条也要删除
+            }
+        }
+
+        // 7. 批量保存新增
+        if (!addMessageList.isEmpty()) {
+            addMessageList.forEach(li -> addNewMessage(li, device));
+        }
+        // 8. 批量删除（包括重复多余的和阿里云没有的 key 对应的记录）
+        if (!deleteMessageList.isEmpty()) {
+            deleteMessageList.forEach(li -> li.setStatus(1));
+            updateBatchById(deleteMessageList);
+        }
+        return true;
+    }
+
+    /**
+     * 构建业务唯一键
+     * 假设 DataElectricSeederMessageEntity 中有 getLotId(), getDataTime(), getAliyun() 方法
+     * 注意 data_time 格式需要统一，建议使用字符串形式（如 "20260408083656.812"）
+     */
+    private String buildUniqueKey(DataElectricSeederMessageEntity entity) {
+        // 如果 data_time 是 LocalDateTime 类型，需要格式化为字符串
+    	LocalDateTime dataTimeStr = entity.getDataTime(); // 假设是字符串
+        // 如果存在 null 值，需要处理
+        return entity.getLotId() + "|" + dataTimeStr + "|" + entity.getAliyun();
+    }
+    
+    public List<DataElectricSeederMessageEntity> getListByLotId(String lotId, String startOfDay,String endOfDay) {
+        LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper
+            .eq(DataElectricSeederMessageEntity::getLotId, lotId)
+            .ne(DataElectricSeederMessageEntity::getStatus, 1);
+        
+        queryWrapper.between(DataElectricSeederMessageEntity::getDataTime, startOfDay, endOfDay);
+        
+        return list(queryWrapper);
+    }
+    public List<DataElectricSeederMessageEntity> getListByLotId(String lotId) {
+    	LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
+    	queryWrapper
+    	.eq(DataElectricSeederMessageEntity::getLotId, lotId)
+    	.ne(DataElectricSeederMessageEntity::getStatus, 1);
+    	
+    	return list(queryWrapper);
+    }
+    
+    
 
 
 	@Override
@@ -269,15 +356,12 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         // 尝试获取锁，最多等待waitTime毫秒
         boolean isLocked;
 		try {
-			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			isLocked = lock.tryLock();
 			if (!isLocked) {
 	            // 获取锁失败
 	            return false;
 	        }
 			paramEntity.forEach(this::reRead);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {
@@ -293,20 +377,15 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     @Override
     public boolean reRead(DataBzjDeviceEntity paramEntit) {
 		
-        LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(paramEntit.getLotId() != null, DataElectricSeederMessageEntity::getLotId, paramEntit.getLotId());
-        
-        // 假设这里还有其他查询条件，比如产品类型等
-        // queryWrapper.eq(..., ...);
 
-        List<DataElectricSeederMessageEntity> list = list(queryWrapper);
+        List<DataElectricSeederMessageEntity> list = getListByLotId(paramEntit.getLotId());
 
         if (list == null || list.isEmpty()) {
             return false; // 没有数据需要处理，直接返回
         }
 
         // 2. 循环处理，reSave 不再需要独立事务
-        list.forEach(li -> reSave(li, paramEntit));
+        list.forEach(li -> addNewMessage(li, paramEntit));
         
         return true;
     }
@@ -323,11 +402,10 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 		}
 		
 		// 2. 循环处理，reSave 不再需要独立事务
-		reSave(byId, paramEntit);
+		addNewMessage(byId, paramEntit);
 		
 		return true;
 	}
-
     /**
      * 重新保存单条消息及其关联数据。
      * 此方法没有独立事务，会加入到 reRead 的事务中。
@@ -336,7 +414,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
      */
     // 3. 移除了 @Transactional 注解
 	@Override
-    public void reSave(DataElectricSeederMessageEntity li, DataBzjDeviceEntity paramEntit) {
+    public void addNewMessage(DataElectricSeederMessageEntity entity, DataBzjDeviceEntity paramEntit) {
         // 4. 增加空指针检查
         CodeReadStrategy strategy = strategyMap.get(paramEntit.getProductKey());
         if (strategy == null) {
@@ -344,43 +422,37 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         }
 
         // 5. 重新读取和构建实体
-        DataElectricSeederMessageEntity entity = strategy.readCode(li.getAliyun());
-        if (entity == null) {
-            return;
-        }
-
-        // 复制基础属性
-        entity.setId(li.getId());
-        entity.setLotId(li.getLotId());
-        entity.setDeviceName(li.getDeviceName());
-        entity.setDataTime(li.getDataTime());
-        entity.setAliyun(li.getAliyun());
+        strategy.readCode(entity);
+        
         
         calculateData(entity);
+        
+        
+        redisDeviceManager.accumulateSeederData(paramEntit.getLotId(), entity.getSeedCount(), entity.getWorkedArea());
 
 
+        if(entity.getId() != null) {
+        	// 6. 精确删除关联数据
+            Map<String, Object> alarmParaMap = new HashMap<>();
+            alarmParaMap.put("message_id", entity.getId());
+            alarmParaMap.put("lot_id", entity.getLotId()); // 加上 lotId，更安全
+            alarmService.removeByMap(alarmParaMap);
+            
+
+            Map<String, Object> lineParaMap = new HashMap<>();
+            lineParaMap.put("message_id", entity.getId());
+            lineParaMap.put("lot_id", entity.getLotId()); // 加上 lotId，更安全
+            messageLineService.removeByMap(lineParaMap);
+        	
+        }
+        
         // 更新，需要先查询出旧实体，再更新它的字段
-        updateById(entity);
-        String newId = entity.getId(); // 获取新保存实体的ID
-
-        // 6. 精确删除关联数据
-        Map<String, Object> alarmParaMap = new HashMap<>();
-        alarmParaMap.put("message_id", li.getId());
-        alarmParaMap.put("lot_id", li.getLotId()); // 加上 lotId，更安全
-        alarmService.removeByMap(alarmParaMap);
-        
-
-        Map<String, Object> lineParaMap = new HashMap<>();
-        lineParaMap.put("message_id", li.getId());
-        lineParaMap.put("lot_id", li.getLotId()); // 加上 lotId，更安全
-        messageLineService.removeByMap(lineParaMap);
-        
-
+        saveOrUpdate(entity);
         // 7. 批量保存新的关联数据
         List<DataElectricSeederMessageLineEntity> lines = entity.getLines();
         if (lines != null && !lines.isEmpty()) {
             lines.forEach(line -> {
-                line.setMessageId(newId); // 使用新的 message_id
+                line.setMessageId(entity.getId()); // 使用新的 message_id
                 line.setLotId(entity.getLotId());
             });
             dataElectricSeederMessageLineService.saveBatch(lines);
@@ -389,7 +461,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         List<DataAlarmEntity> alarms = entity.getAlarms();
         if (alarms != null && !alarms.isEmpty()) {
             alarms.forEach(alarm -> {
-                alarm.setMessageId(newId); // 使用新的 message_id
+                alarm.setMessageId(entity.getId()); // 使用新的 message_id
                 alarm.setLotId(entity.getLotId());
             });
             dataAlarmService.saveBatch(alarms);
@@ -470,5 +542,8 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 		}
 		entity.setSowInterval(sowIntervalString);
 	}
+
+
+
 	
 }

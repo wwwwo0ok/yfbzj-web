@@ -3,6 +3,8 @@ package com.company.project.controller;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,7 +44,8 @@ public class DataElectricSeederMessageController {
     
     @Autowired
     private DataElectricSeederMessageLineService dataElectricSeederMessageLineService;
-
+	@Autowired
+	private RedissonClient redissonClient;
     /**
     * 跳转到页面
     */
@@ -66,23 +69,15 @@ public class DataElectricSeederMessageController {
 //        queryWrapper.eq(dataElectricSeederMessage.getLotId() != null, DataElectricSeederMessageEntity::getLotId, dataElectricSeederMessage.getLotId());
 //        queryWrapper.orderByDesc(DataElectricSeederMessageEntity::getDataTime);
 //        IPage<DataElectricSeederMessageEntity> iPage = dataElectricSeederMessageService.page(dataElectricSeederMessage.getQueryPage(), queryWrapper);
-        
         IPage<DataElectricSeederMessageEntity> iPage = dataElectricSeederMessageService.getMessageList(dataElectricSeederMessage);
+        iPage.getRecords().forEach(li -> {
+        	if(li.getDataTime()!=null) {
+        		li.setDataTimeString(li.getDataTime().toString().replace("T", " "));
+        	}
+        });
         return DataResult.success(iPage);
     }
-    @ApiOperation(value = "更新数据")
-    @PostMapping("dataElectricSeederMessage/refreshData")
-    @ResponseBody
-    public DataResult refreshData(@RequestBody DataElectricSeederMessageEntity dataElectricSeederMessage){
-    	LambdaQueryWrapper<DataElectricSeederMessageEntity> queryWrapper = Wrappers.lambdaQuery();
-    	//空不查询
-    	if(StringUtils.isBlank(dataElectricSeederMessage.getLotId())) {
-    		return DataResult.success();
-    	}
-    	//单数据同步
-    	dataElectricSeederMessageService.insertNewData(dataElectricSeederMessage.getLotId());
-    	return DataResult.success();
-    }
+    
 
 
     @ApiOperation(value = "新增")

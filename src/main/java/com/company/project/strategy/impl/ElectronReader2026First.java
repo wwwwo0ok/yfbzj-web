@@ -28,10 +28,9 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	}
 
 	@Override
-	public DataElectricSeederMessageEntity readCode(String code) {
+	public void readCode(DataElectricSeederMessageEntity entity) {
 		
-		DataElectricSeederMessageEntity analysisElectricHexStr = analysisElectricHexStr(code);
-		return analysisElectricHexStr;
+		analysisElectricHexStr(entity);
 	}
 
 	
@@ -40,10 +39,10 @@ public class ElectronReader2026First implements CodeReadStrategy{
 	 * @param hexStr
 	 * @return
 	 */
-	public DataElectricSeederMessageEntity analysisElectricHexStr(String hexStr) {
+	public void analysisElectricHexStr(DataElectricSeederMessageEntity entity) {
 		
+		String hexStr = entity.getAliyun();
 		
-		DataElectricSeederMessageEntity entity = new DataElectricSeederMessageEntity();
 		List<DataAlarmEntity> alarmEntities = new ArrayList<>();
 
 		entity.setAlarms(alarmEntities);
@@ -188,7 +187,6 @@ public class ElectronReader2026First implements CodeReadStrategy{
 		
 		entity.setLines(lines);
 		
-		return entity;
 	}
 	
 	/**
@@ -424,7 +422,9 @@ public class ElectronReader2026First implements CodeReadStrategy{
 		
 		ElectronReader2026First reader = new ElectronReader2026First();
 		
-		DataElectricSeederMessageEntity analysisMachineHexStr = reader.readCode(aaString);
+		DataElectricSeederMessageEntity analysisMachineHexStr = new DataElectricSeederMessageEntity();
+		
+		reader.readCode(analysisMachineHexStr);
 		
 		
 	}

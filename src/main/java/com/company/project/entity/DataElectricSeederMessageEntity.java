@@ -1,13 +1,14 @@
 package com.company.project.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -54,7 +55,8 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 * 数据发生时刻（硬件时刻）
 	 */
 		@TableField("data_time")
-		private Date dataTime;
+		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
+		private LocalDateTime dataTime;
 		
 	/**
 	 * 电子齿轮比
@@ -493,6 +495,11 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 */
 	@TableField("sow_interval")
 	private String sowInterval;
+	/**
+	 * 株距
+	 */
+	@TableField(exist = false)
+	private String dataTimeString;
 		
 		
 

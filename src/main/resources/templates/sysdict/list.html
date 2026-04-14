@@ -141,7 +141,7 @@
         var layer = layui.layer;
 
         //父：加载table
-        var tableIns1 = table.render({
+        var dicTable = table.render({
             elem: '#showTable'
             , contentType: 'application/json'
             , page: true //开启分页
@@ -251,7 +251,7 @@
         });
 
         //子：加载table
-        var tableIns2 = table.render({
+        var dicDetailTable = table.render({
             elem: '#showTableDetail'
             , contentType: 'application/json'
             , page: true //开启分页
@@ -369,7 +369,7 @@
                     layer.close(index); //如果设定了yes回调，需进行手工关闭
                     CoreUtil.sendDelete(ctx + "sysDict/delete", ids, function (res) {
                         layer.msg(res.msg, {time: 1000}, function () {
-                            tableIns1.reload()
+                            dicTable.reload()
                             if (containCurrentIdFlag) {
                                 selectDictId = null;
                             }
@@ -402,13 +402,13 @@
                 CoreUtil.sendPost(ctx + "sysDict/add", data.field, function (res) {
                     $(".table_div").show();
                     layer.closeAll();
-                    tableIns1.reload()
+                    dicTable.reload()
                 });
             } else {
                 CoreUtil.sendPut(ctx + "sysDict/update", data.field, function (res) {
                     $(".table_div").show();
                     layer.closeAll();
-                    tableIns1.reload()
+                    dicTable.reload()
                 });
             }
 
@@ -418,6 +418,7 @@
 
         //详情监听保存
         form.on('submit(submitDetail)', function (data) {
+			data.field.dictId = selectDictId;
             if (data.field.id === undefined || data.field.id === null || data.field.id === "") {
                 CoreUtil.sendPost(ctx + "sysDictDetail/add", data.field, function (res) {
                     $(".table_div").show();
@@ -438,7 +439,7 @@
         // 监听搜索操作
         form.on('submit(data-search-btn)', function (data) {
             //执行搜索重载
-            tableIns1.reload({
+            dicTable.reload({
                 page: {
                     curr: 1
                 }
@@ -450,7 +451,7 @@
         //明细查询
         var searchDetail = function () {
             //这里以搜索为例
-            tableIns2.reload({
+            dicDetailTable.reload({
                 where: { //设定异步数据接口的额外参数，任意设
                     dictId: selectDictId
                 }

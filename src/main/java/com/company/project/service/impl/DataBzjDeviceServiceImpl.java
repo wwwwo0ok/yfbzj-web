@@ -32,6 +32,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.company.project.aliyun.AliYunService;
+import com.company.project.aliyun.RedisDeviceManager;
 import com.company.project.common.exception.BusinessException;
 import com.company.project.common.exception.code.BaseResponseCode;
 import com.company.project.dto.DeviceAndSaleQueryDTO;
@@ -57,6 +58,8 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
 	@Autowired
 	private RedissonClient redissonClient;
 
+	@Autowired
+	private RedisDeviceManager redisDeviceManager;
 	
 	
 	 /**
@@ -67,21 +70,17 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 2/5 * * * ?")
     public boolean sync() {
     	
     	// 定义锁的key，可以根据业务需求调整
         String lockKey = "sync:bzj:device:lock";
-        // 锁等待时间(毫秒)，防止线程长时间等待
-        long waitTime = 5000;
-        // 锁持有时间(毫秒)，防止死锁
-        long leaseTime = 10000;
         
         RLock lock = redissonClient.getLock(lockKey);
         
         try {
             // 尝试获取锁，最多等待waitTime毫秒
-            boolean isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+            boolean isLocked = lock.tryLock();
             if (!isLocked) {
                 // 获取锁失败
                 return false;
@@ -97,17 +96,19 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
                     .map(this::convertToDataBzjDeviceEntity)
                     .collect(Collectors.toList());
             
+            List<DataBzjDeviceEntity> syncAndGetChangedDevices = redisDeviceManager.syncAndGetChangedDevices(bzjDeviceList);
+            
+            
             // 3. 批量保存或更新
-            boolean batchResult = saveOrUpdateBatch(bzjDeviceList);
+            if(syncAndGetChangedDevices.isEmpty()) {
+            	return false;
+            }
+            boolean batchResult = saveOrUpdateBatch(syncAndGetChangedDevices);
             
             long elapsedTime = System.currentTimeMillis() - startTime;
             // 可以记录日志或监控耗时
             
             return batchResult;
-        } catch (InterruptedException e) {
-            // 线程被中断，返回失败
-            Thread.currentThread().interrupt();
-            return false;
         } finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {
@@ -133,7 +134,7 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
         // 尝试获取锁，最多等待waitTime毫秒
         boolean isLocked;
 		try {
-			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			isLocked = lock.tryLock();
 			if (!isLocked) {
 	            // 获取锁失败
 	            return false;
@@ -151,9 +152,6 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
 	    			.collect(Collectors.toList());
 	    	saveOrUpdateBatch(bzjDeviceList);
 	    	timeMillis = System.currentTimeMillis()- timeMillis ;
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {
@@ -185,7 +183,7 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
         // 尝试获取锁，最多等待waitTime毫秒
         boolean isLocked;
 		try {
-			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			isLocked = lock.tryLock();
 			if (!isLocked) {
 	            // 获取锁失败
 	            return;
@@ -235,9 +233,6 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
 	            	e.printStackTrace();
 	            }
 	    	});
-		}catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {
@@ -311,9 +306,7 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
         String allRereadKey = "sync:bzj:device:productKey:lock";
         String lockKey = "sync:bzj:message:device:"+paramEntit.getLotId()+":lock";
         // 锁等待时间(毫秒)，防止线程长时间等待
-        long waitTime = 5000;
-        // 锁持有时间(毫秒)，防止死锁
-        long leaseTime = 10000;
+        long waitTime = 1000;
         
         RLock allRereadLock = redissonClient.getLock(allRereadKey);
         if(allRereadLock.isLocked()) {
@@ -325,16 +318,13 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
         // 尝试获取锁，最多等待waitTime毫秒
         boolean isLocked;
 		try {
-			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			isLocked = lock.tryLock();
 			if (!isLocked) {
 	            // 获取锁失败
 	            return false;
 	        }
 
     		messageService.reRead(paramEntit);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {
@@ -378,15 +368,12 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
         // 尝试获取锁，最多等待waitTime毫秒
         boolean isLocked;
 		try {
-			isLocked = lock.tryLock(waitTime, leaseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
+			isLocked = lock.tryLock();
 			if (!isLocked) {
 	            // 获取锁失败
 	            return false;
 	        }
 	    	messageService.reRead(byId,messageEntity.getId());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
             // 确保锁被释放
             if (lock.isHeldByCurrentThread()) {

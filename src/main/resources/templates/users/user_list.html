@@ -367,7 +367,6 @@
                 , data: data
                 , onlyIconControl: true  //是否仅允许节点左侧图标控制展开收缩
                 , click: function (obj) {
-                    console.log(obj)
                     deptNo = obj.data.deptNo;
                     $("#leftTree span").removeClass('custom-tree-item-clicked');     //清除旧的样式
                     $("#leftTree span:contains(" + obj.data.title + ")").addClass('custom-tree-item-clicked');

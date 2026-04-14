@@ -1,8 +1,5 @@
 package com.company.project.strategy;
 
-import java.util.List;
-
-import com.company.project.entity.DataBzjDeviceEntity;
 import com.company.project.entity.DataElectricSeederMessageEntity;
 
 /**
@@ -15,10 +12,10 @@ public interface CodeReadStrategy {
 	 */
 	public String getCode();
 	
-	
 	/**
-	 * 解析编码
+	 * 解码
+	 * @param entity 解码的携带对象
 	 */
-	public DataElectricSeederMessageEntity readCode(String code);
+	public void readCode(DataElectricSeederMessageEntity entity);
 
 }

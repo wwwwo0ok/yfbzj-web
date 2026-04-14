@@ -451,6 +451,7 @@
 	var router = layui.router();
 	var lotId = $("#lotId").val();//这个有显示参数
 	var messageId;
+	var dictObj = {};
 	
     //加载table
     var tableIns1 = table.render({
@@ -471,7 +472,7 @@
       , cols: [
         [
           {type: 'checkbox', fixed: 'left'},
-          {width: 160, field: 'dataTime', title: '数据时间', sort: true},
+          {width: 200, field: 'dataTimeString', title: '数据时间', sort: true},
           {width: 120, field: 'uploadType', title: '上传方式', templet : function(item){
   			if (item.uploadType == '0') {
   		          return '  <a class="" >蓝牙连接</a>';
@@ -535,7 +536,7 @@
 		  {width: 110, field: 'sowLine', title: '播种行数', sort: true},
 		  {width: 110, field: 'seedCount', title: '播种数量', sort: true},
 		  {width: 140, field: 'sowingWidth', title: '播种幅宽(mm)', sort: true},
-		  {width: 110, field: 'sowInterval', title: '株距(mm)', sort: true},
+		  {width: 160, field: 'sowInterval', title: '株距(Amm/Bmm)', sort: true},
 		  {width: 130, field: 'seedCountHectare', title: '每公顷种子数', sort: true},
 		  {width: 130, field: 'workedArea', title: '作业面积(亩)', sort: true},
           {width: 220, toolbar: "#tool", title: '操作'}
@@ -610,15 +611,15 @@
 			                data: JSON.stringify({id:data.id,lotId:data.lotId}),
 			                contentType: "application/json",
 			                success: function (res) {
-			  				console.dir(res)
 			                    if (res.code == 0) {
-									layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 			                    } else {
 			                        layer.msg(res.msg);
 			                        $("#img").click();
 			                    }
 			                }
 			            })
+
+						layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 				      }, function(){
 				        layer.msg('重新解析已经取消', {icon: 1});
 				      });
@@ -627,7 +628,7 @@
 	var refreshData = function(){
 		$.ajax({
             type: 'POST',
-            url: ctx + 'dataElectricSeederMessage/refreshData',
+            url: ctx + 'dataBzjDevice/refreshData',
             dataType: "JSON",
             data: JSON.stringify({lotId:lotId}),
             contentType: "application/json",
@@ -645,8 +646,27 @@
                 }
             }
         })
+		layer.msg('任务执行中，请稍后查看界面', {icon: 1});
 		
 	}
+	var getDictInfo = function(){
+		$.ajax({
+            type: 'POST',
+            url: ctx + 'sysDict/getDict',
+            dataType: "JSON",
+            data: JSON.stringify(['el_deputy_fert_alarm','machine_fert_alarm','seed_alarm']),
+            contentType: "application/json",
+            success: function (res) {
+                if (res.code == 0) {
+					dictObj = res.data;
+                } else {
+                    layer.msg(res.msg);
+                    $("#img").click();
+                }
+            }
+        })
+	}
+	getDictInfo();
 	
     //删除
     var tipDialog=function (ids) {
@@ -880,7 +900,7 @@
 					  		      ,cols: [
 								          [
 								            {type: 'checkbox', fixed: 'left'},
-								            {field: 'alarmType', title: '报警类型（0种报警、1肥报警）', sort: true,templet : function(item){
+								            {field: 'alarmType', title: '报警类型（匹配数据字典）', sort: true,templet : function(item){
 					   							if(item.alarmType==0){
 					   								return "种报警";
 					   							}
@@ -898,7 +918,25 @@
 					   							}
 					   			  			}},
 								            {field: 'lineNo', title: '行号', sort: true},
-								            {field: 'alarmName', title: '报警编码', sort: true},
+								            {field: 'alarmName', title: '报警编码（来自数据字典）', sort: true	,templet : function(item){
+							   							
+												if(item.alarmType==0){
+					   								return dictObj['seed_alarm']?dictObj['seed_alarm'][item.code]:item.code;
+					   							}
+					   							if(item.alarmType==1){
+					   								return dictObj['el_fert_monitor_alarm']?dictObj['el_fert_monitor_alarm'][item.code]:item.code;
+					   							}
+					   							if(item.alarmType==2){
+					   								return dictObj['el_main_fert_alarm']?dictObj['el_main_fert_alarm'][item.code]:item.code;
+					   							}
+					   							if(item.alarmType==3){
+					   								return dictObj['el_deputy_fert_alarm']?dictObj['el_deputy_fert_alarm'][item.code]:item.code;
+					   							}
+					   							if(item.alarmType==4){
+					   								return dictObj['machine_fert_alarm']?dictObj['machine_fert_alarm'][item.code]:item.code;
+					   							}
+												
+							   			  	}},
 								          ]
 								        ]
 					  		      

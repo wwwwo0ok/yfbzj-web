@@ -78,7 +78,6 @@ layui.use(function () {
 	                data: JSON.stringify({deviceStatus:'ONLINE'}),
 	                contentType: "application/json",
 	                success: function (res) {
-	  				console.dir(res)
 	                    if (res.code == 0) {
 //	  					dq_data = res.data.records;
 	  					// 遍历数据创建标记点

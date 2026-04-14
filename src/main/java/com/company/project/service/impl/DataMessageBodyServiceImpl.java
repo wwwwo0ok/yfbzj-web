@@ -9,13 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.druid.util.StringUtils;
+import com.aliyun.sdk.service.iot20180120.models.QueryDeviceResponseBody.DeviceInfo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -42,6 +46,9 @@ public class DataMessageBodyServiceImpl extends ServiceImpl<DataMessageBodyMappe
 	
 	@Autowired
 	private DataBzjDeviceService bzjService;
+
+	@Autowired
+	private RedissonClient redissonClient;
 	
 	private ConcurrentHashMap<String, List<DataMessageTypeEntity>> typeMap = new ConcurrentHashMap<>();
 
@@ -55,26 +62,43 @@ public class DataMessageBodyServiceImpl extends ServiceImpl<DataMessageBodyMappe
     @Override
     @Scheduled(cron = "0 3/5 * * * ?")
     public boolean sync() {
-    	
-		long timeMillis = System.currentTimeMillis();
-    	
-		LambdaQueryWrapper<DataBzjDeviceEntity> productQueryWrapper = Wrappers.lambdaQuery();
-    	//查询条件示例
-    	productQueryWrapper.in(DataBzjDeviceEntity::getDeviceStatus, "ONLINE","OFFLINE");
-		
-		
-		//获取所有的设备  
-		List<DataBzjDeviceEntity> dqlist = bzjService.list(productQueryWrapper);
-		
-		
-		
-		dqlist.forEach(this::insertNewData);
-		
-		
 
+    	// 定义锁的key，可以根据业务需求调整
+        String lockKey = "sync:data:messageBody:lock";
+    	
+    	RLock lock = redissonClient.getLock(lockKey);
+    	
+    	try {
+            // 尝试获取锁，最多等待waitTime毫秒
+            boolean isLocked = lock.tryLock();
+            if (!isLocked) {
+                // 获取锁失败
+                return false;
+            }
+            
+            long timeMillis = System.currentTimeMillis();
+        	
+    		LambdaQueryWrapper<DataBzjDeviceEntity> productQueryWrapper = Wrappers.lambdaQuery();
+        	//查询条件示例
+        	productQueryWrapper.in(DataBzjDeviceEntity::getDeviceStatus, "ONLINE","OFFLINE");
+    		
+    		
+    		//获取所有的设备  
+    		List<DataBzjDeviceEntity> dqlist = bzjService.list(productQueryWrapper);
+    		
+    		
+    		dqlist.forEach(this::insertNewData);
+    		
+    		//循环调用增量保存
+            timeMillis = System.currentTimeMillis()- timeMillis ;
+        } finally {
+            // 确保锁被释放
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    	
 		
-		//循环调用增量保存
-        timeMillis = System.currentTimeMillis()- timeMillis ;
         
         
         return true;
