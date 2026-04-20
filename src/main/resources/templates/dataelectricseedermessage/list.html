@@ -214,6 +214,17 @@
         <div class="layui-input-inline">
             <input type="text" readonly class="layui-input" name="createTimeEnd" id="createTimeEnd" placeholder="结束时间">
         </div>
+		<div class="layui-input-inline">
+                    <div class="layui-input-inline" >
+                        <select id="uploadType" name="uploadType" lay-filter="farmFilter">
+                            <option value="">--上传方式--</option>
+                            <option value="0">蓝牙连接</option>
+                            <option value="1">运行停止</option>
+                            <option value="2">物联控制</option>
+                            <option value="3">设置改变</option>
+                        </select>
+                    </div>
+			                        </div>
         <div class="layui-input-inline ">
           <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
         </div>

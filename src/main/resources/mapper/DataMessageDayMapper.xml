@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.company.project.mapper.DataMessageDayMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.company.project.entity.DataMessageDayEntity" id="dataMessageDayMap">
+        <result property="id" column="id"/>
+        <result property="lotId" column="lot_id"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="monthString" column="month_string"/>
+        <result property="yearString" column="year_string"/>
+        <result property="dayString" column="day_string"/>
+        <result property="seedCount" column="seed_count"/>
+        <result property="seedCountHectare" column="seed_count_hectare"/>
+        <result property="workedArea" column="worked_area"/>
+        <result property="sowLine" column="sow_line"/>
+        <result property="sowDistance" column="sow_distance"/>
+        <result property="sowCount" column="sow_count"/>
+        <result property="dataStatus" column="data_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+
+	<select id="addDayData"   resultMap="dataMessageDayMap">
+		select
+		    lot_id,
+		    device_name,
+		    sum(seed_count) as seed_count,                     -- 种子数
+		    sum(worked_area) as worked_area,                   -- 亩数
+		    sum(sow_line) as sow_line,                         -- 行数
+		    sum(sow_distance) as sow_distance,                 -- 距离
+		    count(*) as sow_count,                             -- 播种次数
+		    case 
+		        when sum(worked_area) > 0 
+		        then sum(seed_count) * 15.0 / sum(worked_area) 
+		        else 0 
+		    end as seed_count_hectare                          -- 每公顷种子数
+		from data_electric_seeder_message desm
+		where desm.status != 1
+		    and desm.data_time > #{startDate}
+		    and #{endDate} > desm.data_time
+		    and desm.upload_type = 1
+		group by lot_id, device_name;
+	
+	</select>
+	<select id="queryDayData" resultMap="dataMessageDayMap">
+	    select
+	        lot_id,
+	        device_name,
+	        sum(seed_count) as seed_count,
+	        ROUND(sum(worked_area), 2) as worked_area,          -- 保留两位小数
+	        sum(sow_line) as sow_line,
+	        sum(sow_distance) as sow_distance,
+	        count(*) as sow_count,
+	        case 
+	            when sum(worked_area) > 0 
+	            then sum(seed_count) * 15.0 / sum(worked_area) 
+	            else 0 
+	        end as seed_count_hectare
+	    from data_message_day desm
+	    <where>
+	        <if test="query.yearString != null and query.yearString != ''">
+	            and desm.year_string = #{query.yearString}
+	        </if>
+	        <if test="query.monthString != null and query.monthString != ''">
+	            and desm.month_string = #{query.monthString}
+	        </if>
+	        <if test="query.dayString != null and query.dayString != ''">
+	            and desm.day_string = #{query.dayString}
+	        </if>
+	        and desm.seed_count != 0
+	    </where>
+	    group by lot_id, device_name
+	</select>
+
+</mapper>

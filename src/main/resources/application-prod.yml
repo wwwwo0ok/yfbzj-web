@@ -17,11 +17,6 @@ spring:
     password: yfredis123456  # 密码（如无则删除此行）
     database: 1              # 默认数据库索引
     timeout: 3000            # 连接超时时间（毫秒）
-  session:
-    store-type: redis        # 启用Redis存储Session
-    timeout: 1800           # Session超时时间（秒），默认30分钟
-    redis:
-      namespace: spring:session  # Redis Key前缀（避免冲突）
 sa-token:
   # 使用Redis存储Session
   store: redis
@@ -31,8 +26,7 @@ sa-token:
     port: 6379
     password: yfredis123456
     database: 1
-  token:
-    session-token-timeout: 86400
+  timeout: 1800 # Token 有效期，单位秒（30分钟）
 file:
   #文件上传目录 绝对路径 末尾请加 /
   path: F:/files/ #windows

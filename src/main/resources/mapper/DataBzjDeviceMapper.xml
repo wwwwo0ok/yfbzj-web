@@ -138,21 +138,7 @@
                  #{status}
              </foreach>
          </if>
-        ) AS dq,
-
-        -- 播种设备数量（今日）
-        (SELECT COUNT(DISTINCT lot_Id) 
-         FROM data_electric_seeder_message desm 
-         WHERE desm.data_time >= CURDATE()          
-         AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > desm.data_time
-        ) AS seedDeviceCount,
-
-        -- 播种行数（今日）
-        (SELECT SUM(sow_line) 
-         FROM data_electric_seeder_message desm 
-         WHERE desm.data_time >= CURDATE()          
-         AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > desm.data_time
-        ) AS seedLineCount
+        ) AS dq
 </select>
 
 

@@ -139,45 +139,19 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
      * 同步设备消息
      */
     @Override
+    @Transactional
     public boolean syncMessages(String dayString) {
     	
-    	// 定义锁的key，可以根据业务需求调整
-    	String lockKey = "sync:bzj:message:update:"+dayString;
-    	// 锁等待时间(毫秒)，防止线程长时间等待
-    	long waitTime = 5000;
-    	// 锁持有时间(毫秒)，防止死锁
-    	long leaseTime = 10000;
-    	
-    	RLock lock = redissonClient.getLock(lockKey);
-    	
-    	// 尝试获取锁，最多等待waitTime毫秒
-    	boolean isLocked;
-    	try {
-    		isLocked = lock.tryLock();
-    		if (!isLocked) {
-    			// 获取锁失败
-    			return false;
-    		}
+		long timeMillis = System.currentTimeMillis();
+		
+		//获取全部的设备
+		List<DataBzjDeviceEntity> dqlist = redisDeviceManager.getAllCachedDevices();
+		
+		dqlist.forEach(li -> this.addAndCheck(li,dayString));
+		
+		//循环调用增量保存
+		timeMillis = System.currentTimeMillis()- timeMillis ;
     		
-    		
-    		long timeMillis = System.currentTimeMillis();
-    		
-    		//获取全部的设备
-    		List<DataBzjDeviceEntity> dqlist = redisDeviceManager.getAllCachedDevices();
-    		
-    		dqlist.forEach(li -> this.addAndCheck(li,dayString));
-    		
-    		//循环调用增量保存
-    		timeMillis = System.currentTimeMillis()- timeMillis ;
-    	} finally {
-    		// 确保锁被释放
-    		if (lock.isHeldByCurrentThread()) {
-    			lock.unlock();
-    		}
-    	}
-    	
-    	
-    	
     	
     	return true;
     }
@@ -191,7 +165,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     public boolean addAndCheck(DataBzjDeviceEntity device,String dayString) {
     	
     	String startTime = DateUtil.getStartOfDayString(dayString);
-    	String endTime = DateUtil.getEndOfTodayString();
+    	String endTime = DateUtil.getEndOfDayString(dayString);
     	if(DateUtil.isWithinDays(startTime, endTime, 15)) {
     		return addAndCheck(device,startTime,endTime);
     	}else {
@@ -428,7 +402,7 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
         calculateData(entity);
         
         
-        redisDeviceManager.accumulateSeederData(paramEntit.getLotId(), entity.getSeedCount(), entity.getWorkedArea());
+//        redisDeviceManager.accumulateSeederData(paramEntit.getLotId(), entity.getSeedCount(), entity.getWorkedArea());
 
 
         if(entity.getId() != null) {

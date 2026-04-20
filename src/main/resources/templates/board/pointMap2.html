@@ -10,6 +10,60 @@
     <!-- 如果有特殊样式可以保留，否则删除 -->
     <div th:replace="~{layout}"></div>
 	<link rel="stylesheet" th:href="@{/static/css/pointMap.css}">
+	<style>
+		
+		/* 图标样式 - 背景图居中，固定大小 */
+		.stat-icon {
+		    width: 60px;
+		    height: 60px;
+		    margin: 0 auto;
+		    background-repeat: no-repeat;
+		    background-position: center center;
+		    background-size: contain;  /* 或 60% 根据喜好调整 */
+		}
+
+		/* 文字标签样式（播种设备、播种亩数、播种粒数） */
+		.stat-label {
+		    text-align: center;
+		    font-size: 18px;
+		    font-weight: bold;
+		    color: #fff;
+		    background: rgba(0,0,0,0.3);
+		    border-radius: 8px;
+		    padding: 8px 0;
+		    margin-top: 5px;
+		}
+
+		/* 行标签样式（今日统计、本月统计、今年统计） */
+		.stat-row-label {
+		    text-align: center;
+		    font-size: 18px;
+		    font-weight: bold;
+		    color: #ffd966;
+		    background: rgba(0,0,0,0.3);
+		    border-radius: 8px;
+		    padding: 12px 0;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		}
+
+		/* 数值样式（绿色大数字，带阴影） */
+		.stat-value {
+		    text-align: center;
+		    font-size: 28px;
+		    font-weight: bold;
+		    color: #00df84;
+		    text-shadow: 0 0 3px rgba(14,255,157,.5);
+		    background: rgba(0,0,0,0.3);
+		    border-radius: 8px;
+		    padding: 12px 0;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    line-height: 1.2;
+		}
+	</style>
 </head>
 
 <body style="height:100%;background-color: #060931;">
@@ -30,7 +84,7 @@
 		                        color: #fff;
 		                        border-radius: 4px;">
             <div >
-                煜丰农业大屏展示
+                众为农业大屏展示
             </div>
         </div>
     </div>
@@ -63,7 +117,7 @@
 									align-items: center;     /* 垂直居中 - 关键修正 */
 									padding-bottom: 15px;
 									">
-					                		最多在线设备
+					                		在线数量
 										</div>
 										<div style="flex:1;height:80%">
 											<div id="onlineChart" style="width: 100%; height: 100%;"></div>
@@ -88,217 +142,54 @@
                         margin-bottom: 10px;">
                 <div id="deviceFb" style="width: 100%; height: 100%;"></div>
             </div>
-            <div style="flex: 1; background: url('/manager/static/img/chartBg.png') no-repeat center center;
-                        background-size: cover;
-                        padding: 20px;
-                        box-sizing: border-box;
-                        margin-bottom: 10px;">
-                <!-- 新增的右侧第一个下方内容 -->
-                <div style="
-				width: 30%;
-																	height: 20%;
-																	background: url('/manager/static/img/textTitle.png') no-repeat center center;
-																	background-size: 100%;
-																	text-align: center;
-																	display: flex;          /* 启用flex布局 */
-																	justify-content: center; /* 水平居中 */
-																	align-items: center;     /* 垂直居中 - 关键修正 */
-																	padding-bottom: 15px;
-				">
-                		报警显示
-					</div>
-					<div style="flex:1;height:80%">
-						<div class="layui-col-md4" style="height: 100%;">
-							<div style="flex:1;
-									height:60%;
-							background:url('/manager/static/img/number1.png') no-repeat center center;
-											background-size:100%;
-											text-align: center;
-											display: flex;          /* 启用flex布局 */
-											justify-content: center; /* 水平居中 */
-											align-items: center;     /* 垂直居中 - 关键修正 */
-											margin:10%;
-											
-											line-height: 60px;
-											font-size:20px;
-											
-											">0</div>
-							<div style="flex:1;height:20%;
-
-							text-align: center;
-							display: flex;          /* 启用flex布局 */
-							justify-content: center; /* 水平居中 */
-							align-items: center;     /* 垂直居中 - 关键修正 */
-							">异常数量</div>
-						</div>
-						<div class="layui-col-md4" style="height: 100%;">
-							<div style="flex:1;
-																height:60%;
-														background:url('/manager/static/img/number1.png') no-repeat center center;
-																		background-size:100%;
-																		text-align: center;
-																		display: flex;          /* 启用flex布局 */
-																		justify-content: center; /* 水平居中 */
-																		align-items: center;     /* 垂直居中 - 关键修正 */
-																		margin:10%;
-																		line-height: 60px;
-																		font-size:20px;
-																		
-																		">0</div>
-														<div style="flex:1;height:20%;
-
-														text-align: center;
-														display: flex;          /* 启用flex布局 */
-														justify-content: center; /* 水平居中 */
-														align-items: center;     /* 垂直居中 - 关键修正 */
-														">警告数量</div>
-						</div>
-						<div class="layui-col-md4" style="height: 100%;">
-							<div style="flex:1;
-																height:60%;
-														background:url('/manager/static/img/number1.png') no-repeat center center;
-																		background-size:100%;
-																		text-align: center;
-																		display: flex;          /* 启用flex布局 */
-																		justify-content: center; /* 水平居中 */
-																		align-items: center;     /* 垂直居中 - 关键修正 */
-																		margin:10%;
-																		line-height: 60px;
-																		font-size:20px;
-																		
-																		">0</div>
-														<div style="flex:1;height:20%;
-
-														text-align: center;
-														display: flex;          /* 启用flex布局 */
-														justify-content: center; /* 水平居中 */
-														align-items: center;     /* 垂直居中 - 关键修正 */
-														">报修数量</div>
-						</div>
-
-					</div>
-            </div>
-            <div style="flex: 1; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+            <div style="flex: 1.4; background: url('/manager/static/img/chartBg.png') no-repeat center center;
                         background-size: cover;
                         padding: 20px;
                         box-sizing: border-box;
 						">
                 <!-- 新增的右侧第二个下方内容 -->
-                <div style="width: 100%; height: 100%;">
-					<div style="
-					flex: 1;
-													width: 30%;
-													height: 20%;
-													background: url('/manager/static/img/textTitle.png') no-repeat center center;
-													background-size: 100%;
-													text-align: center;
-													display: flex;          /* 启用flex布局 */
-													justify-content: center; /* 水平居中 */
-													align-items: center;     /* 垂直居中 - 关键修正 */
-													padding-bottom: 15px;
-														
-														
-														">
-										                		播种显示
-															</div>
-															
-															<div style="flex:1;height:80%">
-																<div class="layui-col-md4" style="height: 100%;">
-																							<div style="flex:1;
-																									height:60%;
-																							background:url('/manager/static/img/store1.png') no-repeat center center;
-																											background-size:60%;
-																											text-align: center;
-																											display: flex;          /* 启用flex布局 */
-																											justify-content: center; /* 水平居中 */
-																											align-items: center;     /* 垂直居中 - 关键修正 */
-																											"></div>
-																							<div style="flex:1;height:20%;
-
-																							text-align: center;
-																							display: flex;          /* 启用flex布局 */
-																							justify-content: center; /* 水平居中 */
-																							align-items: center;     /* 垂直居中 - 关键修正 */
-																							">播种设备</div>
-																							<div id="seedingDeviceNum" style="flex:1;height:20%;
-
-																							text-align: center;
-																							display: flex;          /* 启用flex布局 */
-																							justify-content: center; /* 水平居中 */
-																							align-items: center;     /* 垂直居中 - 关键修正 */
-
-																							line-height:28px;
-																							font-size:28px;
-																							color:#00df84;
-																							text-shadow:0 0 3px rgba(14,255,157,.5);
-																							">0</div>
-																						</div>
-																<div class="layui-col-md4" style="height: 100%;">
-																							<div style="flex:1;
-																									height:60%;
-																							background:url('/manager/static/img/store2.png') no-repeat center center;
-																											background-size:60%;
-																											text-align: center;
-																											display: flex;          /* 启用flex布局 */
-																											justify-content: center; /* 水平居中 */
-																											align-items: center;     /* 垂直居中 - 关键修正 */
-																											"></div>
-																							<div style="flex:1;height:20%;
-
-																							text-align: center;
-																							display: flex;          /* 启用flex布局 */
-																							justify-content: center; /* 水平居中 */
-																							align-items: center;     /* 垂直居中 - 关键修正 */
-																							">播种行数</div>
-																							<div id="seedingLineNum" style="flex:1;height:20%;
-
-																							text-align: center;
-																							display: flex;          /* 启用flex布局 */
-																							justify-content: center; /* 水平居中 */
-																							align-items: center;     /* 垂直居中 - 关键修正 */
-
-																							line-height:28px;
-																							font-size:28px;
-																							color:#00df84;
-																							text-shadow:0 0 3px rgba(14,255,157,.5);
-																							">0</div>
-																						</div>
-																<div class="layui-col-md4" style="height: 100%;">
-																							<div style="flex:1;
-																									height:60%;
-																							background:url('/manager/static/img/store3.png') no-repeat center center;
-																											background-size:60%;
-																											text-align: center;
-																											display: flex;          /* 启用flex布局 */
-																											justify-content: center; /* 水平居中 */
-																											align-items: center;     /* 垂直居中 - 关键修正 */
-																											"></div>
-																							<div  style="flex:1;height:20%;
-
-																							text-align: center;
-																							display: flex;          /* 启用flex布局 */
-																							justify-content: center; /* 水平居中 */
-																							align-items: center;     /* 垂直居中 - 关键修正 */
-																							">平均行数</div>
-																							<div id="avgLineNum" style="flex:1;height:20%;
-
-																							text-align: center;
-																							display: flex;          /* 启用flex布局 */
-																							justify-content: center; /* 水平居中 */
-																							align-items: center;     /* 垂直居中 - 关键修正 */
-																							
-																							line-height:28px;
-																							font-size:28px;
-																							color:#00df84;
-																							text-shadow:0 0 3px rgba(14,255,157,.5);
-																							
-																							">0</div>
-																						</div>
-																
-																
-																
-															</div>
-                </div>
+				<div style="width: 100%; height: 100%;">
+				    <!-- 标题：今日统计（保留原有样式） -->
+				    <div style="width: 30%; height: 20%; background: url('/manager/static/img/textTitle.png') no-repeat center center; background-size: 100%; text-align: center; display: flex; justify-content: center; align-items: center; padding-bottom: 15px;">
+				        播种统计
+				    </div>
+				
+				    <!-- 数据表格区域 -->
+				    <div style="flex:1; height:80%; padding: 20px; box-sizing: border-box;">
+				        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 20px;">
+				            
+				            <!-- 第一行：空单元格 + 三个图标（背景图方式，控制大小） -->
+				            <div></div>
+				            <div class="stat-icon" style="background-image: url('/manager/static/img/store1.png');"></div>
+				            <div class="stat-icon" style="background-image: url('/manager/static/img/store2.png');"></div>
+				            <div class="stat-icon" style="background-image: url('/manager/static/img/store3.png');"></div>
+				
+				            <!-- 第二行：空单元格 + 三个文字标签 -->
+				            <div></div>
+				            <div class="stat-label">播种设备</div>
+				            <div class="stat-label">播种亩数</div>
+				            <div class="stat-label">播种粒数</div>
+				
+				            <!-- 第三行：今日统计 -->
+				            <div class="stat-row-label">今日</div>
+				            <div class="stat-value" id="todayDeviceNum">0</div>
+				            <div class="stat-value" id="todayWorkedArea">0</div>
+				            <div class="stat-value" id="todaySeedCount">0</div>
+				
+				            <!-- 第四行：本月统计 -->
+				            <div class="stat-row-label">本月</div>
+				            <div class="stat-value" id="monthDeviceNum">0</div>
+				            <div class="stat-value" id="monthWorkedArea">0</div>
+				            <div class="stat-value" id="monthSeedCount">0</div>
+				
+				            <!-- 第五行：今年统计 -->
+				            <div class="stat-row-label">今年</div>
+				            <div class="stat-value" id="yearDeviceNum">0</div>
+				            <div class="stat-value" id="yearWorkedArea">0</div>
+				            <div class="stat-value" id="yearSeedCount">0</div>
+				        </div>
+				    </div>
+				</div>
             </div>
         </div>
     </div>
@@ -378,14 +269,26 @@ layui.use(function () {
               contentType: "application/json",
               success: function (res) {
 				if (res.code == 0) {
-					screenData = res.data;
+					Object.assign(screenData, res.data);
 					refreshPage();
 					}
 			  }
-          })
+          });
+		  $.ajax({
+              type: 'POST',
+              url: ctx + 'dataMessageDay/getDayData',
+              dataType: "JSON",
+              data: JSON.stringify({}),
+              contentType: "application/json",
+              success: function (res) {
+				if (res.code == 0) {
+					Object.assign(screenData, res.data);
+					}
+			  }
+          });
 		}
 		fetchData();
-		// 每 1 秒刷新一次
+		// 每 10 秒刷新一次
         setInterval(fetchData, 1000 * 10);
 		// 每 10分钟刷新一次定位
         setInterval(getDeviceList, 1000 * 5 * 60);
@@ -838,12 +741,15 @@ layui.use(function () {
            // 例如："4-15": 28
 	           updateChart(screenData.onlineMap);
 				$("#alarmNum").text(0);
-				$("#seedingDeviceNum").text(screenData.seedDeviceCount);
-				$("#seedingLineNum").text(screenData.seedLineCount);
-				if(screenData.seedDeviceCount && screenData.seedDeviceCount!=0){
-					var avg = Math.round(parseInt(screenData.seedLineCount)/parseInt(screenData.seedDeviceCount));
-					$("#avgLineNum").text(avg);
-				}
+				$("#todayDeviceNum").text(screenData.todayDeviceNum);
+				$("#todayWorkedArea").text(screenData.todayWorkedArea);
+				$("#todaySeedCount").text(screenData.todaySeedCount);
+				$("#monthDeviceNum").text(screenData.monthDeviceNum);
+				$("#monthWorkedArea").text(screenData.monthWorkedArea);
+				$("#monthSeedCount").text(screenData.monthSeedCount);
+				$("#yearDeviceNum").text(screenData.yearDeviceNum);
+				$("#yearWorkedArea").text(screenData.yearWorkedArea);
+				$("#yearSeedCount").text(screenData.yearSeedCount);
 
 				const leftData = [
 								
@@ -858,7 +764,7 @@ layui.use(function () {
 				const rightData = [
 								
 								{value:screenData.dq,name:"电驱"},
-								{value:screenData.jkq,name:"监控器"},
+								{value:screenData.jkq,name:"机械"},
 								
 							];
 	

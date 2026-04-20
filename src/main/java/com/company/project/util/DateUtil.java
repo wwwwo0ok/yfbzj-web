@@ -3,6 +3,7 @@ package com.company.project.util;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -95,6 +96,29 @@ public class DateUtil {
     public static long getEndOfTodayTimestamp() {
         LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
         return endOfToday.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+    
+    /**
+     * 传入日期字符串（兼容时分秒），返回该日期的 23:59:59 字符串（格式 yyyy-MM-dd HH:mm:ss）
+     *
+     * @param dateTimeStr 输入的日期字符串，例如 "2014-12-26" 或 "2014-12-26 12:34:56"
+     * @return 该日期的结束时间字符串，例如 "2014-12-26 23:59:59"
+     */
+    public static String getEndOfDayString(String dateTimeStr) {
+        LocalDateTime dateTime = parseDateTime(dateTimeStr);
+        LocalDateTime endOfDay = dateTime.toLocalDate().atTime(LocalTime.MAX);
+        return endOfDay.format(DATETIME_FORMATTER);
+    }
+
+    /**
+     * 传入日期字符串，返回该日期的 23:59:59 对应的时间戳（毫秒）
+     *
+     * @param dateTimeStr 日期字符串
+     * @return 毫秒时间戳
+     */
+    public static long getEndOfDayTimestamp(String dateTimeStr) {
+        LocalDateTime endOfDay = parseDateTime(dateTimeStr).toLocalDate().atTime(LocalTime.MAX);
+        return endOfDay.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     // ================== 互转方法 ==================
@@ -235,5 +259,17 @@ public class DateUtil {
      */
     public static String[] getLastDaysFromToday(int days) {
         return getLastDaysFromDate(getTodayString(), days);
+    }
+    
+    /**
+     * 获取其他日期，1则是明天，-1则是昨天。
+     * @param dayString
+     * @param dayInt
+     * @return
+     */
+    public static String getTheNextDayString(String dayString, int dayInt) {
+        LocalDateTime dateTime = parseDateTime(dayString);
+        LocalDateTime nextDay = dateTime.plusDays(dayInt);
+        return nextDay.toLocalDate().toString(); // yyyy-MM-dd
     }
 }

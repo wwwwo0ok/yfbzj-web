@@ -93,6 +93,9 @@
 	        <if test="query.deviceName != null and query.deviceName != ''">
 	            AND device_name LIKE CONCAT('%', #{query.deviceName}, '%')
 	        </if>
+	        <if test="query.uploadType != null ">
+	            AND upload_type =#{query.uploadType}
+	        </if>
 	        <if test="query.dataTime != null">
 	            AND data_time = #{query.dataTime}
 	        </if>

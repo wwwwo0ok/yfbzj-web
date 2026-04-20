@@ -386,7 +386,7 @@ public class DataElectricSeederMessageEntity extends BaseEntity implements Seria
 	 * 物联上传数据类型
 	 */
 		@TableField("upload_type")
-		private int uploadType;
+		private Integer uploadType;
 
 	/**
 	 * 当前到限里程停止时的剩余路程，4095是无限里程，单位是512米
