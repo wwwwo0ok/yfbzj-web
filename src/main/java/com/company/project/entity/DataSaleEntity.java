@@ -48,9 +48,17 @@ public class DataSaleEntity extends BaseEntity implements Serializable {
     @ExcelProperty(value = "行数", index = 6)
     private Integer machineLines;
 
+    @TableField("address_info")
+    @ExcelProperty(value = "详细地址", index = 7) // 注意：这里index=7，和上面的createTime冲突了！需要调整顺序。
+    private String addressInfo;
+    
     @TableField("product_code")
-    @ExcelIgnore // 激光喷码可能不需要导出，根据业务决定
+    @ExcelProperty(value = "监控器号", index = 8)
     private String productCode;
+    
+    @TableField("sale_date")
+    @ExcelProperty(value = "销售时间", index = 9)
+    private String saleDate;
 
     // 如果 createTime 已提升到基类，则此处删除
     // @TableField("create_time")
@@ -73,9 +81,7 @@ public class DataSaleEntity extends BaseEntity implements Serializable {
     @ExcelIgnore // 内部ID，不需要导出
     private String countryId;
 
-    @TableField("address_info")
-    @ExcelProperty(value = "详细地址", index = 7) // 注意：这里index=7，和上面的createTime冲突了！需要调整顺序。
-    private String addressInfo;
+  
 
     @TableField("machine_model_id")
     @ExcelIgnore

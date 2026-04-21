@@ -2,9 +2,10 @@ package com.company.project.controller;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.naming.spi.DirStateFactory.Result;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.company.project.common.service.ExcelUploadService;
 import com.company.project.common.utils.DataResult;
 import com.company.project.entity.DataSaleEntity;
 import com.company.project.entity.SysAreaEntity;
@@ -49,6 +51,10 @@ public class DataSaleController {
     private DataSaleService dataSaleService;
     @Autowired
     private SysAreaService sysAreaService;
+    
+
+    @Autowired
+    private ExcelUploadService excelUploadService;
     
     /**
     * 跳转到页面
@@ -142,5 +148,20 @@ public class DataSaleController {
                 .sheet("销售信息")
                 .doWrite(dataList);
     }
+    
+    @PostMapping("dataSale/import")
+    public DataResult uploadUser(@RequestParam("file") MultipartFile file) {
+        // 自定义业务处理：比如校验并保存到数据库
+        ExcelUploadService.UploadResult<DataSaleEntity> result = excelUploadService.upload(
+                file,
+                DataSaleEntity.class,
+                dataSaleService::addNewSale
+        );
+         
+        return DataResult.success();
+    }
+    
+    
+    
 
 }

@@ -63,7 +63,7 @@ public class DataMessageDayEntity extends BaseEntity implements Serializable {
 	 * 种子数（计算得来）
 	 */
 		@TableField("seed_count")
-		private Integer seedCount;
+		private Long seedCount;
 
 	/**
 	 * 每公顷种子数（计算得来）

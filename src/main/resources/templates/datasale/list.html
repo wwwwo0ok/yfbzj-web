@@ -154,7 +154,11 @@
   <div class="layui-btn-container oper">
     <button class="layui-btn layui-btn-sm" lay-event="add"  sa:hasPermission="dataSale:add">添加</button>
     <button class="layui-btn layui-btn-sm" lay-event="export"  >导出</button>
+	</button>
     <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" sa:hasPermission="dataSale:delete">删除</button>
+	<button type="button" class="layui-btn demo-class-accept" lay-options="{accept: 'file'}">
+	  <i class="layui-icon layui-icon-upload"></i> 
+	  点击导入
   </div>
 </script>
 <script type="text/html" id="tool">
@@ -169,6 +173,7 @@
   layui.use(function () {
     var table = layui.table;
     var form = layui.form;
+	var upload = layui.upload;
     var layer = layui.layer;
 	var curData = {};
     //加载table
@@ -305,6 +310,23 @@
 	     $('#' + selectId).html('<option value="">' + placeholder + '</option>').prop('disabled', true);
 	   }
 
+	   // 渲染
+	   upload.render({
+	     elem: '.demo-class-accept', // 绑定多个元素
+	     url: ctx + 'dataSale/import', // 此处配置你自己的上传接口即可
+	     accept: 'file', // 普通文件
+	     done: function(res){
+	       layer.msg('上传成功');
+		   //执行搜索重载
+		        tableIns1.reload({
+		          page: {
+		            curr: 1
+		          }
+		        });
+	     }
+	   });
+	   
+	   
     //表头工具
     table.on('toolbar(showTable)', function(obj){
       switch(obj.event){
@@ -470,6 +492,22 @@
     }
 	// 导出方法
 	function exportData() {
+	    // 动态创建一个隐藏的 form 表单
+	    var form = $('<form></form>');
+	    form.attr('method', 'post');
+	    form.attr('action', ctx + 'dataSale/export'); // 根据实际后端路径调整
+	    form.attr('style', 'display:none');
+
+	    // 如果需要传递额外参数（如查询条件），可以添加隐藏字段
+	    // 示例：form.append('<input type="hidden" name="startTime" value="2024-01-01">');
+
+	    // 将表单附加到 body 并提交
+	    $('body').append(form);
+	    form.submit();
+	    form.remove(); // 提交后移除
+	}
+	// 导出方法
+	function importData() {
 	    // 动态创建一个隐藏的 form 表单
 	    var form = $('<form></form>');
 	    form.attr('method', 'post');

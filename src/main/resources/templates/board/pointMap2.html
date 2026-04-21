@@ -48,10 +48,27 @@
 		    justify-content: center;
 		}
 
+		/* 确保 grid 容器列宽稳定 */
+		.stat-grid {
+		    display: grid;
+		    grid-template-columns: 100px 1fr 1fr 1fr;  /* 第一列固定100px，后三列等分 */
+		    gap: 15px;
+		    background: rgba(0,0,0,0.2);
+		    border-radius: 15px;
+		    padding: 20px;
+		}
+
+		/* 保证每个单元格内容不溢出，文字居中 */
+		.stat-icon, .stat-label, .stat-row-label, .stat-value {
+		    text-align: center;
+		    overflow: hidden;
+		    white-space: nowrap;
+		    text-overflow: ellipsis; /* 如果内容过长显示省略号，但通常不会 */
+		}
 		/* 数值样式（绿色大数字，带阴影） */
 		.stat-value {
 		    text-align: center;
-		    font-size: 28px;
+		    font-size: 20px;
 		    font-weight: bold;
 		    color: #00df84;
 		    text-shadow: 0 0 3px rgba(14,255,157,.5);
@@ -62,6 +79,8 @@
 		    align-items: center;
 		    justify-content: center;
 		    line-height: 1.2;
+			white-space: normal;
+			word-break: keep-all; /* 数字不换行 */
 		}
 	</style>
 </head>
@@ -142,7 +161,7 @@
                         margin-bottom: 10px;">
                 <div id="deviceFb" style="width: 100%; height: 100%;"></div>
             </div>
-            <div style="flex: 1.4; background: url('/manager/static/img/chartBg.png') no-repeat center center;
+            <div style="flex: 1.6; background: url('/manager/static/img/chartBg.png') no-repeat center center;
                         background-size: cover;
                         padding: 20px;
                         box-sizing: border-box;
@@ -150,13 +169,13 @@
                 <!-- 新增的右侧第二个下方内容 -->
 				<div style="width: 100%; height: 100%;">
 				    <!-- 标题：今日统计（保留原有样式） -->
-				    <div style="width: 30%; height: 20%; background: url('/manager/static/img/textTitle.png') no-repeat center center; background-size: 100%; text-align: center; display: flex; justify-content: center; align-items: center; padding-bottom: 15px;">
+				    <div style="width: 30%; height: 10%; background: url('/manager/static/img/textTitle.png') no-repeat center center; background-size: 100%; text-align: center; display: flex; justify-content: center; align-items: center; padding-bottom: 15px;">
 				        播种统计
 				    </div>
 				
 				    <!-- 数据表格区域 -->
-				    <div style="flex:1; height:80%; padding: 20px; box-sizing: border-box;">
-				        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 20px;">
+				    <div style="height:90%;width:100%; padding: 20px; box-sizing: border-box;">
+				        <div style="display: grid;  grid-template-columns: 40px 1fr 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 20px;">
 				            
 				            <!-- 第一行：空单元格 + 三个图标（背景图方式，控制大小） -->
 				            <div></div>

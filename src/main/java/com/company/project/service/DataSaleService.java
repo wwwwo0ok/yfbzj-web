@@ -25,5 +25,7 @@ public interface DataSaleService extends IService<DataSaleEntity> {
 	 */
 	DataSaleEntity getByScreenCode(String screenCode);
 
+	DataSaleEntity getByPhone(String phone);
+
 }
 

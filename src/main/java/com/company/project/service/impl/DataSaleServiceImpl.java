@@ -32,11 +32,15 @@ public class DataSaleServiceImpl extends ServiceImpl<DataSaleMapper, DataSaleEnt
     @Transactional
 	public void addNewSale(DataSaleEntity newSale) {
 		
-    	//保存
-		save(newSale);
 		String phone = newSale.getPhone();
 		//检查新增用户
         if(phone!=null) {
+        	
+        	//暂定不支持通过新增的方式修改
+        	DataSaleEntity byPhone = getByPhone(phone);
+        	if(byPhone==null) {
+        		save(newSale);
+        	}
         	
         	//检查是否包含这个user
         	LambdaQueryWrapper<SysUser> queryWrapper = Wrappers.lambdaQuery();
@@ -69,14 +73,16 @@ public class DataSaleServiceImpl extends ServiceImpl<DataSaleMapper, DataSaleEnt
     }
     
 	
-	public void getByPhone(String phone) {
+    @Override
+	public DataSaleEntity getByPhone(String phone) {
 		
 		LambdaQueryWrapper<DataSaleEntity> wrapper  = Wrappers.lambdaQuery();
 		
 		wrapper.eq(StringUtils.isNotBlank(phone),DataSaleEntity::getPhone, phone);
 		
-		List<DataSaleEntity> list = list(wrapper);
+		DataSaleEntity one = getOne(wrapper);
 		
+		return one;
 		
 	}
 	
