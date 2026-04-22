@@ -5,21 +5,26 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -45,6 +50,16 @@ import com.company.project.util.DateUtil;
 @Service("dataElectricSeederMessageService")
 public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectricSeederMessageMapper, DataElectricSeederMessageEntity> implements DataElectricSeederMessageService {
 
+    private static final Logger logger = LoggerFactory.getLogger(DataElectricSeederMessageServiceImpl.class);
+
+    // Constants for locks and limits
+    private static final String SYNC_TODAY_LOCK_KEY = "sync:bzj:message:update:today";
+    private static final String REREAD_LOCK_KEY = "sync:bzj:device:productKey:lock";
+    private static final long LOCK_WAIT_TIME = 5000;
+    private static final long LOCK_LEASE_TIME = 10000;
+    private static final int MAX_DAYS_RANGE = 15;
+    private static final BigDecimal HECTARE_TO_MU_FACTOR = new BigDecimal(15);
+    private static final BigDecimal AREA_CALC_DIVISOR = new BigDecimal(10000000);
 
 	@Autowired
     private AliYunService aliYunService;
@@ -94,150 +109,138 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
     @Override
     @Scheduled(cron = "0 2/5 * * * ?")
     public boolean syncToday() {
-    	
-    	// 定义锁的key，可以根据业务需求调整
-        String lockKey = "sync:bzj:message:update:today";
-        // 锁等待时间(毫秒)，防止线程长时间等待
-        long waitTime = 5000;
-        // 锁持有时间(毫秒)，防止死锁
-        long leaseTime = 10000;
-        
-        RLock lock = redissonClient.getLock(lockKey);
-        
-        // 尝试获取锁，最多等待waitTime毫秒
-        boolean isLocked;
-		try {
-			isLocked = lock.tryLock();
-			if (!isLocked) {
-	            // 获取锁失败
-	            return false;
-	        }
-			
-
-			long timeMillis = System.currentTimeMillis();
-	    	
-			//获取今日累计在线的设备  
-			List<DataBzjDeviceEntity> dqlist = redisDeviceManager.getTodayOnlineDeviceList();
-			
-			dqlist.forEach(this::addAndCheck);
-			
-			//循环调用增量保存
-	        timeMillis = System.currentTimeMillis()- timeMillis ;
-		} finally {
-            // 确保锁被释放
+        RLock lock = redissonClient.getLock(SYNC_TODAY_LOCK_KEY);
+        try {
+            if (!lock.tryLock()) {
+                logger.warn("Failed to acquire lock for syncToday");
+                return false;
+            }
+            long startTime = System.currentTimeMillis();
+            List<DataBzjDeviceEntity> devices = redisDeviceManager.getTodayOnlineDeviceList();
+            devices.forEach(this::addAndCheck);
+            long duration = System.currentTimeMillis() - startTime;
+            logger.info("syncToday completed in {} ms for {} devices", duration, devices.size());
+            return true;
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            logger.error("syncToday interrupted", e);
+            return false;
+        } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
-    	
-    	
-        
-        
-        return true;
     }
+
     /**
      * 同步设备消息
      */
     @Override
     @Transactional
     public boolean syncMessages(String dayString) {
-    	
-		long timeMillis = System.currentTimeMillis();
-		
-		//获取全部的设备
-		List<DataBzjDeviceEntity> dqlist = redisDeviceManager.getAllCachedDevices();
-		
-		dqlist.forEach(li -> this.addAndCheck(li,dayString));
-		
-		//循环调用增量保存
-		timeMillis = System.currentTimeMillis()- timeMillis ;
-    		
-    	
-    	return true;
+        long startTime = System.currentTimeMillis();
+        List<DataBzjDeviceEntity> devices = redisDeviceManager.getAllCachedDevices();
+        devices.forEach(device -> this.addAndCheck(device, dayString));
+        long duration = System.currentTimeMillis() - startTime;
+        logger.info("syncMessages for {} completed in {} ms for {} devices", dayString, duration, devices.size());
+        return true;
     }
-    
 
     @Override
     public boolean addAndCheck(DataBzjDeviceEntity device) {
-    	return addAndCheck(device,DateUtil.getTodayString());
+        return addAndCheck(device, DateUtil.getTodayString());
     }
+
     @Override
-    public boolean addAndCheck(DataBzjDeviceEntity device,String dayString) {
-    	
-    	String startTime = DateUtil.getStartOfDayString(dayString);
-    	String endTime = DateUtil.getEndOfDayString(dayString);
-    	if(DateUtil.isWithinDays(startTime, endTime, 15)) {
-    		return addAndCheck(device,startTime,endTime);
-    	}else {
-    		return false;
-    	}
+    public boolean addAndCheck(DataBzjDeviceEntity device, String dayString) {
+        String startTime = DateUtil.getStartOfDayString(dayString);
+        String endTime = DateUtil.getEndOfDayString(dayString);
+        if (!DateUtil.isWithinDays(startTime, endTime, MAX_DAYS_RANGE)) {
+            logger.warn("Date range exceeds maximum allowed days: {}", MAX_DAYS_RANGE);
+            return false;
+        }
+        return addAndCheck(device, startTime, endTime);
     }
     
     
     @Override
     @Transactional
-    public boolean addAndCheck(DataBzjDeviceEntity device,String startTime,String endTime) {
+    public boolean addAndCheck(DataBzjDeviceEntity device, String startTime, String endTime) {
         List<DataElectricSeederMessageEntity> addMessageList = new ArrayList<>();
         List<DataElectricSeederMessageEntity> deleteMessageList = new ArrayList<>();
 
-        
         // 1. 从阿里云获得数据
-        List<DataElectricSeederMessageEntity> aliyunList = aliYunService.getMessage(device.getDeviceName(), device.getRawdata(), device.getProductKey(),DateUtil.getTimestamp(startTime),DateUtil.getTimestamp(endTime));
+        List<DataElectricSeederMessageEntity> aliyunList = aliYunService.getMessage(device.getDeviceName(), device.getRawdata(), device.getProductKey(), DateUtil.getTimestamp(startTime), DateUtil.getTimestamp(endTime));
         // 2. 本地数据集合
-        List<DataElectricSeederMessageEntity> databaseList = getListByLotId(device.getLotId(),startTime,endTime);
+        List<DataElectricSeederMessageEntity> databaseList = getListByLotId(device.getLotId(), startTime, endTime);
 
-        // ========== 新增：本地重复数据去重 ==========
-        // 按 key 分组，每组只保留一条（这里按 id 降序取最大）
+        // 3. 本地数据去重
+        Map<String, DataElectricSeederMessageEntity> keepMap = removeDuplicates(databaseList, deleteMessageList);
+
+        // 4. 比较阿里云数据和本地数据，确定新增和删除
+        identifyChanges(aliyunList, keepMap, addMessageList, deleteMessageList);
+
+        // 5. 批量保存新增和删除
+        batchSaveAndDelete(addMessageList, deleteMessageList, device);
+
+        return true;
+    }
+
+    /**
+     * 去重本地数据，返回保留的映射，并将重复项加入删除列表
+     */
+    private Map<String, DataElectricSeederMessageEntity> removeDuplicates(List<DataElectricSeederMessageEntity> databaseList, List<DataElectricSeederMessageEntity> deleteMessageList) {
         Map<String, DataElectricSeederMessageEntity> keepMap = new HashMap<>();
         Map<String, List<DataElectricSeederMessageEntity>> groupByKey = databaseList.stream()
                 .collect(Collectors.groupingBy(this::buildUniqueKey));
-        
+
         for (Map.Entry<String, List<DataElectricSeederMessageEntity>> entry : groupByKey.entrySet()) {
             List<DataElectricSeederMessageEntity> records = entry.getValue();
-            // 按 id 降序排序，第一条为要保留的（id 最大）
             records.sort((a, b) -> b.getId().compareTo(a.getId()));
             DataElectricSeederMessageEntity keep = records.get(0);
             keepMap.put(entry.getKey(), keep);
-            // 其余重复记录加入删除集合
             for (int i = 1; i < records.size(); i++) {
                 deleteMessageList.add(records.get(i));
             }
         }
-        // =======================================
+        return keepMap;
+    }
 
-        // 3. 构建本地去重后的映射（用于比较）
-        // 注意：这里直接用 keepMap，而不是原始的 databaseList
+    /**
+     * 比较阿里云数据和本地数据，确定新增和删除
+     */
+    private void identifyChanges(List<DataElectricSeederMessageEntity> aliyunList, Map<String, DataElectricSeederMessageEntity> keepMap,
+                                 List<DataElectricSeederMessageEntity> addMessageList, List<DataElectricSeederMessageEntity> deleteMessageList) {
+        Set<String> aliyunKeySet = aliyunList.stream()
+                .map(this::buildUniqueKey)
+                .collect(Collectors.toSet());
 
-        // 4. 记录阿里云中存在的所有 key
-        Set<String> aliyunKeySet = new HashSet<>();
-
-        // 5. 遍历阿里云数据，判断本地去重后的映射中是否存在
         for (DataElectricSeederMessageEntity aliyun : aliyunList) {
             String key = buildUniqueKey(aliyun);
-            aliyunKeySet.add(key);
             if (!keepMap.containsKey(key)) {
                 addMessageList.add(aliyun);
             }
         }
 
-        // 6. 遍历本地去重后的映射，判断是否在阿里云中不存在（多余）
         for (Map.Entry<String, DataElectricSeederMessageEntity> entry : keepMap.entrySet()) {
             String key = entry.getKey();
             if (!aliyunKeySet.contains(key)) {
-                deleteMessageList.add(entry.getValue());  // 保留的这条也要删除
+                deleteMessageList.add(entry.getValue());
             }
         }
+    }
 
-        // 7. 批量保存新增
+    /**
+     * 批量保存新增和删除
+     */
+    private void batchSaveAndDelete(List<DataElectricSeederMessageEntity> addMessageList, List<DataElectricSeederMessageEntity> deleteMessageList, DataBzjDeviceEntity device) {
         if (!addMessageList.isEmpty()) {
-            addMessageList.forEach(li -> addNewMessage(li, device));
+            addMessageList.forEach(entity -> addNewMessage(entity, device));
         }
-        // 8. 批量删除（包括重复多余的和阿里云没有的 key 对应的记录）
         if (!deleteMessageList.isEmpty()) {
-            deleteMessageList.forEach(li -> li.setStatus(1));
+            deleteMessageList.forEach(entity -> entity.setStatus(1));
             updateBatchById(deleteMessageList);
         }
-        return true;
     }
 
     /**
@@ -316,68 +319,44 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	}
 	@Override
 	public boolean reRead(List<DataBzjDeviceEntity> paramEntity) {
-		
-		// 定义锁的key，可以根据业务需求调整
-        String lockKey = "sync:bzj:device:productKey:lock";
-        // 锁等待时间(毫秒)，防止线程长时间等待
-        long waitTime = 5000;
-        // 锁持有时间(毫秒)，防止死锁
-        long leaseTime = 10000;
-        
-        
-        RLock lock = redissonClient.getLock(lockKey);
-        
-        // 尝试获取锁，最多等待waitTime毫秒
-        boolean isLocked;
-		try {
-			isLocked = lock.tryLock();
-			if (!isLocked) {
-	            // 获取锁失败
-	            return false;
-	        }
-			paramEntity.forEach(this::reRead);
-		} finally {
-            // 确保锁被释放
+        RLock lock = redissonClient.getLock(REREAD_LOCK_KEY);
+        try {
+            if (!lock.tryLock(LOCK_WAIT_TIME, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+                logger.warn("Failed to acquire lock for reRead");
+                return false;
+            }
+            paramEntity.forEach(this::reRead);
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("reRead interrupted", e);
+            return false;
+        } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
-		
-		return true;
 	}
 	
-	
-	@Transactional(rollbackFor = Exception.class) // 1. 将事务注解移到这里
+	@Transactional(rollbackFor = Exception.class)
     @Override
     public boolean reRead(DataBzjDeviceEntity paramEntit) {
-		
-
         List<DataElectricSeederMessageEntity> list = getListByLotId(paramEntit.getLotId());
-
-        if (list == null || list.isEmpty()) {
-            return false; // 没有数据需要处理，直接返回
+        if (CollectionUtils.isEmpty(list)) {
+            return false;
         }
-
-        // 2. 循环处理，reSave 不再需要独立事务
         list.forEach(li -> addNewMessage(li, paramEntit));
-        
         return true;
     }
-	@Transactional(rollbackFor = Exception.class) // 1. 将事务注解移到这里
-	@Override
-	public boolean reRead(DataBzjDeviceEntity paramEntit,String messageId) {
-		
-     
 
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public boolean reRead(DataBzjDeviceEntity paramEntit, String messageId) {
 		DataElectricSeederMessageEntity byId = getById(messageId);
-		
-		if (byId == null ) {
-			return false; // 没有数据需要处理，直接返回
+		if (byId == null) {
+			return false;
 		}
-		
-		// 2. 循环处理，reSave 不再需要独立事务
 		addNewMessage(byId, paramEntit);
-		
 		return true;
 	}
     /**
@@ -448,72 +427,59 @@ public class DataElectricSeederMessageServiceImpl extends ServiceImpl<DataElectr
 	 * @param entity
 	 */
 	public void calculateData(DataElectricSeederMessageEntity entity) {
-		
-		Integer sowLine = entity.getSowLine();
 		/**
 		 * 种子数量
 		 */
 		List<DataElectricSeederMessageLineEntity> lines = entity.getLines();
-		  // 初始化总和为 BigDecimal.ZERO
-		int totalSeedCount = 0;
+		int totalSeedCount = Optional.ofNullable(lines)
+				.orElse(Collections.emptyList())
+				.stream()
+				.filter(line -> line != null && line.getSeedNum() != null)
+				.mapToInt(DataElectricSeederMessageLineEntity::getSeedNum)
+				.sum();
+		entity.setSeedCount(totalSeedCount);
 
-	    // 确保 lines 不为 null，然后进行求和计算
-	    if (lines != null && !lines.isEmpty()) {
-	        totalSeedCount = lines.stream() // 1. 将列表转换为流
-	                .filter(line -> line != null && line.getSeedNum() != null) // 2. 过滤掉null的行和seedCount为null的行，防止空指针异常
-	                .mapToInt(DataElectricSeederMessageLineEntity::getSeedNum) // 3. 提取每个对象的 seedCount 属性，并转换为 IntStream
-	                .sum(); // 4. 对流中的所有整数求和
-	    }
-	    entity.setSeedCount(totalSeedCount);
-	    /**
-	     * 每公顷种子数
-	     */
-	    // 提取参数并处理 null 值，提供默认值 0
-	    Integer sowDistance = entity.getSowDistance();
-	    Integer sowingWidth = entity.getSowingWidth();
+		/**
+		 * 每公顷种子数
+		 */
+		Integer sowDistance = entity.getSowDistance();
+		Integer sowingWidth = entity.getSowingWidth();
+		BigDecimal areaInHectares = BigDecimal.ZERO;
+		if (sowDistance != null && sowDistance > 0 && sowingWidth != null && sowingWidth > 0) {
+			BigDecimal distance = new BigDecimal(sowDistance);
+			BigDecimal width = new BigDecimal(sowingWidth);
+			areaInHectares = distance.multiply(width).divide(AREA_CALC_DIVISOR, 4, RoundingMode.HALF_UP);
+		}
 
-	    // 使用 BigDecimal 进行精确计算，避免整数除法精度丢失
-	    BigDecimal areaInHectares = BigDecimal.ZERO;
-	    if (sowDistance > 0 && sowingWidth > 0) {
-	        // 面积（公顷） = (距离(米) * 宽度(毫米)) / 10,000,000
-	        // 解释：米 * 毫米 = 0.001 平方米，所以除以 10,000,000 得到公顷（因为 1 公顷 = 10,000 平方米）
-	        BigDecimal distance = new BigDecimal(sowDistance);
-	        BigDecimal width = new BigDecimal(sowingWidth);
-	        BigDecimal divisor = new BigDecimal(10000000); // 10,000,000
-	        areaInHectares = distance.multiply(width).divide(divisor, 4, RoundingMode.HALF_UP); // 保留4位小数
-	    }
+		if (areaInHectares.compareTo(BigDecimal.ZERO) > 0) {
+			BigDecimal totalSeeds = new BigDecimal(totalSeedCount);
+			BigDecimal seedCountPerHectare = totalSeeds.divide(areaInHectares, 0, RoundingMode.HALF_UP);
+			entity.setSeedCountHectare(seedCountPerHectare.intValue());
+		} else {
+			entity.setSeedCountHectare(0);
+		}
 
-	    // 计算每公顷种子数（播种密度）
-	    if (areaInHectares.compareTo(BigDecimal.ZERO) > 0) { // 确保面积大于0
-	        BigDecimal totalSeeds = new BigDecimal(totalSeedCount);
-	        BigDecimal seedCountPerHectare = totalSeeds.divide(areaInHectares, 0, RoundingMode.HALF_UP); // 保留0位小数，四舍五入
-	        entity.setSeedCountHectare(seedCountPerHectare.intValue());
-	    } else {
-	        entity.setSeedCountHectare(0); // 面积为零时，设置密度为0
-	    }
-
-	    /**
-	     * 作业面积（亩）
-	     */
-	    // 1 公顷 = 15 亩
-	    BigDecimal workedAreaInMu = areaInHectares.multiply(new BigDecimal(15));
-	    entity.setWorkedArea(workedAreaInMu.toString()); // 转换为 int，注意可能丢失小数部分
+		/**
+		 * 作业面积（亩）
+		 */
+		BigDecimal workedAreaInMu = areaInHectares.multiply(HECTARE_TO_MU_FACTOR);
+		entity.setWorkedArea(workedAreaInMu.toString());
 
 		/**
 		 * 株距
 		 */
 		Integer aSowInterval = entity.getASowInterval();
 		Integer bSowInterval = entity.getBSowInterval();
-		String sowIntervalString = "";
-		if(aSowInterval!=0 && bSowInterval!=0) {
-			sowIntervalString = aSowInterval + "/" + bSowInterval ;
-		}else if(aSowInterval==0) {
-			sowIntervalString = Integer.toString(bSowInterval) ;
-		}else if(bSowInterval==0) {
-			sowIntervalString = Integer.toString(aSowInterval) ;
-		}else {
-			sowIntervalString = "0";
-		}
+		String sowIntervalString = Optional.ofNullable(aSowInterval)
+				.filter(a -> a != 0)
+				.map(a -> Optional.ofNullable(bSowInterval)
+						.filter(b -> b != 0)
+						.map(b -> a + "/" + b)
+						.orElse(String.valueOf(a)))
+				.orElse(Optional.ofNullable(bSowInterval)
+						.filter(b -> b != 0)
+						.map(String::valueOf)
+						.orElse("0"));
 		entity.setSowInterval(sowIntervalString);
 	}
 
