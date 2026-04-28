@@ -33,11 +33,12 @@ public class DataSaleServiceImpl extends ServiceImpl<DataSaleMapper, DataSaleEnt
 	public void addNewSale(DataSaleEntity newSale) {
 		
 		String phone = newSale.getPhone();
+		String brandNumber = newSale.getBrandNumber();
 		//检查新增用户
-        if(phone!=null) {
+        if(phone!=null&&brandNumber!=null) {
         	
         	//暂定不支持通过新增的方式修改
-        	DataSaleEntity byPhone = getByPhone(phone);
+        	DataSaleEntity byPhone = getByBrandNumber(phone);
         	if(byPhone==null) {
         		save(newSale);
         	}
@@ -85,5 +86,21 @@ public class DataSaleServiceImpl extends ServiceImpl<DataSaleMapper, DataSaleEnt
 		return one;
 		
 	}
+    /**
+     * 通过大架号查询
+     * @param phone
+     * @return
+     */
+    public DataSaleEntity getByBrandNumber(String brandNumber) {
+    	
+    	LambdaQueryWrapper<DataSaleEntity> wrapper  = Wrappers.lambdaQuery();
+    	
+    	wrapper.eq(StringUtils.isNotBlank(brandNumber),DataSaleEntity::getBrandNumber, brandNumber);
+    	
+    	DataSaleEntity one = getOne(wrapper);
+    	
+    	return one;
+    	
+    }
 	
 }

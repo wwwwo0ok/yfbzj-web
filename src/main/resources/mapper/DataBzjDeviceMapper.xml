@@ -85,6 +85,50 @@
 	        </if>
     	</where>
 	</select>
+	<select id="getSelectList" 
+	        parameterType="com.company.project.entity.DataBzjDeviceEntity" 
+	        resultMap="dataBzjDeviceMap">
+	    SELECT
+	        sale.buyer AS username,
+	        sale.address_info AS address,
+	        sale.phone AS telephone,
+	        device.*
+	    FROM
+	        data_bzj_device device
+	    LEFT JOIN
+	        data_sale sale ON device.device_name = sale.product_code
+	    <where>
+	        <!-- 设备名称（非空判断，支持模糊查询） -->
+	        <if test="query.deviceName != null and query.deviceName != ''">
+	            AND device.device_name LIKE CONCAT('%', #{query.deviceName}, '%')
+	        </if>
+	
+	        <!-- 设备状态（支持多选列表，优先使用列表） -->
+	        <if test="query.deviceStatusList != null and query.deviceStatusList.size() > 0">
+	            AND device.device_status IN
+	            <foreach collection="query.deviceStatusList" item="status" open="(" separator="," close=")">
+	                #{status}
+	            </foreach>
+	        </if>
+	        <!-- 若没有多选列表，则回退到单个状态值 -->
+	        <if test="(query.deviceStatusList == null or query.deviceStatusList.size() == 0) 
+	                  and query.deviceStatus != null and query.deviceStatus != ''">
+	            AND device.device_status = #{query.deviceStatus}
+	        </if>
+	
+	        <!-- 设备类型（支持多选列表，优先使用列表） -->
+	        <if test="query.deviceTypeList != null and query.deviceTypeList.size() > 0">
+	            AND device.device_type IN
+	            <foreach collection="query.deviceTypeList" item="type" open="(" separator="," close=")">
+	                #{type}
+	            </foreach>
+	        </if>
+	        <if test="(query.deviceTypeList == null or query.deviceTypeList.size() == 0) 
+	                  and query.deviceType != null and query.deviceType != ''">
+	            AND device.device_type = #{query.deviceType}
+	        </if>
+	    </where>
+	</select>
 
 	<select id="pointMap" parameterType="com.company.project.entity.DataBzjDeviceEntity" resultType="java.util.Map">
     SELECT 

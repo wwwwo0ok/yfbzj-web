@@ -21,6 +21,7 @@
         <result property="countryId" column="country_id"/>
         <result property="machineModelId" column="machine_model_id"/>
         <result property="saleStatus" column="sale_status"/>
+        <result property="saleDesc" column="sale_desc"/>
     </resultMap>
 
 

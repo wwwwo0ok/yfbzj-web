@@ -150,6 +150,7 @@ public class DataSaleController {
     }
     
     @PostMapping("dataSale/import")
+    @ResponseBody
     public DataResult uploadUser(@RequestParam("file") MultipartFile file) {
         // 自定义业务处理：比如校验并保存到数据库
         ExcelUploadService.UploadResult<DataSaleEntity> result = excelUploadService.upload(

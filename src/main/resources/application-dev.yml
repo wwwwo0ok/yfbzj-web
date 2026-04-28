@@ -27,8 +27,8 @@ sa-token:
     port: 6379
     password: yfredis123456
     database: 9
-  timeout: 1800                     # Token 有效期，单位秒（30分钟）
-  active-timeout: 1800
+  timeout: 86400                   # Token 有效期，单位秒（30分钟）
+  active-timeout: 86400
   # 如果希望每次操作自动续期，可以去掉 active-timeout 或设置 -1
 
 # 文件上传目录

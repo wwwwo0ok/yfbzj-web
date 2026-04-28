@@ -63,6 +63,13 @@ public interface DataBzjDeviceService extends IService<DataBzjDeviceEntity> {
 	 */
 	IPage<DataBzjDeviceEntity> selectPage(DeviceAndSaleQueryDTO dataDto);
 
+	/**
+	 * 复合查询
+	 * @param dataBzjDevice
+	 * @return
+	 */
+	List<DataBzjDeviceEntity> selectList(DataBzjDeviceEntity dataBzjDevice);
+
 
 }
 

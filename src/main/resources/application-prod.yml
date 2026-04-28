@@ -26,7 +26,8 @@ sa-token:
     port: 6379
     password: yfredis123456
     database: 1
-  timeout: 1800 # Token 有效期，单位秒（30分钟）
+  timeout: 86400 # Token 有效期，单位秒（30分钟）
+  active-timeout: 86400 
 file:
   #文件上传目录 绝对路径 末尾请加 /
   path: F:/files/ #windows

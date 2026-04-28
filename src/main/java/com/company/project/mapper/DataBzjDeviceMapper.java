@@ -25,5 +25,7 @@ public interface DataBzjDeviceMapper extends BaseMapper<DataBzjDeviceEntity> {
 	
 	IPage<DataBzjDeviceEntity> getSelect(
 			Page<DataBzjDeviceEntity> page, @Param("query")DeviceAndSaleQueryDTO dataDto);
+	List<DataBzjDeviceEntity> getSelectList(
+			@Param("query")DataBzjDeviceEntity dataDto);
 	
 }

@@ -390,5 +390,10 @@ public class DataBzjDeviceServiceImpl extends ServiceImpl<DataBzjDeviceMapper, D
     	IPage<DataBzjDeviceEntity> select = getBaseMapper().getSelect(page,dataDto);
     	return select;
     }
+    @Override
+    public List<DataBzjDeviceEntity> selectList(DataBzjDeviceEntity dataDto) {
+    	List<DataBzjDeviceEntity> select = getBaseMapper().getSelectList(dataDto);
+    	return select;
+    }
     
 }

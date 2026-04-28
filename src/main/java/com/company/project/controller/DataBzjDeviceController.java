@@ -266,17 +266,19 @@ public class DataBzjDeviceController {
 			return DataResult.success();
 		}
 		
-    	LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
-    	//查询条件示例
-    	queryWrapper
-    	.in(DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceTypeList())
-    	.in(DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatusList())
-    	.isNotNull(DataBzjDeviceEntity::getBaiduX)
-    	.isNotNull(DataBzjDeviceEntity::getBaiduY)
-    	.orderByDesc(DataBzjDeviceEntity::getLotId);
+//    	LambdaQueryWrapper<DataBzjDeviceEntity> queryWrapper = Wrappers.lambdaQuery();
+//    	//查询条件示例
+//    	queryWrapper
+//    	.in(DataBzjDeviceEntity::getDeviceType,dataBzjDevice.getDeviceTypeList())
+//    	.in(DataBzjDeviceEntity::getDeviceStatus,dataBzjDevice.getDeviceStatusList())
+//    	.isNotNull(DataBzjDeviceEntity::getBaiduX)
+//    	.isNotNull(DataBzjDeviceEntity::getBaiduY)
+//    	.orderByDesc(DataBzjDeviceEntity::getLotId);
+//    	
+//    	
+//    	List<DataBzjDeviceEntity> list = dataBzjDeviceService.list(queryWrapper);
     	
-    	
-    	List<DataBzjDeviceEntity> list = dataBzjDeviceService.list(queryWrapper);
+    	List<DataBzjDeviceEntity> list = dataBzjDeviceService.selectList(dataBzjDevice);
     	
         
         return DataResult.success(list);

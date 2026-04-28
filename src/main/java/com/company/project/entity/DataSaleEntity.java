@@ -59,6 +59,9 @@ public class DataSaleEntity extends BaseEntity implements Serializable {
     @TableField("sale_date")
     @ExcelProperty(value = "销售时间", index = 9)
     private String saleDate;
+    @TableField("sale_desc")
+    @ExcelProperty(value = "备注", index = 10)
+    private String saleDesc;
 
     // 如果 createTime 已提升到基类，则此处删除
     // @TableField("create_time")

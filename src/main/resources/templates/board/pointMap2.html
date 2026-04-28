@@ -263,20 +263,6 @@ layui.use(function () {
 	   
 	   //定义一个控件类【重点：自定义控件】
 		  
-		  //电驱列表
-		  var dq_data = [];
-		  [
-		  {username:"张三",telephone:13311111111,iotId: 'xhtljqDAzglHhn8bXYdxh25y00',x:128.615,y:47.721},
-		  {username:"李四",telephone:13311111111,iotId: 'xXM2cIG3XLKH5okJ4lYGh25y00',x:128.115,y:47.461},
-		  {username:"王五",telephone:13311111111,iotId: 'FuTuJY7o8BUKHn4PrmvGh25y00',x:128.265,y:46.931},
-		  {username:"赵六",telephone:13311111111,iotId: 'T4VQOs5wDDQgDWnuuXb2h25y00',x:128.935,y:47.121},
-		  {username:"冯七",telephone:13311111111,iotId: "9JOryjGUWZCzko0yMOSRh25y00",x:128.315,y:47.701},
-		  {username:"朱八",telephone:13311111111,iotId: "9tsYtF3yEQp2jvkzNhrfh25y00",x:129.115,y:48.921},
-		  {username:"严九",telephone:13311111111,iotId: 'qAeaIeni4x7J1CJKetj0h25y00',x:128.235,y:47.211},
-		  {username:"牛二",telephone:13311111111,iotId: 'uloLycpuBkgKzstaIGcxh25y00',x:128.673,y:47.321},
-		  {username:"孙一一",telephone:13311111111,iotId: 'U2yT4oqxVjB1yVGFqMXVh25y00',x:128.235,y:47.741},
-		  {username:"贾千户",telephone:13311111111,iotId: 'q3m0avOphryyzOCn4aefh25y00',x:128.605,y:47.763},
-		  ]
 		  
 // 定时获取数据并更新页面
         function fetchData() {
@@ -434,10 +420,6 @@ layui.use(function () {
 								    <div class="custom-info-window">
 								        <div class="info-header">${device.username}的播种机</div>
 								        <div class="info-content">
-								            <div class="info-row">
-								                <div class="info-label">设备ID:</div>
-								                <div class="info-value">${device.lotId}</div>
-								            </div>
 								            <div class="info-row">
 								                <div class="info-label">机器名称:</div>
 								                <div class="info-value">${device.deviceName}</div>
