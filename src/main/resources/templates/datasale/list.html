@@ -72,11 +72,6 @@
 	  	                            <div class="layui-input-inline">
 	  	                                <select id="provinceId" name="provinceId" lay-filter="provinceFilter">
 	  	                                    <option value=""></option>
-	  	                                    <option value="0">写作</option>
-	  	                                    <option value="1">阅读</option>
-	  	                                    <option value="2">游戏</option>
-	  	                                    <option value="3">音乐</option>
-	  	                                    <option value="4">旅行</option>
 	  	                                </select>
 	  	                            </div>
 	  	                        </div>
@@ -85,11 +80,6 @@
 	  	                            <div class="layui-input-inline">
 	  	                                <select id="cityId" name="cityId"  lay-filter="cityFilter">
 	  	                                    <option value=""></option>
-	  	                                    <option value="0">写作</option>
-	  	                                    <option value="1">阅读</option>
-	  	                                    <option value="2">游戏</option>
-	  	                                    <option value="3">音乐</option>
-	  	                                    <option value="4">旅行</option>
 	  	                                </select>
 	  	                            </div>
 	  	                        </div>
@@ -98,11 +88,6 @@
 	  	                            <div class="layui-input-inline">
 	  	                                <select id="countryId" name="countryId"  lay-filter="countryFilter">
 	  	                                    <option value=""></option>
-	  	                                    <option value="0">写作</option>
-	  	                                    <option value="1">阅读</option>
-	  	                                    <option value="2">游戏</option>
-	  	                                    <option value="3">音乐</option>
-	  	                                    <option value="4">旅行</option>
 	  	                                </select>
 	  	                            </div>
 	  	                        </div>
@@ -176,6 +161,7 @@
 	var upload = layui.upload;
     var layer = layui.layer;
 	var curData = {};
+
     //加载table
     var tableIns1 = table.render({
       elem: '#showTable'
@@ -471,6 +457,9 @@
                       , "machineModelId": data.machineModelId
                       , "addressInfo": data.addressInfo
                       , "saleStatus": data.saleStatus
+                      , "provinceId": data.provinceId
+                      , "cityId": data.cityId
+                      , "countryId": data.countryId
                   });
       }, 200);
     }
